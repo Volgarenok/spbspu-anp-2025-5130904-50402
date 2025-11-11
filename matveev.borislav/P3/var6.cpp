@@ -1,8 +1,9 @@
 #include <iostream>
+#include <fstream>
 namespace matveev
 {
-  void rMatrix(int& rows, int& cols);
-  void wMatrix(int** matrix, int rows, int cols);
+  void rMatrix(int** matrix, int& rows, int& cols, const char* filename);
+  void wMatrix(int** matrix, int rows, int cols, const char* filename);
   int** allocMatrix(int rows, int cols);
   void rm(int** matrix, int rows);
   void spiral(int** matrix, int rows, int cols);
@@ -11,31 +12,41 @@ namespace matveev
 int main()
 {
   int rows = 0, cols = 0;
-  matveev::rMatrix(rows, cols);
-  int** matrix = matveev::allocMatrix(rows, cols);
+  int** matrix = new int*[100];
+  matveev::rMatrix(matrix, rows, cols, "input.txt");
   matveev::spiral(matrix, rows, cols);
-  matveev::wMatrix(matrix, rows, cols);
+  matveev::wMatrix(matrix, rows, cols, "output.txt");
   matveev::rm(matrix, rows);
 return 0;
 }
 
 namespace matveev
 {
-  void rMatrix(int& rows, int& cols)
+  void rMatrix(int** matrix, int& rows, int& cols, const char* filename)
   {
-    std::cin >> rows >> cols;
-  }
-  void wMatrix(int** matrix, int rows, int cols)
-  {
-    for (int i = 0; i < rows; ++i) {
-      for (int j = 0; j < cols; ++j) {
-        if (j > 0){
-           std::cout << " ";
-        }
-        std::cout << matrix[i][j];
-      }
-      std::cout << "\n";
+  std::ifstream file(filename);
+  file >> rows >> cols;
+  for (int i = 0; i < rows; ++i) {
+    matrix[i] = new int[cols];
+    for (int j = 0; j < cols; ++j) {
+      file >> matrix[i][j];
     }
+  }
+  file.close();
+  }
+  void wMatrix(int** matrix, int rows, int cols, const char* filename)
+  {
+  std::ofstream file(filename);
+  for (int i = 0; i < rows; ++i) {
+    for (int j = 0; j < cols; ++j) {
+      if (j > 0) {
+        file << " ";
+      }
+      file << matrix[i][j];
+    }
+    file << "\n";
+  }
+  file.close();
   }
   int** allocMatrix(int rows, int cols)
   {
