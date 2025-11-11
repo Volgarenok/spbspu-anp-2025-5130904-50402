@@ -4,6 +4,7 @@ namespace matveev
   void rMatrix(int** matrix, int& rows, int& cols);
   void wMatrix(int** matrix, int rows, int cols);
   int** allocMatrix(int rows, int cols);
+  void rm(int** matrix, int rows);
 
 }
 
@@ -41,6 +42,13 @@ namespace matveev
       }
     }
     return matrix;
+  }
+  void rm(int** matrix, int rows)
+  {
+    for (int i = 0; i < rows; ++i) {
+      delete[] matrix[i];
+    }
+    delete[] matrix;
   }
 
 }
