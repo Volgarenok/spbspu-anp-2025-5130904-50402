@@ -1,7 +1,34 @@
 #include <iostream>
+namespace matveev
+{
+  void rMatrix(int** matrix, int& rows, int& cols);
+  void wMatrix(int** matrix, int rows, int cols);
+
+}
 
 int main()
 {
 
 return 0;
 }
+
+namespace matveev
+{
+  void rMatrix(int** matrix, int& rows, int& cols)
+  {
+    std::cin >> rows >> cols;
+  }
+  void wMatrix(int** matrix, int rows, int cols)
+  {
+    for (int i = 0; i < rows; ++i) {
+      for (int j = 0; j < cols; ++j) {
+        if (j > 0){
+           std::cout << " ";
+        }
+        std::cout << matrix[i][j];
+      }
+    }
+    std::cout << "\n";
+  }
+}
+
