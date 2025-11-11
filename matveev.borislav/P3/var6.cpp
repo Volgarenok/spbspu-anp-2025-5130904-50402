@@ -3,6 +3,7 @@ namespace matveev
 {
   void rMatrix(int** matrix, int& rows, int& cols);
   void wMatrix(int** matrix, int rows, int cols);
+  int** allocMatrix(int rows, int cols);
 
 }
 
@@ -30,5 +31,16 @@ namespace matveev
     }
     std::cout << "\n";
   }
-}
+  int** allocMatrix(int rows, int cols)
+  {
+  int** matrix = new int*[rows];
+    for (int i = 0; i < rows; ++i) {
+      matrix[i] = new int[cols];
+      for (int j = 0; j < cols; ++j) {
+        std::cin >> matrix[i][j];
+      }
+    }
+    return matrix;
+  }
 
+}
