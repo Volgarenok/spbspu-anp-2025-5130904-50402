@@ -10,6 +10,7 @@ namespace matveev
 
   void rMatrixDin(int matrix[][100], int& rows, int& cols, const char* filename);
   void wMatrixDin(int matrix[][100], int rows, int cols, const char* filename);
+  void spiralDin(int matrix[][100], int rows, int cols);
 }
 
 int main(int argc, char* argv[])
@@ -21,6 +22,7 @@ int main(int argc, char* argv[])
   if (num == 1) {
     int matrix[100][100] = {0};
   matveev::rMatrixDin(matrix, rows, cols, input);
+  matveev::spiralDin(matrix, rows, cols);
   matveev::wMatrixDin(matrix, rows, cols, output);
   } else if (num == 2) {
   int** matrix = new int*[100];
@@ -133,5 +135,35 @@ void spiral(int** matrix, int rows, int cols)
     file << "\n";
   }
   file.close();
+  }
+  void spiralDin(int matrix[][100], int rows, int cols)
+{
+  int up_r = 0, left_c = 0;
+  int down_r = rows - 1, right_c = cols - 1;
+  int counter = 1;
+  while (up_r <= down_r && left_c <= right_c) {
+    for (int i = left_c; i <= right_c; ++i) {
+      matrix[down_r][i] += counter++;
+    }
+    down_r--;
+    if (left_c <= right_c) {
+      for (int i = down_r; i >= up_r; --i) {
+        matrix[i][right_c] += counter++;
+      }
+      right_c--;
+    }
+    if (up_r <= down_r) {
+      for (int i = right_c; i >= left_c; --i) {
+        matrix[up_r][i] += counter++;
+      }
+      up_r++;
+    }
+    if (left_c <= right_c) {
+      for (int i = up_r; i <= down_r; ++i) {
+        matrix[i][left_c] += counter++;
+      }
+      left_c++;
+    }
+  }
   }
 }
