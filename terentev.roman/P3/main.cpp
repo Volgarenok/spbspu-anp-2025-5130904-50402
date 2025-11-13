@@ -17,7 +17,7 @@ int main(int argc, char ** argv)
         std::cerr << "Too many arguments\n";
         return 1;
     }
-    if (!anum (argv[1])) {
+    if (anum (argv[1])) {
         std::cerr << "First parameter is not a number\n";
         return 1;
     }
@@ -29,5 +29,10 @@ int main(int argc, char ** argv)
 }
 
 bool anum(char * a) {
-
+    for (size_t i = 0; i < std::strlen(a); ++i) {
+        if (!std::isdigit(static_cast<unsigned char>(a[i]))) {
+            return 1;
+        }
+    }
+    return 0;
 }
