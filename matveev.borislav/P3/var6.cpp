@@ -9,14 +9,21 @@ namespace matveev
   void spiral(int** matrix, int rows, int cols);
 }
 
-int main()
+int main(int argc, char* argv[])
 {
   int rows = 0, cols = 0;
+  int num = argv[1][0] - '0';
+  const char* input = argv[2];
+  const char* output = argv[3];
+  if (num == 1) {
+    int matrix[100][100] = {0};
+  } else if (num == 2) {
   int** matrix = new int*[100];
-  matveev::rMatrix(matrix, rows, cols, "input.txt");
+  matveev::rMatrix(matrix, rows, cols, input);
   matveev::spiral(matrix, rows, cols);
-  matveev::wMatrix(matrix, rows, cols, "output.txt");
+  matveev::wMatrix(matrix, rows, cols, output);
   matveev::rm(matrix, rows);
+  }
 return 0;
 }
 
