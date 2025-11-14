@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
   }
   std::ifstream input(argv[2]);
   std::ofstream output(argv[3]);
-  int n = 0, m = 0;
+  size_t n = 0, m = 0;
   if (!input || !(input >> n >> m) || n < 0 || m < 0 ||
     n == 1 || m == 1 || (n * m)>10000) {
     std::cerr << "Array cannot exist\n";
@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
     output << kolmin << "\n" << kolmax << "\n";
   }
   else {
-    int* a = (int*)malloc(n * m * sizeof(int));
+    int* a = static_cast<int*>(malloc(n * m * sizeof(int)));
     if (!a) {
       std::cerr << "bad_alloc\n";
       return 3;
