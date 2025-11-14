@@ -34,14 +34,22 @@ int main(int argc, char ** argv)
   }
   if (std::stoi(argv[1]) == 1) {
     int a[10000] = {};
-    for (size_t i = 0; i < n; ++i){
+    size_t count = 0;
+    for (size_t i = 0; i < n*m; ++i){
       input >> a[i];
+      count = count + 1;
       if (!input) {
-        std::cerr << "failed to read array element\n";
+        std::cerr << "Failed to read array element\n";
         return 2;
       }
     }
+    if (count != n * m) {
+      std::cerr << " Invalid number of array elements\n";
+      return 2;
+    }
     size_t ix = m + 1;
+    size_t kolmin = 0;
+    size_t kolmax = 0;
     int min = a[m + 1];
     int max = a[m + 1];
     while (ix < n * m - 1 - m) {
@@ -59,6 +67,14 @@ int main(int argc, char ** argv)
           max = a[ix];
         }
         ix = ix + 1;
+      }
+    }
+    for (size_t p = m; p < n * m - m; ++p) {
+      if (a[p] == min && p % m != 0 && p % m != m - 1) {
+        kolmin = kolmin + 1;
+      }
+      if (a[p] == max && p % m != 0 && p % m != m - 1) {
+        kolmax = kolmax + 1;
       }
     }
 
@@ -70,17 +86,25 @@ int main(int argc, char ** argv)
       std::cerr << "bad_alloc\n";
       return 3;
     }
-    for (size_t i = 0; i < n; ++i) {
+    size_t count = 0;
+    for (size_t i = 0; i < n*m; ++i) {
       input >> a[i];
+      count = count + 1;
       if (!input) {
-        std::cerr << "failed to read array element\n";
+        std::cerr << "Failed to read array element\n";
         free(a);
         return 2;
       }
     }
+    if (count != n * m) {
+      std::cerr << " Invalid number of array elements\n";
+      return 2;
+    }
     size_t ix = m + 1;
     int min = a[m + 1];
     int max = a[m + 1];
+    size_t kolmin = 0;
+    size_t kolmax = 0;
     while (ix < n * m - 1 - m) {
       if (ix % m == 0) {
         ix = ix + 1;
@@ -96,6 +120,14 @@ int main(int argc, char ** argv)
           max = a[ix];
         }
         ix = ix + 1;
+      }
+    }
+    for (size_t p = m; p < n * m - m; ++p) {
+      if (a[p] == min && p % m != 0 && p % m != m - 1) {
+        kolmin = kolmin + 1;
+      }
+      if (a[p] == max && p % m != 0 && p % m != m - 1) {
+        kolmax = kolmax + 1;
       }
     }
 
