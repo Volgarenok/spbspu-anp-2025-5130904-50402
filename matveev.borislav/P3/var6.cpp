@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <fstream>
 namespace matveev
@@ -19,6 +20,10 @@ int main(int argc, char* argv[])
   int num = argv[1][0] - '0';
   const char* input = argv[2];
   const char* output = argv[3];
+  if (argc != 4) {
+    std::cerr << "Error ./lab num input output\n";
+    return 1;
+  }
   if (num == 1) {
     int matrix[100][100] = {0};
   matveev::rMatrixDin(matrix, rows, cols, input);
