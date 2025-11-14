@@ -2,11 +2,8 @@
 #include <fstream>
 #include <string>
 #include <cstring>
-
 bool anum(char * a);
-
-int main(int argc, char ** argv)
-{
+int main(int argc, char** argv) {
   if (argc < 4)
   {
     std::cerr << "Not enough arguments\n";
@@ -17,19 +14,19 @@ int main(int argc, char ** argv)
     std::cerr << "Too many arguments\n";
     return 1;
   }
-  if (!anum (argv[1])) {
+  if (!anum(argv[1])) {
     std::cerr << "First parameter is not a number\n";
     return 1;
   }
-  if (std::stoi(argv[1])>2 || std::stoi(argv[1]) < 1) {
+  if (std::stoi(argv[1]) > 2 || std::stoi(argv[1]) < 1) {
     std::cerr << "First parameter is out of range\n";
     return 1;
   }
   std::ifstream input(argv[2]);
   std::ofstream output(argv[3]);
-
   int n = 0, m = 0;
-  if (!input || !(input >> n >> m) || n < 0 || m < 0 || n == 1 || m == 1 || (n*m)>10000) {
+  if (!input || !(input >> n >> m) || n < 0 || m < 0 ||
+    n == 1 || m == 1 || (n * m)>10000) {
     std::cerr << "Array cannot exist\n";
     return 2;
   }
@@ -44,7 +41,7 @@ int main(int argc, char ** argv)
   if (std::stoi(argv[1]) == 1) {
     int a[10000] = {};
     size_t count = 0;
-    for (size_t i = 0; i < n*m; ++i){
+    for (size_t i = 0; i < n * m; ++i) {
       input >> a[i];
       count = count + 1;
       if (!input) {
@@ -56,13 +53,11 @@ int main(int argc, char ** argv)
       std::cerr << " Invalid number of array elements\n";
       return 2;
     }
-    
     size_t ix = m + 1;
     size_t kolmin = 0;
     size_t kolmax = 0;
     int min = a[m + 1];
     int max = a[m + 1];
-    
     while (ix < n * m - 1 - m) {
       if (ix % m == m - 1) {
         ix = ix + 2;
@@ -71,10 +66,14 @@ int main(int argc, char ** argv)
         ix = ix + 1;
       }
       else {
-        if (a[ix] < a[ix - m - 1] && a[ix] < a[ix - m] && a[ix] < a[ix - m + 1] && a[ix] < a[ix - 1] && a[ix] < a[ix + 1] && a[ix] < a[ix + m - 1] && a[ix] < a[ix + m] && a[ix] < a[ix + m + 1]) {
+        if (a[ix] < a[ix - m - 1] && a[ix] < a[ix - m] && a[ix] < a[ix - m + 1] &&
+          a[ix] < a[ix - 1] && a[ix] < a[ix + 1] && a[ix] < a[ix + m - 1] &&
+          a[ix] < a[ix + m] && a[ix] < a[ix + m + 1]) {
           min = a[ix];
         }
-        if (a[ix] > a[ix - m - 1] && a[ix] > a[ix - m] && a[ix] > a[ix - m + 1] && a[ix] > a[ix - 1] && a[ix] > a[ix + 1] && a[ix] > a[ix + m - 1] && a[ix] > a[ix + m] && a[ix] > a[ix + m + 1]) {
+        if (a[ix] > a[ix - m - 1] && a[ix] > a[ix - m] && a[ix] > a[ix - m + 1] &&
+          a[ix] > a[ix - 1] && a[ix] > a[ix + 1] && a[ix] > a[ix + m - 1] &&
+          a[ix] > a[ix + m] && a[ix] > a[ix + m + 1]) {
           max = a[ix];
         }
         ix = ix + 1;
@@ -90,7 +89,6 @@ int main(int argc, char ** argv)
     }
     output << kolmin << "\n" << kolmax << "\n";
   }
-
   else {
     int* a = (int*)malloc(n * m * sizeof(int));
     if (!a) {
@@ -98,7 +96,7 @@ int main(int argc, char ** argv)
       return 3;
     }
     size_t count = 0;
-    for (size_t i = 0; i < n*m; ++i) {
+    for (size_t i = 0; i < n * m; ++i) {
       input >> a[i];
       count = count + 1;
       if (!input) {
@@ -111,13 +109,11 @@ int main(int argc, char ** argv)
       std::cerr << " Invalid number of array elements\n";
       return 2;
     }
-
     size_t ix = m + 1;
     int min = a[m + 1];
     int max = a[m + 1];
     size_t kolmin = 0;
     size_t kolmax = 0;
-
     while (ix < n * m - 1 - m) {
       if (ix % m == 0) {
         ix = ix + 1;
@@ -126,10 +122,14 @@ int main(int argc, char ** argv)
         ix = ix + 2;
       }
       else {
-        if (a[ix] < a[ix - m - 1] && a[ix] < a[ix - m] && a[ix] < a[ix - m + 1] && a[ix] < a[ix - 1] && a[ix] < a[ix + 1] && a[ix] < a[ix + m - 1] && a[ix] < a[ix + m] && a[ix] < a[ix + m + 1]) {
+        if (a[ix] < a[ix - m - 1] && a[ix] < a[ix - m] && a[ix] < a[ix - m + 1] &&
+          a[ix] < a[ix - 1] && a[ix] < a[ix + 1] && a[ix] < a[ix + m - 1] &&
+          a[ix] < a[ix + m] && a[ix] < a[ix + m + 1]) {
           min = a[ix];
         }
-        if (a[ix] > a[ix - m - 1] && a[ix] > a[ix - m] && a[ix] > a[ix - m + 1] && a[ix] > a[ix - 1] && a[ix] > a[ix + 1] && a[ix] > a[ix + m - 1] && a[ix] > a[ix + m] && a[ix] > a[ix + m + 1]) {
+        if (a[ix] > a[ix - m - 1] && a[ix] > a[ix - m] && a[ix] > a[ix - m + 1] &&
+          a[ix] > a[ix - 1] && a[ix] > a[ix + 1] && a[ix] > a[ix + m - 1] &&
+          a[ix] > a[ix + m] && a[ix] > a[ix + m + 1]) {
           max = a[ix];
         }
         ix = ix + 1;
@@ -148,7 +148,7 @@ int main(int argc, char ** argv)
   }
 }
 
-bool anum(char * a) {
+bool anum(char* a) {
   for (size_t i = 0; i < std::strlen(a); ++i) {
     if (!std::isdigit(static_cast<unsigned char>(a[i]))) {
       return 0;
