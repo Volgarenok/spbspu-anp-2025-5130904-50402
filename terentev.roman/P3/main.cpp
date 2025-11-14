@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 
 bool anum(char * a);
 
@@ -28,9 +29,17 @@ int main(int argc, char ** argv)
   std::ofstream output(argv[3]);
 
   int n = 0, m = 0;
-  if (!input || !(input >> n >> m) || n < 0 || m < 0 || (n*m)>10000) {
+  if (!input || !(input >> n >> m) || n < 0 || m < 0 || n == 1 || m == 1 || (n*m)>10000) {
     std::cerr << "Array cannot exist\n";
     return 2;
+  }
+  if (n == 0 && m == 0) {
+    output << "0\n";
+    return 0;
+  }
+  if (n == 2 || m == 2) {
+    output << "0\n";
+    return 0;
   }
   if (std::stoi(argv[1]) == 1) {
     int a[10000] = {};
@@ -47,17 +56,19 @@ int main(int argc, char ** argv)
       std::cerr << " Invalid number of array elements\n";
       return 2;
     }
+    
     size_t ix = m + 1;
     size_t kolmin = 0;
     size_t kolmax = 0;
     int min = a[m + 1];
     int max = a[m + 1];
+    
     while (ix < n * m - 1 - m) {
-      if (ix % m == 0) {
-        ix = ix + 1;
-      }
       if (ix % m == m - 1) {
         ix = ix + 2;
+      }
+      if (ix % m == 0) {
+        ix = ix + 1;
       }
       else {
         if (a[ix] < a[ix - m - 1] && a[ix] < a[ix - m] && a[ix] < a[ix - m + 1] && a[ix] < a[ix - 1] && a[ix] < a[ix + 1] && a[ix] < a[ix + m - 1] && a[ix] < a[ix + m] && a[ix] < a[ix + m + 1]) {
@@ -77,11 +88,11 @@ int main(int argc, char ** argv)
         kolmax = kolmax + 1;
       }
     }
-
+    output << kolmin << "\n" << kolmax << "\n";
   }
 
   else {
-    int* a = (int*)malloc(n * sizeof(int*));
+    int* a = (int*)malloc(n * m * sizeof(int));
     if (!a) {
       std::cerr << "bad_alloc\n";
       return 3;
@@ -100,11 +111,13 @@ int main(int argc, char ** argv)
       std::cerr << " Invalid number of array elements\n";
       return 2;
     }
+
     size_t ix = m + 1;
     int min = a[m + 1];
     int max = a[m + 1];
     size_t kolmin = 0;
     size_t kolmax = 0;
+
     while (ix < n * m - 1 - m) {
       if (ix % m == 0) {
         ix = ix + 1;
@@ -130,7 +143,8 @@ int main(int argc, char ** argv)
         kolmax = kolmax + 1;
       }
     }
-
+    output << kolmin << "\n" << kolmax << "\n";
+    free(a);
   }
 }
 
