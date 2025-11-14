@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
   std::ifstream input(argv[2]);
   std::ofstream output(argv[3]);
   size_t n = 0, m = 0;
-  if (!input || !(input >> n >> m) || n < 0 || m < 0 ||
+  if (!input || !(input >> n >> m) ||
     n == 1 || m == 1 || (n * m)>10000) {
     std::cerr << "Array cannot exist\n";
     return 2;
