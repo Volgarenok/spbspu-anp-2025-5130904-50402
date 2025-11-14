@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 namespace matveev
 {
   void rm(int** matrix, int rows);
@@ -7,7 +8,8 @@ namespace matveev
   int** allocMatrix(int rows, int cols);
   void rMatrixDin(int matrix[][100], int& rows, int& cols, const char* filename);
   void wMatrixDin(int matrix[][100], int rows, int cols, const char* filename);
-
+  int find(int** matrix, int rows, int cols);
+  int findDin(int matrix[][100], int rows, int cols);
 
 }
 int main(int argc, char* argv[]){
@@ -16,15 +18,23 @@ int main(int argc, char* argv[]){
   const char* input = argv[2];
   const char* output = argv[3];
   int res = 0;
+  if (argc != 4) {
+    std::cerr << "Error ./lab num input output\n";
+    return 1;
+  }
   if (num == 1) {
     int matrix[100][100] = {0};
-  matveev::rMatrixDin(matrix, rows, cols, input);
+    matveev::rMatrixDin(matrix, rows, cols, input);
+    res = matveev::findDin(matrix, rows, cols);
   } else if (num == 2) {
-  int** matrix = new int*[100];
-  matveev::rMatrix(matrix, rows, cols, input);
-  matveev::rm(matrix, rows);
+    int** matrix = new int*[100];
+    matveev::rMatrix(matrix, rows, cols, input);
+    res = matveev::find(matrix, rows, cols);
+    matveev::rm(matrix, rows);
   }
-  std::cin << res << "\n";
+  std::ofstream out(output);
+  out << res << "\n";
+  out.close();
 return 0;
 }
 
@@ -99,5 +109,50 @@ namespace matveev
   }
   file.close();
   }
-
+  int find(int** matrix, int rows, int cols)
+  {
+  int max = 0, result = 0;
+  for (int col = 0; col < cols; ++col) {
+    int series = 1;
+    for (int row = 1; row < rows; ++row) {
+      if (matrix[row][col] == matrix[row - 1][col]) {
+        series++;
+      } else {
+        if (series > max) {
+          max = series;
+          result = col;
+        }
+        series = 1;
+      }
+    }
+    if (series > max) {
+      max = series;
+      result = col;
+    }
+  }
+  return result;
+}
+int findDin(int matrix[][100], int rows, int cols)
+{
+  int max = 0, result = 0;
+  for (int col = 0; col < cols; ++col) {
+    int series = 1;
+    for (int row = 1; row < rows; ++row) {
+      if (matrix[row][col] == matrix[row - 1][col]) {
+        series++;
+      } else {
+        if (series > max) {
+          max = series;
+          result = col;
+        }
+        series = 1;
+      }
+    }
+    if (series > max) {
+      max = series;
+      result = col;
+    }
+  }
+  return result;
+}
 }
