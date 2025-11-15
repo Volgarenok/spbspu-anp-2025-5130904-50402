@@ -16,17 +16,17 @@ int main(int argc, char ** argv)
 {
   if(argc<4)
   {
-    std::cerr<<"Not enough arguments \n";
+    std::cerr << "Not enough arguments \n";
     return 1;
   }
   if(argc>4)
   {
-    std::cerr<<"Too many arguments \n";
+    std::cerr << "Too many arguments \n";
     return 1;
   }
   if(!isdig(argv[1]))
   {
-    std::cerr<<"first parameter is not a number \n";
+    std::cerr << "first parameter is not a number \n";
     return 1;
   }
   int num = 0;
@@ -200,7 +200,7 @@ int minSum(int ** mtr, size_t m, size_t n)
   for (size_t k = 0; k <= m + n - 2; ++k)
   {
     sum = 0;
-    for (size_t i = 0; i < m; ++i) 
+    for (size_t i = 0; i < m; ++i)
     {
       if (k - i < n) {
         sum += mtr[i][k - i];
