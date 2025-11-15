@@ -62,12 +62,6 @@ int main(int argc, char ** argv)
     return 2;
   }
 
-  if(!(in >> m >> n))
-  {
-    std::cerr <<"Not correct file";
-    return 2;
-  }
-
   size_t lng = 0;
 
   try
