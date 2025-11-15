@@ -30,7 +30,7 @@ namespace alisov
     }
     return a * b;
   }
-int myPow(int a, int b)
+  int myPow(int a, int b)
   {
     if (a == 0 || a == 1)
     {
@@ -78,25 +78,6 @@ int myPow(int a, int b)
     }
     return res;
   }
-
-  int myPow(int a, int b)
-  {
-    if (a == 0 || a == 1)
-    {
-      return a;
-    }
-    int res = 1;
-    for (int i = 0; i < b; i++)
-    {
-      if (res > std::numeric_limits<int>::max() / a)
-      {
-        throw std::overflow_error("First parameter is out of range");
-      }
-      res *= a;
-    }
-    return res;
-  }
-
   int minSum(int * mtr, size_t m, size_t n)
   {
     int sum;
