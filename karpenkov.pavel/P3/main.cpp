@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
     if (num < 1 || num > 2) {
       std::cout << "First parametr is out of range";
     }
-  } catch (std::invalid_argument) {
+  } catch (std::invalid_argument &) {
     std::cout << "First parametr is not a number";
     return 1;
   }
