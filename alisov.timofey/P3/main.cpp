@@ -30,6 +30,7 @@ namespace alisov
     }
     return a * b;
   }
+
   int myPow(int a, int b)
   {
     if (a == 0 || a == 1)
@@ -47,6 +48,7 @@ namespace alisov
     }
     return res;
   }
+
   bool isDig(char * argv)
   {
     size_t l = std::strlen(argv);
@@ -78,6 +80,7 @@ namespace alisov
     }
     return res;
   }
+
   int minSum(int * mtr, size_t m, size_t n)
   {
     int sum;
@@ -91,8 +94,8 @@ namespace alisov
       sum = 0;
       for (size_t i = 0; i < m; ++i)
       {
-        if (k - i < n) {
-          sum += mtr[i*n+k-i];
+        if (k - i < n && i<=k) {
+          sum += mtr[i*n+(k-i)];
         }
       }
       min = (sum < min) ? sum : min;
@@ -146,7 +149,7 @@ namespace alisov
     }
 
     return ans1;
-}
+  }
 }
 
 int main(int argc, char ** argv)
@@ -166,7 +169,9 @@ int main(int argc, char ** argv)
     std::cerr << "first parameter is not a number \n";
     return 1;
   }
+
   int num = 0;
+
   try
   {
     num = alisov::sti(argv[1]);
@@ -190,7 +195,6 @@ int main(int argc, char ** argv)
     std::cerr<<"Not correct file";
     return 2;
   }
-
   if(in.peek() == std::ifstream::traits_type::eof())
   {
     std::cerr << "File is empty";
@@ -231,6 +235,7 @@ int main(int argc, char ** argv)
       delete[] b;
       return 2;
     }
+
   std::ofstream out(argv[3]);
   size_t res1 = alisov::ncl(matr, m, n);
   int res2 = alisov::minSum(matr, m, n);
