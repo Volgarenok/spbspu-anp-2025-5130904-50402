@@ -188,7 +188,7 @@ int myPow(int a, int b)
   return res;
 }
 
-int minSum(int ** mtr, size_t m, size_t n)
+int minSum(int * mtr, size_t m, size_t n)
 {
   int sum;
   int min = std::numeric_limits<int>::max();
@@ -201,11 +201,61 @@ int minSum(int ** mtr, size_t m, size_t n)
     sum = 0;
     for (size_t i = 0; i < m; ++i)
     {
+      int j = k > i ? k-i : n;
       if (k - i < n) {
-        sum += mtr[i][k - i];
+        sum += mtr[i*n+k];
       }
     }
     min = (sum < min) ? sum : min;
   }
   return min;
 }
+
+size_t ncl(int * arr, size_t m, size_t n)
+{
+  int ans1 = 0;
+  size_t total = m * n;
+  int max_length = 0;
+
+  int mas[n][2];
+  for (size_t i = 0; i < n; ++i)
+  {
+    mas[i][0] = -1;
+    mas[i][1] = 0;
+  }
+
+  for (size_t i = 0; i < total; ++i)
+  {
+    size_t j = i % n;
+    if (mas[j][0] == -1)
+    {
+      mas[j][0] = j + 1;
+      mas[j][1] = 1;
+    }else
+    {
+      if (arr[i] == arr[i - n])
+      {
+        ++mas[j][1];
+      } else
+      {
+        if(mas[j][1] > max_length)
+        {
+          max_length = mas[j][1];
+        }
+        mas[j][1] = 1;
+      }
+    }
+  }
+
+  for (size_t i = 0; i < n; ++i)
+  {
+    if (max_length < mas[i][1])
+    {
+      ans1 = mas[i][0];
+      max_length = mas[i][1];
+    }
+  }
+
+  return ans1;
+}
+
