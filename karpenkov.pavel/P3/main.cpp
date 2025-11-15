@@ -101,7 +101,22 @@ int main(int argc, char **argv) {
     }
   }
   while (input >> tmp) {
+    if (index >= n * m) {
+      std::cout << "Too much data in file";
+      if (variant == 2) {
+        free(array);
+      }
+      return 2;
+    }
     array[index++] = tmp;
+  }
+
+  if (index < n * m) {
+    std::cout << "Not enough data in file";
+    if (variant == 2) {
+      free(array);
+    }
+    return 2;
   }
 
   std::ofstream output("output.txt");
