@@ -65,7 +65,9 @@ int main(int argc, char ** argv)
     std::cerr <<"Not correct file";
     return 2;
   }
+
   size_t lng = 0;
+
   try
   {
     lng = lengthInput(argv[2]);
@@ -74,6 +76,7 @@ int main(int argc, char ** argv)
     std::cerr << e.what() << '\n';
     return 2;
   }
+
   int a[10000] = {};
   int *b = new int [lng];
   std::ifstream in(argv[2]);
@@ -187,20 +190,23 @@ int myPow(int a, int b)
 }
 
 int minSum(int ** mtr, size_t m, size_t n)
+{
+  int sum;
+  int min = std::numeric_limits<int>::max();
+  if (m + n < 2) 
   {
-    int sum;
-    int min = std::numeric_limits<int>::max();
-    if (m + n < 2) {
-      return 0;
-    }
-    for (size_t k = 0; k <= m + n - 2; ++k) {
-      sum = 0;
-      for (size_t i = 0; i < m; ++i) {
-        if (k - i < n) {
-          sum += mtr[i][k - i];
-        }
-      }
-      min = (sum < min) ? sum : min;
-    }
-    return min;
+    return 0;
   }
+  for (size_t k = 0; k <= m + n - 2; ++k)
+  {
+    sum = 0;
+    for (size_t i = 0; i < m; ++i) 
+    {
+      if (k - i < n) {
+        sum += mtr[i][k - i];
+      }
+    }
+    min = (sum < min) ? sum : min;
+  }
+  return min;
+}
