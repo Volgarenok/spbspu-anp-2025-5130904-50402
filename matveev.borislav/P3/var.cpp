@@ -13,16 +13,26 @@ namespace matveev
   int find(int** matrix, int rows, int cols);
   int findDin(int matrix[][100], int rows, int cols);
 }
+
 int main(int argc, char* argv[])
 {
   if (argc != 4) {
     std::cerr << "Error ./lab num input output\n";
     return 1;
   }
-  int rows = 0, cols = 0;
   int num = argv[1][0] - '0';
+  if (num < 1 || num > 2) {
+    std::cerr << "Error first argument\n";
+    return 1;
+}
+  int rows = 0, cols = 0;
   const char* input = argv[2];
   const char* output = argv[3];
+  std::ifstream file(input);
+  if (!file.is_open() || file.peek() == EOF) {
+    std::cerr << "Error empty file\n";
+    return 1;
+}
   if (num == 1) {
     int matrix[100][100] = {0};
     matveev::rMatrixDin(matrix, rows, cols, input);
@@ -39,6 +49,7 @@ int main(int argc, char* argv[])
   }
   return 0;
 }
+
 namespace matveev
 {
   void rMatrix(int** matrix, int& rows, int& cols, const char* filename)
@@ -172,7 +183,11 @@ namespace matveev
   }
   int find(int** matrix, int rows, int cols)
   {
-    int max = 0, result = 0;
+  if (rows == 0 || cols == 0) {
+    return 3; 
+    }
+    int max = 0;
+    int result = 0;
     for (int col = 0; col < cols; ++col) {
       int series = 1;
       for (int row = 1; row < rows; ++row) {
