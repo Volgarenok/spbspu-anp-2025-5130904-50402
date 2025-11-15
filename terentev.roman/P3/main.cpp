@@ -2,8 +2,9 @@
 #include <fstream>
 #include <string>
 #include <cstring>
-namespace terentev{
-bool anum(char * a);
+namespace terentev
+{
+  bool anum(char* a);
 }
 int main(int argc, char** argv)
 {
@@ -17,7 +18,7 @@ int main(int argc, char** argv)
     std::cerr << "Too many arguments\n";
     return 1;
   }
-  if (!std::anum(argv[1]))
+  if (!terentev::anum(argv[1]))
   {
     std::cerr << "First parameter is not a number\n";
     return 1;
@@ -31,7 +32,7 @@ int main(int argc, char** argv)
   std::ofstream output(argv[3]);
   size_t n = 0, m = 0;
   if (!input || !(input >> n >> m) ||
-    n == 1 || m == 1 || (n * m)>10000)
+    n == 1 || m == 1 || (n * m) > 10000)
   {
     std::cerr << "Array cannot exist\n";
     return 2;
@@ -51,7 +52,7 @@ int main(int argc, char** argv)
     int a[10000] = {};
     size_t count = 0;
     for (size_t i = 0; i < n * m; ++i)
-      {
+    {
       input >> a[i];
       count = count + 1;
       if (!input)
@@ -129,7 +130,7 @@ int main(int argc, char** argv)
       }
     }
     if (count != n * m)
-      {
+    {
       std::cerr << " Invalid number of array elements\n";
       return 2;
     }
@@ -181,7 +182,7 @@ int main(int argc, char** argv)
   }
 }
 
-terentev::bool anum(char* a)
+bool terentev::anum(char* a)
 {
   for (size_t i = 0; i < std::strlen(a); ++i)
   {
