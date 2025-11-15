@@ -111,4 +111,7 @@ int main(int argc, char **argv) {
   std::cout << "CNT-COL-NSM - " << CNT_COL_NSM(array, m, n) << "\n";
   std::cout << "MAX-SUM-SDG - " << MAX_SUM_SDG(array, m, n) << "\n";
 
+  if (variant == 2) {
+    free(array);
+  }
 }
