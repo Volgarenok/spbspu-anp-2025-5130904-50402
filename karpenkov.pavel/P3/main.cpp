@@ -4,6 +4,22 @@
 int *createDynamicMassive(size_t n, size_t m) {
   return (int *)malloc(n * m * sizeof(int));
 }
+int CNT_COL_NSM(int *array, int m, int n) {
+  bool flag = false;
+  int num = 0, cntCol = n;
+  for (int i = 0; i < m * n - 3; ++i) {
+    if (num == n) {
+      flag = false;
+      num = 0;
+    }
+    if (array[i] == array[i + 3] && flag != true) {
+      --cntCol;
+      flag = true;
+    }
+    ++num;
+  }
+  return cntCol;
+}
 int main(int argc, char **argv) {
   if (argc < 4) {
     std::cout << "Not enough arguments";
@@ -60,4 +76,5 @@ int main(int argc, char **argv) {
   for (int i = 0; i < n * m; ++i) {
     output << array[i] << " ";
   }
+  std::cout << "CNT-COL-NSM - " << CNT_COL_NSM(array, m, n) << "\n";
 }
