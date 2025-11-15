@@ -9,7 +9,7 @@ namespace matveev
   void spiral(int** matrix, int rows, int cols);
   void rMatrixDin(int matrix[][100], int& rows, int& cols, const char* filename);
   void wMatrixDin(int matrix[][100], int rows, int cols, const char* filename);
-  void spiralDin(int matrix[][100], int rows, int cols); 
+  void spiralDin(int matrix[][100], int rows, int cols);
   int find(int** matrix, int rows, int cols);
   int findDin(int matrix[][100], int rows, int cols);
 }
