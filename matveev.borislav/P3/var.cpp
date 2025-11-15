@@ -184,7 +184,7 @@ namespace matveev
   int find(int** matrix, int rows, int cols)
   {
   if (rows == 0 || cols == 0) {
-    return 3; 
+    return 3;
     }
     int max = 0;
     int result = 0;
