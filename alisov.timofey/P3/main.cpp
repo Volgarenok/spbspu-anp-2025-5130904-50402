@@ -201,9 +201,8 @@ int minSum(int * mtr, size_t m, size_t n)
     sum = 0;
     for (size_t i = 0; i < m; ++i)
     {
-      int j = k > i ? k-i : n;
       if (k - i < n) {
-        sum += mtr[i*n+k];
+        sum += mtr[i*n+k-i];
       }
     }
     min = (sum < min) ? sum : min;
