@@ -20,6 +20,37 @@ int CNT_COL_NSM(int *array, int m, int n) {
   }
   return cntCol;
 }
+int MAX_SUM_SDG(int *array, int m, int n) {
+  int max_sum = INT_MIN;
+  for (int diag = 1; diag < m; ++diag) {
+    int sum = 0, count = 0;
+    for (int i = 0; i < n; ++i) {
+      int j = i + diag;
+      if (j < m) {
+        sum += array[i * m + j];
+        ++count;
+      }
+    }
+    if (count > 0 && sum > max_sum) {
+      max_sum = sum;
+    }
+  }
+  for (int diag = 1; diag < n; ++diag) {
+    int sum = 0, count = 0;
+    for (int i = 0; i < m; ++i) {
+      int j = i + diag;
+      if (j < n) {
+        sum += array[j * m + i];
+        ++count;
+      }
+    }
+    if (count > 0 && sum > max_sum) {
+      max_sum = sum;
+    }
+  }
+  return max_sum;
+}
+
 int main(int argc, char **argv) {
   if (argc < 4) {
     std::cout << "Not enough arguments";
@@ -76,5 +107,8 @@ int main(int argc, char **argv) {
   for (int i = 0; i < n * m; ++i) {
     output << array[i] << " ";
   }
+
   std::cout << "CNT-COL-NSM - " << CNT_COL_NSM(array, m, n) << "\n";
+  std::cout << "MAX-SUM-SDG - " << MAX_SUM_SDG(array, m, n) << "\n";
+
 }
