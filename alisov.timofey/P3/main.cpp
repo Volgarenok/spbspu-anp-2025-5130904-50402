@@ -149,7 +149,6 @@ bool isdig(char * argv)
     }
   }
   return true;
-
 }
 
 int sti(char *str)
@@ -193,7 +192,7 @@ int minSum(int ** mtr, size_t m, size_t n)
 {
   int sum;
   int min = std::numeric_limits<int>::max();
-  if (m + n < 2) 
+  if (m + n < 2)
   {
     return 0;
   }
