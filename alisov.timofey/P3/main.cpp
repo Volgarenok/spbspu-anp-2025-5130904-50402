@@ -78,17 +78,18 @@ int main(int argc, char ** argv)
   int *b = new int [lng];
   std::ifstream in(argv[2]);
   int *matr = nullptr;
+
   try
   {
     if(num == 1)
     {
-      input(in,a,lng);
+      input(in, a, lng);
       matr = a;
       delete[] b;
     }
     if(num == 2)
     {
-      input(in,b,lng);
+      input(in, b, lng);
       matr = b;
     }
     } catch(std::logic_error &e)
@@ -99,7 +100,7 @@ int main(int argc, char ** argv)
     }
   std::ofstream out(argv[3]);
   size_t res1 = ncl(matr, m, n);
-  int res2 = minSum(matr,m,n);
+  int res2 = minSum(matr, m, n);
   std::ofstream out;
   out << "Answer for var-1: " << res1 << "\n";
   out << "Answer for var-2: " << res2 << "\n";
