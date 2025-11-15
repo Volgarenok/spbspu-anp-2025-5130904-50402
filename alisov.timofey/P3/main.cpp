@@ -1,8 +1,9 @@
-#include <iostream>
+#include <algorithm>
 #include <fstream>
+#include <iostream>
+#include <stdexcept>
 #include <cstring>
 #include <limits>
-
 
 bool isDig(char * argv);
 int sti(char * n);
@@ -10,6 +11,7 @@ void input(std::istream &in, int *m, size_t lng);
 size_t ncl(int * arr, size_t m, size_t n);
 int minSum(int * matr, size_t m,size_t n);
 size_t lengthInput(char *file);
+int myPow(int a, int b);
 
 
 int main(int argc, char ** argv)
@@ -24,7 +26,7 @@ int main(int argc, char ** argv)
     std::cerr << "Too many arguments \n";
     return 1;
   }
-  if(!isdig(argv[1]))
+  if(!isDig(argv[1]))
   {
     std::cerr << "first parameter is not a number \n";
     return 1;
@@ -79,7 +81,6 @@ int main(int argc, char ** argv)
 
   int a[10000] = {};
   int *b = new int [lng];
-  std::ifstream in(argv[2]);
   int *matr = nullptr;
 
   try
@@ -138,7 +139,7 @@ size_t lengthInput(char *file)
   return a * b;
 }
 
-bool isdig(char * argv)
+bool isDig(char * argv)
 {
   size_t l = std::strlen(argv);
   for (size_t i=0;i<l;i++)
