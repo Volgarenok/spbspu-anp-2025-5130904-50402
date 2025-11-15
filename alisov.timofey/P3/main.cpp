@@ -6,7 +6,7 @@
 #include <limits>
 
 bool isDig(char * argv);
-int sti(char * n);
+int sti(char * str);
 void input(std::istream &in, int *m, size_t lng);
 size_t ncl(int * arr, size_t m, size_t n);
 int minSum(int * matr, size_t m,size_t n);
@@ -40,7 +40,7 @@ int main(int argc, char ** argv)
     std::cerr<<e.what() << "\n";
     return 1;
   }
-  if(num!=1 || num!=2)
+  if(num!='1' || num!='2' )
   {
     std::cerr<<"First parameter is out of range \n";
     return 1;
