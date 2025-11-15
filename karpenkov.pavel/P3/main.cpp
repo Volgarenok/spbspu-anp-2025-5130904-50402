@@ -1,8 +1,9 @@
+#include <climits>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 int *createDynamicMassive(size_t n, size_t m) {
-  return (int *)malloc(n * m * sizeof(int));
+  return static_cast<int *>(malloc(n * m * sizeof(int)));
 }
 int CNT_COL_NSM(int *array, int m, int n) {
   bool flag = false;
@@ -80,7 +81,7 @@ int main(int argc, char **argv) {
     return 2;
   }
 
-  size_t m, n;
+  int m, n;
   if (!(input >> m >> n)) {
     std::cout << "Cannot read matrix dimension";
     return 2;
@@ -89,9 +90,9 @@ int main(int argc, char **argv) {
   int *array = nullptr;
 
   int variant = std::stoi(argv[1]);
-  int count = 0, index = 0, tmp;
+  int index = 0, tmp;
   if (variant == 1) {
-    array = (int *)alloca(n * m * sizeof(int));
+    array = static_cast<int *>(alloca(n * m * sizeof(int)));
   } else {
     array = createDynamicMassive(n, m);
     if (array == nullptr) {
