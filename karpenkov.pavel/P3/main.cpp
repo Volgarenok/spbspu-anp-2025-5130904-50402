@@ -1,4 +1,9 @@
+#include <fstream>
 #include <iostream>
+#include <stdexcept>
+int *createDynamicMassive(size_t n, size_t m) {
+  return (int *)malloc(n * m * sizeof(int));
+}
 int main(int argc, char **argv) {
   if (argc < 4) {
     std::cout << "Not enough arguments";
@@ -32,5 +37,27 @@ int main(int argc, char **argv) {
   if (!(input >> m >> n)) {
     std::cout << "Cannot read matrix dimension";
     return 2;
+  }
+
+  int *array = nullptr;
+
+  int variant = std::stoi(argv[1]);
+  int count = 0, index = 0, tmp;
+  if (variant == 1) {
+    array = (int *)alloca(n * m * sizeof(int));
+  } else {
+    array = createDynamicMassive(n, m);
+    if (array == nullptr) {
+      std::cout << "Cannot allocate memory";
+      return 3;
+    }
+  }
+  while (input >> tmp) {
+    array[index++] = tmp;
+  }
+
+  std::ofstream output("output.txt");
+  for (int i = 0; i < n * m; ++i) {
+    output << array[i] << " ";
   }
 }
