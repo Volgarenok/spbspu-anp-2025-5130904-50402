@@ -37,13 +37,37 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  int trows = 0, tcows = 0;
-  if (!(file >> trows >> tcows) || trows <= 0 || tcows <= 0) {
+  int trows = 0, tcols = 0;
+  if (!(file >> trows >> tcols)) {
     std::cerr << "Error empty or invalid file\n";
     file.close();
     return 1;
   }
+
+  if (trows == 0 && tcols == 0) {
+    file.close();
+    std::ofstream out(output);
+    out.close();
+    return 0;
+  }
+
+  if (trows <= 0 || tcols <= 0) {
+    std::cerr << "Error invalid dimensions\n";
+    file.close();
+    return 1;
+  }
+
+  int count = 0;
+  int temp;
+  while (file >> temp) {
+    count++;
+  }
   file.close();
+
+  if (count < trows * tcols) {
+    std::cerr << "Error not enough data\n";
+    return 1;
+  }
 
   int rows = 0, cols = 0;
 
