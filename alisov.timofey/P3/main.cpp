@@ -103,7 +103,7 @@ namespace alisov
     return min;
   }
 
-  size_t ncl(int * arr, size_t m, size_t n)
+  size_t ncl(int * mtr, size_t m, size_t n)
   {
     int ans1 = 0;
     size_t total = m * n;
@@ -125,7 +125,7 @@ namespace alisov
         mas[j][1] = 1;
       }else
       {
-        if (arr[i] == arr[i - n])
+        if (mtr[i] == mtr[i - n])
         {
           ++mas[j][1];
         } else
