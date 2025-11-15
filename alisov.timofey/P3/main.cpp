@@ -105,7 +105,6 @@ int main(int argc, char ** argv)
   std::ofstream out(argv[3]);
   size_t res1 = ncl(matr, m, n);
   int res2 = minSum(matr, m, n);
-  std::ofstream out;
   out << "Answer for var-1: " << res1 << "\n";
   out << "Answer for var-2: " << res2 << "\n";
 
