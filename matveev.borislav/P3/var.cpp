@@ -9,12 +9,10 @@ namespace matveev
   void spiral(int** matrix, int rows, int cols);
   void rMatrixDin(int matrix[][100], int& rows, int& cols, const char* filename);
   void wMatrixDin(int matrix[][100], int rows, int cols, const char* filename);
-  void spiralDin(int matrix[][100], int rows, int cols);
-  
+  void spiralDin(int matrix[][100], int rows, int cols); 
   int find(int** matrix, int rows, int cols);
   int findDin(int matrix[][100], int rows, int cols);
 }
-
 int main(int argc, char* argv[])
 {
   if (argc != 4) {
@@ -41,7 +39,6 @@ int main(int argc, char* argv[])
   }
   return 0;
 }
-
 namespace matveev
 {
   void rMatrix(int** matrix, int& rows, int& cols, const char* filename)
@@ -93,7 +90,6 @@ namespace matveev
     int up_r = 0, left_c = 0;
     int down_r = rows - 1, right_c = cols - 1;
     int counter = 1;
-    
     while (up_r <= down_r && left_c <= right_c) {
       for (int i = left_c; i <= right_c; ++i) {
         matrix[down_r][i] += counter++;
