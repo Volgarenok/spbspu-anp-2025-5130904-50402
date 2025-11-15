@@ -97,7 +97,6 @@ namespace alisov
       }
       min = (sum < min) ? sum : min;
     }
-
     return min;
   }
 
