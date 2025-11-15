@@ -40,7 +40,7 @@ int main(int argc, char ** argv)
     std::cerr<<e.what() << "\n";
     return 1;
   }
-  if(num!='1' || num!='2' )
+  if(num!='1' && num!='2' )
   {
     std::cerr<<"First parameter is out of range \n";
     return 1;
