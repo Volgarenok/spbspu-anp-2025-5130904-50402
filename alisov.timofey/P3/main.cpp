@@ -207,7 +207,7 @@ int minSum(int * mtr, size_t m, size_t n)
     }
     min = (sum < min) ? sum : min;
   }
-  
+
   return min;
 }
 
