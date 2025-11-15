@@ -53,7 +53,7 @@ int main(int argc, char ** argv)
     std::cerr<<"Not correct file";
     return 2;
   }
-    
+
   if(in.peek() == std::ifstream::traits_type::eof())
   {
     std::cerr << "File is empty";
