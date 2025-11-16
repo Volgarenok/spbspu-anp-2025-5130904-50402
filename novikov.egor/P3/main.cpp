@@ -267,9 +267,7 @@ MatrixD get_matrix_dynamic(const char* input_file)
 
   int rows = 0, cols = 0;
   input >> rows >> cols;
-  int len = 0;
-  len = rows * cols;
-  if (rows < 3 || cols < 3) {
+    if (rows < 3 || cols < 3) {
     std::cerr << "matrix is too small...\n";
     throw std::logic_error("cant open");
   }
