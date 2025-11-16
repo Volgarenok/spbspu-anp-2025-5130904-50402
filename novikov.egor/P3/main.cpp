@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cctype>
 
 struct Matrix
 {
@@ -32,11 +31,11 @@ void write_dynamic(int a, const char* output_file, MatrixD& m);
 int main(int argc, char* argv[])
 {
   if (argc > 4) {
-    std::cerr << "Too many arguments";
+    std::cerr << "Too many arguments\n";
     return 1;
   }
   else if (argc < 4) {
-    std::cerr << "Not enough arguments";
+    std::cerr << "Not enough arguments\n";
     return 1;
   }
   int action = atoi(argv[1]);
@@ -64,17 +63,17 @@ int main(int argc, char* argv[])
     }
     catch (const std::logic_error& e) {
       if (e.what() == std::string("cant open")) {
-        std::cerr << "cant open";
+        std::cerr << "cant open/n";
         return 2;
       }
       else if (e.what() == std::string("use action 2")) {
-        std::cerr << "use action 2";
+        std::cerr << "use action 2/n";
         return 1;
       }
     }
   }
   else {
-    std::cerr << "Invalid action. Use 1 or 2.";
+    std::cerr << "Invalid action. Use 1 or 2.\n";
     return 1;
   }
   return 0;
@@ -199,7 +198,7 @@ void write(int a, std::string output_file, Matrix m)
 {
   std::ofstream output(output_file);
   if (!output) {
-    std::cerr << "cant open";
+    std::cerr << "cant open\n";
     throw std::logic_error("cant open");
   }
   std::string text = "";
@@ -264,10 +263,21 @@ MatrixD get_matrix_dynamic(const char* input_file)
   if (!input) {
     throw std::logic_error("cant open");
   }
-
+  std::streampos pos = input.tellg();
+  std::string word;
+  int count = 0;
+  while (input >> word) {
+    ++count;
+  }
+  input.clear();
+  input.seekg(pos);
   int rows = 0, cols = 0;
   input >> rows >> cols;
-    if (rows < 3 || cols < 3) {
+  if (count - 2 != cols * rows) {
+    std::cerr << "not enough data matrix\n";
+    throw std::logic_error("cant open");
+  }
+  if (rows < 3 || cols < 3) {
     std::cerr << "matrix is too small...\n";
     throw std::logic_error("cant open");
   }
@@ -276,10 +286,6 @@ MatrixD get_matrix_dynamic(const char* input_file)
   for (int i = 0; i < rows; ++i) {
     data[i] = new int[cols];
     for (int j = 0; j < cols; ++j) {
-      if (input.eof()) {
-        std::cerr << "not enough data matrix\n";
-        throw std::logic_error("cant open");
-      }
       input >> x;
       try {
         data[i][j] = stoi(x);
