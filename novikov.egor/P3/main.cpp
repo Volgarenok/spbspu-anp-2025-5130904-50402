@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cctype>
 
 struct Matrix
 {
@@ -20,7 +21,7 @@ void for_fix(std::string input_file, std::string output_file);
 void for_dinamyc(const char* input, const char* output);
 Matrix get_matrix(std::string input_file);
 void write(int a, std::string output_file, Matrix m);
-void change_matrix(Matrix m);
+Matrix change_matrix(Matrix m);
 
 MatrixD get_matrix_dynamic(const char* input_file);
 void free_matrix_dynamic(MatrixD& m);
@@ -99,7 +100,7 @@ void for_fix(std::string input_file, std::string output_file)
         }
       }
     }
-    change_matrix(m);
+    m = change_matrix(m);
     write(answ_counter, output_file, m);
   }
   catch (const std::logic_error& e) {
@@ -154,15 +155,21 @@ Matrix get_matrix(std::string input_file)
       counter++;
     }
     else if (counter >= 2) {
-      data[counter - 2] = std::stoi(word);
-      counter++;
+      try {
+        data[counter - 2] = std::stoi(word);
+        counter++;
+      }
+      catch(...){
+        std::cerr << "dont use letter in data matrix pls\n";
+        throw std::logic_error("cant open");
+      }
     }
   }
   if (rows > 100 || cols > 100) {
     throw std::logic_error("use action 2");
   }
   if (rows < 3 || cols < 3) {
-    std::cerr << "matrix is too small...";
+    std::cerr << "matrix is too small...\n";
     throw std::logic_error("cant open");
   }
   int true_data[100][100];
@@ -172,6 +179,10 @@ Matrix get_matrix(std::string input_file)
       true_data[i][k] = data[count];
       count++;
     }
+  }
+  if (data[count-1] == data[count]) {
+    std::cerr << "not enough data matrix\n";
+    throw std::logic_error ("cant open");
   }
   Matrix result;
   result.r = rows;
@@ -203,7 +214,7 @@ void write(int a, std::string output_file, Matrix m)
   output.close();
 }
 
-void change_matrix(Matrix m)
+Matrix change_matrix(Matrix m)
 {
   int rows = m.r;
   int cols = m.c;
@@ -235,6 +246,16 @@ void change_matrix(Matrix m)
       count_r_f--;
     }
   }
+  Matrix result;
+  result.r = rows;
+  result.c = cols;
+  for (int i = 0; i < rows; ++i) {
+    for (int k = 0; k < cols; ++k) {
+      result.data[i][k] = m.data[i][k];
+    }
+  }
+  return result;
+
 }
 
 MatrixD get_matrix_dynamic(const char* input_file)
@@ -246,17 +267,28 @@ MatrixD get_matrix_dynamic(const char* input_file)
 
   int rows = 0, cols = 0;
   input >> rows >> cols;
-
+  int len = rows * cols;
   if (rows < 3 || cols < 3) {
-    std::cerr << "matrix is too small...";
+    std::cerr << "matrix is too small...\n";
     throw std::logic_error("cant open");
   }
-
+  std::string x = "";
   int** data = new int* [rows];
   for (int i = 0; i < rows; ++i) {
     data[i] = new int[cols];
     for (int j = 0; j < cols; ++j) {
-      input >> data[i][j];
+      if (input.eof()) {
+        std::cerr << "not enough data matrix\n";
+        throw std::logic_error("cant open");
+      }
+      input >> x;
+      try {
+        data[i][j] = stoi(x);
+      }
+      catch (...) {
+        std::cerr << "dont use letter in data matrix pls\n";
+        throw std::logic_error("cant open");
+      }
     }
   }
   MatrixD result;
