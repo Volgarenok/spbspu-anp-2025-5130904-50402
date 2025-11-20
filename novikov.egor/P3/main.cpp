@@ -1,394 +1,236 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
+#include <vector>
+#include <stdexcept>
 
-struct Matrix
+namespace novikov 
 {
-  int r;
-  int c;
-  int data[100][100];
-};
-
-struct MatrixD
-{
-  int r;
-  int c;
-  int** data;
-};
-
-void for_fix(std::string input_file, std::string output_file);
-void for_dinamyc(const char* input, const char* output);
-Matrix get_matrix(std::string input_file);
-void write(int a, std::string output_file, Matrix m);
-Matrix change_matrix(Matrix m);
-
-MatrixD get_matrix_dynamic(const char* input_file);
-void free_matrix_dynamic(MatrixD& m);
-int count_local_maxima_dynamic(MatrixD& m);
-void change_matrix_dynamic(MatrixD& m);
-void write_dynamic(int a, const char* output_file, MatrixD& m);
-
-int main(int argc, char* argv[])
-{
-  if (argc > 4) {
-    std::cerr << "Too many arguments\n";
-    return 1;
+  const int MAX_FIXED_SIZE = 10000;
+  bool isNumber(const std::string& str) 
+  {
+    if (str.empty()) return false;
+    size_t start = 0;
+    if (str[0] == '-') {
+      if (str.length() == 1) return false;
+      start = 1;
+    }
+    for (size_t i = start; i < str.length(); i++) {
+      if (!isdigit(str[i])) {
+        return false;
+      }
+    }
+    return true;
   }
-  else if (argc < 4) {
-    std::cerr << "Not enough arguments\n";
-    return 1;
-  }
-  int action = atoi(argv[1]);
-  std::string input_file = argv[2];
-  std::string output_file = argv[3];
 
-  if (action == 1) {
+  int getIndex(int i, int j, int cols) {
+    return i * cols + j;
+  }
+
+  bool readMatrixFromFile(const std::string& filename, bool use_fixed, int*& matrix_data, int& rows, int& cols) 
+  {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+      return false;
+    }
+    std::string line;
+    if (!std::getline(file, line)) {
+      return false;
+    }
+    std::istringstream iss(line);
+    std::vector<int> all_numbers;
+    std::string token;
+    while (iss >> token) {
+      if (!isNumber(token)) {
+        return false;
+      }
+      try {
+        all_numbers.push_back(std::stoi(token));
+      }
+      catch (const std::exception& e) {
+        return false;
+      }
+    }
+    if (all_numbers.size() < 2) {
+      return false;
+    }
+    rows = all_numbers[0];
+    cols = all_numbers[1];
+    if (rows < 0 || cols < 0) {
+      return false;
+    }
+    int expected_elements = rows * cols;
+    if (all_numbers.size() != 2 + expected_elements) {
+      return false;
+    }
+    if (use_fixed && expected_elements > MAX_FIXED_SIZE) {
+      return false;
+    }
     try {
-      for_fix(input_file, output_file);
-    }
-    catch (const std::logic_error& e) {
-      if (e.what() == std::string("cant open")) {
-        std::cerr << "cant open";
-        return 2;
+      if (use_fixed) {
+        matrix_data = new int[rows * cols];
       }
-      else if (e.what() == std::string("use action 2")) {
-        std::cerr << "use action 2";
-        return 1;
+      else {
+        matrix_data = static_cast<int*>(malloc(rows * cols * sizeof(int)));
+        if (!matrix_data) {
+          throw std::bad_alloc();
+        }
       }
     }
+    catch (const std::bad_alloc& e) {
+      return false;
+    }
+    int index = 0;
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        matrix_data[getIndex(i, j, cols)] = all_numbers[2 + index];
+        index++;
+      }
+    }
+    return true;
   }
-  else if (action == 2) {
-    try {
-      for_dinamyc(input_file.c_str(), output_file.c_str());
-    }
-    catch (const std::logic_error& e) {
-      if (e.what() == std::string("cant open")) {
-        std::cerr << "cant open/n";
-        return 2;
-      }
-      else if (e.what() == std::string("use action 2")) {
-        std::cerr << "use action 2/n";
-        return 1;
-      }
-    }
-  }
-  else {
-    std::cerr << "Invalid action. Use 1 or 2.\n";
-    return 1;
-  }
-  return 0;
-}
 
-void for_fix(std::string input_file, std::string output_file)
-{
-  try {
-    Matrix m = get_matrix(input_file);
-    int point = 0;
-    int answ_counter = 0;
-    for (int i = 1; i < m.r - 1; ++i) {
-      for (int k = 1; k < m.c - 1; ++k) {
-        point = m.data[i][k];
-        if (point > m.data[i - 1][k] && point > m.data[i - 1][k - 1]) {
-          if (point > m.data[i][k - 1] && point > m.data[i + 1][k]) {
-            if (point > m.data[i + 1][k + 1] && point > m.data[i][k + 1]) {
-              if (point > m.data[i + 1][k - 1] && point > m.data[i - 1][k + 1]) {
-                answ_counter++;
-              }
+  void freeMatrix(int* matrix_data, bool use_fixed) 
+  {
+    if (!matrix_data) return;
+
+    if (use_fixed) {
+      delete[] matrix_data;
+    }
+    else {
+      free(matrix_data);
+    }
+  }
+
+  int countLocalMaxima(int* matrix_data, int rows, int cols) 
+  {
+    if (rows < 3 || cols < 3) {
+      return 0;
+    }
+    int count = 0;
+    for (int i = 1; i < rows - 1; i++) {
+      for (int j = 1; j < cols - 1; j++) {
+        int current = matrix_data[getIndex(i, j, cols)];
+        bool is_maxima = true;
+        for (int di = -1; di <= 1; di++) {
+          for (int dj = -1; dj <= 1; dj++) {
+            if (di == 0 && dj == 0) continue;
+            int neighbor = matrix_data[getIndex(i + di, j + dj, cols)];
+            if (current <= neighbor) {
+              is_maxima = false;
+              break;
             }
           }
+          if (!is_maxima) break;
+        }
+        if (is_maxima) {
+          count++;
         }
       }
     }
-    m = change_matrix(m);
-    write(answ_counter, output_file, m);
+    return count;
   }
-  catch (const std::logic_error& e) {
-    if (e.what() == std::string("use action 2")) {
-      throw std::logic_error("use action 2");
-    }
-    else if (e.what() == std::string("cant open")) {
-      throw std::logic_error("cant open");
+
+  void spiralTransform(int* matrix_data, int rows, int cols) 
+  {
+    if (rows == 0 || cols == 0) return;
+    int total_elements = rows * cols;
+    int current_value = 1;
+    int top = rows - 1, bottom = 0, left = 0, right = cols - 1;
+    int direction = 0;
+    int i = top, j = left;
+    while (current_value <= total_elements) {
+      matrix_data[getIndex(i, j, cols)] -= current_value;
+      current_value++;
+      switch (direction) {
+      case 0:
+        if (j < right) j++;
+        else { direction = 1; i--; }
+        break;
+      case 1:
+        if (i > bottom) i--;
+        else { direction = 2; j--; }
+        break;
+      case 2:
+        if (j > left) j--;
+        else { direction = 3; i++; }
+        break;
+      case 3:
+        if (i < top - 1) i++;
+        else {
+          direction = 0;
+          top--;
+          bottom++;
+          left++;
+          right--;
+          i = top;
+          j = left;
+        }
+        break;
+      }
     }
   }
+
+  bool writeResultsToFile(const std::string& filename, int* matrix_data, int rows, int cols, int local_maxima_count) 
+  {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+      return false;
+    }
+    file << local_maxima_count << std::endl;
+    file << rows << " " << cols;
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        file << " " << matrix_data[getIndex(i, j, cols)];
+      }
+    }
+    file << std::endl;
+    return true;
+  }
+
 }
 
-void for_dinamyc(const char* input, const char* output)
+int main(int argc, char* argv[]) 
 {
+  using namespace novikov;
+  if (argc != 4) {
+    std::cerr << (argc < 4 ? "Not enough arguments" : "Too many arguments") << std::endl;
+    return 1;
+  }
+  std::string num_str = argv[1];
+  std::string input_file = argv[2];
+  std::string output_file = argv[3];
+  if (!isNumber(num_str)) {
+    std::cerr << "First parameter is not a number" << std::endl;
+    return 1;
+  }
+  int num;
   try {
-    MatrixD m = get_matrix_dynamic(input);
-
-    int count = count_local_maxima_dynamic(m);
-    change_matrix_dynamic(m);
-    write_dynamic(count, output, m);
-
-    free_matrix_dynamic(m);
+    num = std::stoi(num_str);
   }
-  catch (const std::logic_error& e) {
-    if (e.what() == std::string("cant open")) {
-      throw std::logic_error("cant open");
-    }
-    else if (e.what() == std::string("use action 2")) {
-      throw std::logic_error("cant open");
-    }
+  catch (const std::exception& e) {
+    std::cerr << "First parameter is not a number" << std::endl;
+    return 1;
   }
-}
-
-Matrix get_matrix(std::string input_file)
-{
-  std::ifstream input(input_file);
-  if (!input) {
-    throw std::logic_error("cant open");
+  if (num != 1 && num != 2) {
+    std::cerr << "First parameter is out of range" << std::endl;
+    return 1;
   }
-  int cols = 0;
-  int rows = 0;
-  int data[10000];
-  std::string word;
-  int counter = 0;
-  while (input >> word) {
-    if (counter == 0) {
-      rows = std::stoi(word);
-      counter++;
-    }
-    else if (counter == 1) {
-      cols = std::stoi(word);
-      counter++;
-    }
-    else if (counter >= 2) {
-      try {
-        data[counter - 2] = std::stoi(word);
-        counter++;
-      }
-      catch(...){
-        std::cerr << "dont use letter in data matrix pls\n";
-        throw std::logic_error("cant open");
-      }
-    }
-  }
-  if (rows > 100 || cols > 100) {
-    throw std::logic_error("use action 2");
-  }
-  if (rows < 3 || cols < 3) {
-    std::cerr << "matrix is too small...\n";
-    throw std::logic_error("cant open");
-  }
-  int true_data[100][100];
-  int count = 0;
-  for (int i = 0; i < rows; ++i) {
-    for (int k = 0; k < cols; ++k) {
-      true_data[i][k] = data[count];
-      count++;
-    }
-  }
-  if (data[count-1] == data[count]) {
-    std::cerr << "not enough data matrix\n";
-    throw std::logic_error ("cant open");
-  }
-  Matrix result;
-  result.r = rows;
-  result.c = cols;
-  for (int i = 0; i < rows; ++i) {
-    for (int k = 0; k < cols; ++k) {
-      result.data[i][k] = true_data[i][k];
-    }
-  }
-  return result;
-}
-
-void write(int a, std::string output_file, Matrix m)
-{
-  std::ofstream output(output_file);
-  if (!output) {
-    std::cerr << "cant open\n";
-    throw std::logic_error("cant open");
-  }
-  std::string text = "";
-  for (int i = 0; i < m.r; ++i) {
-    for (int k = 0; k < m.c; ++k) {
-      text += std::to_string(m.data[i][k]);
-      text += " ";
-    }
-    text += "\n";
-  }
-  output << a << "\n" << text;
-  output.close();
-}
-
-Matrix change_matrix(Matrix m)
-{
-  int rows = m.r;
-  int cols = m.c;
-  int count_r_s = 0;
-  int count_c_s = 0;
-  int count_c_f = cols - 1;
-  int count_r_f = rows - 1;
-  while (count_r_s <= count_r_f && count_c_s <= count_c_f) {
-    for (int i = count_r_f; i >= count_r_s; --i) {
-      m.data[i][count_c_s]--;
-    }
-    count_c_s++;
-    if (count_c_s <= count_c_f) {
-      for (int k = count_c_s; k <= count_c_f; ++k) {
-        m.data[count_r_s][k]--;
-      }
-    }
-    count_r_s++;
-    if (count_r_s <= count_r_f) {
-      for (int i = count_r_s; i <= count_r_f; ++i) {
-        m.data[i][count_c_f]--;
-      }
-      count_c_f--;
-    }
-    if (count_c_s <= count_c_f && count_r_s <= count_r_f) {
-      for (int k = count_c_f; k >= count_c_s; --k) {
-        m.data[count_r_f][k]--;
-      }
-      count_r_f--;
-    }
-  }
-  Matrix result;
-  result.r = rows;
-  result.c = cols;
-  for (int i = 0; i < rows; ++i) {
-    for (int k = 0; k < cols; ++k) {
-      result.data[i][k] = m.data[i][k];
-    }
-  }
-  return result;
-
-}
-
-MatrixD get_matrix_dynamic(const char* input_file)
-{
-  std::ifstream input(input_file);
-  if (!input) {
-    throw std::logic_error("cant open");
-  }
-  std::streampos pos = input.tellg();
-  std::string word;
-  int count = 0;
-  while (input >> word) {
-    ++count;
-  }
-  input.clear();
-  input.seekg(pos);
+  bool use_fixed = (num == 1);
+  int* matrix_data = nullptr;
   int rows = 0, cols = 0;
-  input >> rows >> cols;
-  if (count - 2 != cols * rows) {
-    std::cerr << "not enough data matrix\n";
-    throw std::logic_error("cant open");
+  if (!readMatrixFromFile(input_file, use_fixed, matrix_data, rows, cols)) {
+    std::cerr << "Invalid input file content" << std::endl;
+    return 2;
   }
-  if (rows < 3 || cols < 3) {
-    std::cerr << "matrix is too small...\n";
-    throw std::logic_error("cant open");
+  int local_maxima_count = countLocalMaxima(matrix_data, rows, cols);
+  spiralTransform(matrix_data, rows, cols);
+  if (!writeResultsToFile(output_file, matrix_data, rows, cols, local_maxima_count)) {
+    std::cerr << "Error writing to output file" << std::endl;
+    freeMatrix(matrix_data, use_fixed);
+    return 3;
   }
-  std::string x = "";
-  int** data = new int* [rows];
-  for (int i = 0; i < rows; ++i) {
-    data[i] = new int[cols];
-    for (int j = 0; j < cols; ++j) {
-      input >> x;
-      try {
-        data[i][j] = stoi(x);
-      }
-      catch (...) {
-        std::cerr << "dont use letter in data matrix pls\n";
-        throw std::logic_error("cant open");
-      }
-    }
-  }
-  MatrixD result;
-  result.r = rows;
-  result.c = cols;
-  result.data = data;
-
-  return result;
-}
-
-void free_matrix_dynamic(MatrixD& m)
-{
-  for (int i = 0; i < m.r; ++i) {
-    delete[] m.data[i];
-  }
-  delete[] m.data;
-  m.data = nullptr;
-}
-
-int count_local_maxima_dynamic(MatrixD& m)
-{
-  int count = 0;
-  for (int i = 1; i < m.r - 1; ++i) {
-    for (int j = 1; j < m.c - 1; ++j) {
-      int center = m.data[i][j];
-      bool isLocalMax = true;
-
-      for (int di = -1; di <= 1; ++di) {
-        for (int dj = -1; dj <= 1; ++dj) {
-          if (di == 0 && dj == 0) continue;
-          if (m.data[i + di][j + dj] >= center) {
-            isLocalMax = false;
-            break;
-          }
-        }
-        if (!isLocalMax) break;
-      }
-
-      if (isLocalMax) {
-        ++count;
-      }
-    }
-  }
-  return count;
-}
-
-void change_matrix_dynamic(MatrixD& m)
-{
-  int rows = m.r;
-  int cols = m.c;
-  int count_r_s = 0;
-  int count_c_s = 0;
-  int count_c_f = cols - 1;
-  int count_r_f = rows - 1;
-
-  while (count_r_s <= count_r_f && count_c_s <= count_c_f) {
-    for (int i = count_r_f; i >= count_r_s; --i) {
-      m.data[i][count_c_s]--;
-    }
-    count_c_s++;
-    if (count_c_s <= count_c_f) {
-      for (int k = count_c_s; k <= count_c_f; ++k) {
-        m.data[count_r_s][k]--;
-      }
-    }
-    count_r_s++;
-    if (count_r_s <= count_r_f) {
-      for (int i = count_r_s; i <= count_r_f; ++i) {
-        m.data[i][count_c_f]--;
-      }
-      count_c_f--;
-    }
-    if (count_c_s <= count_c_f && count_r_s <= count_r_f) {
-      for (int k = count_c_f; k >= count_c_s; --k) {
-        m.data[count_r_f][k]--;
-      }
-      count_r_f--;
-    }
-  }
-}
-
-void write_dynamic(int a, const char* output_file, MatrixD& m)
-{
-  std::ofstream output(output_file);
-  if (!output) {
-    std::cerr << "cant open";
-    throw std::logic_error("cant open");
-  }
-
-  output << a << "\n";
-  for (int i = 0; i < m.r; ++i) {
-    for (int j = 0; j < m.c; ++j) {
-      output << m.data[i][j] << " ";
-    }
-    output << "\n";
-  }
-  output.close();
+  freeMatrix(matrix_data, use_fixed);
+  return 0;
 }
