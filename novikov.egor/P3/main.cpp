@@ -60,7 +60,7 @@ namespace novikov
     if (rows < 0 || cols < 0) {
       return false;
     }
-    int expected_elements = rows * cols;
+    size_t expected_elements = static_cast<size_t>(rows) * static_cast<size_t>(cols);
     if (all_numbers.size() != 2 + expected_elements) {
       return false;
     }
