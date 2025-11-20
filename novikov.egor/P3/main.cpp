@@ -5,10 +5,10 @@
 #include <vector>
 #include <stdexcept>
 
-namespace novikov 
+namespace novikov
 {
   const int MAX_FIXED_SIZE = 10000;
-  bool isNumber(const std::string& str) 
+  bool isNumber(const std::string& str)
   {
     if (str.empty()) return false;
     size_t start = 0;
@@ -28,7 +28,7 @@ namespace novikov
     return i * cols + j;
   }
 
-  bool readMatrixFromFile(const std::string& filename, bool use_fixed, int*& matrix_data, int& rows, int& cols) 
+  bool readMatrixFromFile(const std::string& filename, bool use_fixed, int*& matrix_data, int& rows, int& cols)
   {
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -91,7 +91,7 @@ namespace novikov
     return true;
   }
 
-  void freeMatrix(int* matrix_data, bool use_fixed) 
+  void freeMatrix(int* matrix_data, bool use_fixed)
   {
     if (!matrix_data) return;
 
@@ -103,7 +103,7 @@ namespace novikov
     }
   }
 
-  int countLocalMaxima(int* matrix_data, int rows, int cols) 
+  int countLocalMaxima(int* matrix_data, int rows, int cols)
   {
     if (rows < 3 || cols < 3) {
       return 0;
@@ -132,7 +132,7 @@ namespace novikov
     return count;
   }
 
-  void spiralTransform(int* matrix_data, int rows, int cols) 
+  void spiralTransform(int* matrix_data, int rows, int cols)
   {
     if (rows == 0 || cols == 0) return;
     int total_elements = rows * cols;
@@ -172,7 +172,7 @@ namespace novikov
     }
   }
 
-  bool writeResultsToFile(const std::string& filename, int* matrix_data, int rows, int cols, int local_maxima_count) 
+  bool writeResultsToFile(const std::string& filename, int* matrix_data, int rows, int cols, int local_maxima_count)
   {
     std::ofstream file(filename);
     if (!file.is_open()) {
@@ -191,7 +191,7 @@ namespace novikov
 
 }
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
   using namespace novikov;
   if (argc != 4) {
