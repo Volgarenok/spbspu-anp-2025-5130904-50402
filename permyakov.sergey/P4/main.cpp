@@ -9,6 +9,28 @@ namespace permyakov
 int main()
 {
   return 0;
+  char * line1 = nullptr;
+  size_t size1 = 0;
+  char * line2 = nullptr;
+  size_t size2 = 0;
+  
+  try{
+    line1 = new char[size1];
+  } catch (std::bad_alloc()) {
+    std::cerr << "Failure to allocate memory\n";
+    return 2;
+  }
+
+  try{
+    line2 = new char[size2];
+  } catch (std::bad_alloc()) {
+    std::cerr << "Failure to allocate memory\n";
+    delete[] line2;
+    return 2;
+  }
+
+  delete[] line1;
+  delete[] line2;
 }
 
 void permyakov::addSymToStr(char * line, const char sym, size_t & size)
