@@ -5,7 +5,7 @@ namespace permyakov
 {
   void addSymToStr(char * & line, const char sym, size_t & size);
   void cinStr(char * & line, size_t & size);
-  void LAT_TWO(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine);
+  void LAT_TWO(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine, const size_t size);
   void UNI_TWO(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine);
 }
 
@@ -17,14 +17,14 @@ int main()
   size_t size2 = 0;
 
   try{
-    line1 = new char[size1];
+    line1 = new char[size1 + 1];
   } catch (std::bad_alloc()) {
     std::cerr << "Failure to allocate memory\n";
     return 2;
   }
 
   try{
-    line2 = new char[size2];
+    line2 = new char[size2 + 1];
   } catch (std::bad_alloc()) {
     std::cerr << "Failure to allocate memory\n";
     delete[] line2;
@@ -32,6 +32,9 @@ int main()
   }
 
   namespace per = permyakov;
+
+  line1[0] = '\0';
+  line2[0] = '\0';
 
   try{
     per::cinStr(line1, size1);
@@ -61,7 +64,7 @@ int main()
   size_t resSize2 = size1 + size2;
 
   try{
-    result1 = new char[resSize1];
+    result1 = new char[resSize1 + 1];
   } catch (std::bad_alloc()) {
     delete[] line1;
     delete[] line2;
@@ -70,7 +73,7 @@ int main()
   }
 
   try{
-    result2 = new char[resSize2];
+    result2 = new char[resSize2 + 1];
   } catch (std::bad_alloc()) {
     std::cerr << "Failure to allocate memory\n";
     delete[] line1;
@@ -79,7 +82,10 @@ int main()
     return 2;
   }
 
-  per::LAT_TWO(line1, size1, line2, size2, result1);
+  result1[resSize1] = '\0';
+  result2[resSize2] = '\0';
+
+  per::LAT_TWO(line1, size1, line2, size2, result1, resSize1);
   per::UNI_TWO(line1, size1, line2, size2, result2);
 
   std::cout << result1 << '\n';
@@ -93,11 +99,12 @@ int main()
 
 void permyakov::addSymToStr(char * & line, const char sym, size_t & size)
 {
-  char * newLine = new char[size + 1];
+  char * newLine = new char[size + 2];
   for (size_t i = 0; i < size; ++i){
     newLine[i] = line[i];
   }
   newLine[size] = sym;
+  newLine[size + 1] = '\0';
   delete[] line;
   line = newLine;
   size++;
@@ -113,13 +120,32 @@ void permyakov::cinStr(char * & line, size_t & size)
   }
 }
 
-void permyakov::LAT_TWO(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine)
+void permyakov::LAT_TWO(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine, const size_t size)
 {
-  (void)line1;
-  (void)size1;
-  (void)line2;
-  (void)size2;
-  (void)newLine;
+  size_t istr = 0;
+  for (size_t i = 0; i < size1; ++i){
+    if (isalpha(line1[i])){
+      newLine[istr] = line1[i];
+      istr++;
+    }
+  }
+  for (size_t i = 0; i < size2; ++i){
+    if (isalpha(line2[i])){
+      newLine[istr] = line2[i];
+      istr++;
+    }
+  }
+
+  char swch = ' ';
+  for (size_t i = size - 1; i > 0; --i){
+    for (size_t j = 0; j < i; ++j){
+      if (newLine[j] > newLine[j + 1]){
+	swch = newLine[j];
+	newLine[j] = newLine[j + 1];
+	newLine[j + 1] = swch;
+      }
+    }
+  }
 }
 
 void permyakov::UNI_TWO(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine)
