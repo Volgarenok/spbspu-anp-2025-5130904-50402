@@ -4,7 +4,7 @@
 namespace permyakov
 {
   void addSymToStr(char * & line, const char sym, size_t & size);
-  void cinStr(char * & line, size_t & size);
+  int cinStr(char * & line, size_t & size);
   void LAT_TWO(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine, const size_t size);
   void UNI_TWO(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine);
 }
@@ -27,9 +27,7 @@ int main()
 
   namespace per = permyakov;
   line1[0] = '\0';
-  try {
-    per::cinStr(line1, size1);
-  } catch (...) {
+  if (per::cinStr(line1, size1)) {
     std::cerr << "Failure to read str\n";
     delete[] line1;
     return 1;
@@ -93,17 +91,19 @@ void permyakov::addSymToStr(char * & line, const char sym, size_t & size)
   size++;
 }
 
-void permyakov::cinStr(char * & line, size_t & size)
+int permyakov::cinStr(char * & line, size_t & size)
 {
-  if(!std::cin){
-    return;
-  }
   char sym = ' ';
   std::cin.get(sym);
-  while (sym != '\n') {
-    addSymToStr(line, sym, size);
+  while (sym != '\n' && std::cin) {
+    try {
+      addSymToStr(line, sym, size);
+    } catch (std::bad_alloc()) {
+      return 1;
+    }
     std::cin.get(sym);
   }
+  return 0;
 }
 
 void permyakov::LAT_TWO(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine, const size_t size)
