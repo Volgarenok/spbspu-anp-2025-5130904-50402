@@ -28,6 +28,12 @@ int main()
   namespace per = permyakov;
   line1[0] = '\0';
   if (per::cinStr(line1, size1)) {
+    std::cerr << "Failure to allocate memory\n";
+    delete[] line1;
+    return 2;
+  }
+
+  if (!std::cin) {
     std::cerr << "Failure to read str\n";
     delete[] line1;
     return 1;
