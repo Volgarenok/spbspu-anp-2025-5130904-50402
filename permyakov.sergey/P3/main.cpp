@@ -4,8 +4,6 @@
 
 namespace permyakov
 {
-  void movePointToEnd(int * arr, size_t & ij, size_t & cnt, size_t end,
-  size_t & i, size_t & j, size_t m, bool isCntInc, bool isIncr);
   void lftTopClk(int * arr1, int * arr, size_t n, size_t m);
   void lftBotCnt(int * arr2, int * arr, size_t n, size_t m);
   std::ifstream & arrInFromFile(std::ifstream & in, int * arr, size_t n, size_t m);
@@ -23,8 +21,8 @@ int main(int argc, char ** argv)
     std::cerr << "Too many arguments\n";
     return 1;
   }
-  char * endFrstArg;
-  long task = std::strtol(argv[1], &endFrstArg, 10);
+  char * endFrstArg = nullptr;;
+  long task = std::strtol(argv[1], std::addressof(endFrstArg), 10);
 
   if (!(task == 1 || task == 2) || *endFrstArg != '\0') {
     std::cerr << "First argument is not correct\n";
@@ -41,60 +39,49 @@ int main(int argc, char ** argv)
     }
     return 2;
   }
+  int * arr = nullptr;
   int * arr1 = nullptr;
   int * arr2 = nullptr;
-  const size_t SIZE_OF_MATRIX = 10000;
   if (task == 1) {
-    int arr[SIZE_OF_MATRIX]{};
-    if (!per::arrInFromFile(input, arr, n, m)) {
-      std::cerr << "Failure to define array\n";
-      return 2;
-    }
-    try{
-      arr1 = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));;
-    } catch (std::bad_alloc()) {
-      std::cerr << "Failure to allocate memoty\n";
-      return 3;
-    }
-    try{
-      arr2 = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));
-    } catch (std::bad_alloc()) {
-      std::cerr << "Failure to allocate memory\n";
-      free(arr1);
-      return 3;
-    }
-    per::lftTopClk(arr1, arr, n, m);
-    per::lftBotCnt(arr2, arr, n, m);
+    const size_t SIZE_OF_MATRIX = 10000;
+    int cArr[SIZE_OF_MATRIX]{};
+    arr = cArr;
   } else {
-    int * d_arr = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));
-    if (d_arr == nullptr) {
-      std::cerr << "Failure to allocate memory\n";
-      return 3;
-    }
-    if (!per::arrInFromFile(input, d_arr, n, m)) {
-      std::cerr << "Failure to define array\n";
-      free(d_arr);
-      return 2;
-    }
-    try{
-      arr1 = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));
+    try {
+      arr = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));
     } catch (std::bad_alloc()) {
-      std::cerr << "Failure to allocate memory\n";
-      free(d_arr);
-      return 3;
+    std::cerr << "Failure to allocate memoty\n";
+    return 3;
     }
-    try{
-      arr2 = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));
-    } catch (std::bad_alloc()) {
-      std::cerr << "Failure to allocate memory\n";
-      free(arr1);
-      free(d_arr);
-      return 3;
-    }
-    per::lftTopClk(arr1, d_arr, n, m);
-    per::lftBotCnt(arr2, d_arr, n, m);
-    free(d_arr);
   }
+  if (!per::arrInFromFile(input, arr, n, m)) {
+    std::cerr << "Failure to define array\n";
+    if (task == 2) {
+      free(arr);
+    }
+    return 2;
+  }
+  try {
+    arr1 = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));;
+  } catch (std::bad_alloc()) {
+    std::cerr << "Failure to allocate memoty\n";
+    if (task == 2) {
+      free(arr);
+    }
+    return 3;
+  }
+  try {
+    arr2 = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));
+  } catch (std::bad_alloc()) {
+    std::cerr << "Failure to allocate memory\n";
+    free(arr1);
+    if (task == 2) {
+      free(arr);
+    }
+    return 3;
+  }
+  per::lftTopClk(arr1, arr, n, m);
+  per::lftBotCnt(arr2, arr, n, m);
 
   std::ofstream output(argv[3]);
   per::arrOutInFile(output, arr1, n, m);
@@ -102,23 +89,8 @@ int main(int argc, char ** argv)
   per::arrOutInFile(output, arr2, n, m);
   free(arr1);
   free(arr2);
-}
-
-void permyakov::movePointToEnd(int * arr, size_t & ij, size_t & cnt, size_t end,
-size_t & i, size_t & j, size_t m, bool isCntInc, bool isIncr)
-{
-  if (isIncr) {
-    while (ij < end) {
-      arr[i * m + j] += cnt * (isCntInc ? 1 : -1);
-      cnt++;
-      ij++;
-    }
-  } else {
-    while (ij > end) {
-      arr[i * m + j] += cnt * (isCntInc ? 1 : -1);
-      cnt++;
-      ij--;
-    }
+  if (task == 2) {
+    free(arr);
   }
 }
 
@@ -132,15 +104,30 @@ void permyakov::lftTopClk(int * arr1, int * arr, size_t n, size_t m)
   }
   size_t lef = 0, rig = m - 1, top = 0, bot = n - 1;
   size_t cnt = 1, i = 0, j = 0;
-  namespace per = permyakov;
   while (cnt < n * m) {
-    per::movePointToEnd(arr1, j, cnt, rig, i, j, m, false, true);
+    while(j < rig){
+      arr1[i * m + j] -= cnt;
+      cnt++;
+      j++;
+    }
     top++;
-    per::movePointToEnd(arr1, i, cnt, bot, i, j, m, false, true);
+    while(i < bot){
+      arr1[i * m + j] -= cnt;
+      cnt++;
+      i++;
+    }
     rig--;
-    per::movePointToEnd(arr1, j, cnt, lef, i, j, m, false, false);
+    while(j > lef){
+      arr1[i * m + j] -= cnt;
+      cnt++;
+      j--;
+    }
     bot--;
-    per::movePointToEnd(arr1, i, cnt, top, i, j, m, false, false);
+    while(i > top){
+      arr1[i * m + j] -= cnt;
+      cnt++;
+      i--;
+    }
     lef++;
     if (cnt == m * n) {
       arr1[i * m + j] -= cnt;
@@ -158,15 +145,30 @@ void permyakov::lftBotCnt(int * arr2, int * arr, size_t n, size_t m)
   }
   size_t lef = 0, rig = m - 1, top = 0, bot = n - 1;
   size_t cnt = 1, i = n - 1, j = 0;
-  namespace per = permyakov;
   while (cnt < n * m) {
-    per::movePointToEnd(arr2, j, cnt, rig, i, j, m, true, true);
+    while(j < rig){
+      arr2[i * m + j] += cnt;
+      cnt++;
+      j++;
+    }
     bot--;
-    per::movePointToEnd(arr2, i, cnt, top, i, j, m, true, false);
+    while(i > top){
+      arr2[i * m + j] += cnt;
+      cnt++;
+      i--;
+    }
     rig--;
-    per::movePointToEnd(arr2, j, cnt, lef, i, j, m, true, false);
+    while(j > lef){
+      arr2[i * m + j] += cnt;
+      cnt++;
+      j--;
+    }
     top++;
-    per::movePointToEnd(arr2, i, cnt, bot, i, j, m, true, true);
+    while(i < bot){
+      arr2[i * m + j] += cnt;
+      cnt++;
+      i++;
+    }
     lef++;
     if (cnt == n * m) {
       arr2[i * m + j] += cnt;
@@ -176,14 +178,8 @@ void permyakov::lftBotCnt(int * arr2, int * arr, size_t n, size_t m)
 
 std::ifstream & permyakov::arrInFromFile(std::ifstream & in, int * arr, size_t n, size_t m)
 {
-  size_t s = 0;
-  int h = 0;
-  for (; in >> h; ++s) {
-    arr[s] = h;
-  }
-  in.clear();
-  if (s != m * n) {
-    in >> h;
+  for (size_t i = 0; i < n * m; ++i) {
+    in >> arr[i];
   }
   return in;
 }
