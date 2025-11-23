@@ -49,7 +49,7 @@ int main()
   }
   char * result2 = nullptr;
   size_t resSize2 = size1 + size2u;
-  
+
   try {
     result1 = new char[resSize1 + 1];
   } catch (std::bad_alloc()) {
