@@ -112,7 +112,7 @@ int main(int argc, char **argv)
       return 3;
     }
   }
-  int index = 0, tmp;
+  size_t index = 0, tmp;
   while (input >> tmp) {
     if (index >= n * m) {
       std::cout << "Too much data in file" << '\n';
@@ -134,7 +134,7 @@ int main(int argc, char **argv)
 
   std::ofstream output(argv[3]);
   output << n*m;
-  for (int i = 0; i < n * m; ++i) {
+  for (size_t i = 0; i < n * m; ++i) {
     output << " "<< array[i];
   }
 
