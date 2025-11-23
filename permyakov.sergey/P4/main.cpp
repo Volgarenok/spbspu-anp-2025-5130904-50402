@@ -95,6 +95,9 @@ void permyakov::addSymToStr(char * & line, const char sym, size_t & size)
 
 void permyakov::cinStr(char * & line, size_t & size)
 {
+  if(!std::cin){
+    return;
+  }
   char sym = ' ';
   std::cin.get(sym);
   while (sym != '\n') {
