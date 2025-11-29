@@ -32,8 +32,7 @@ namespace alisov
       throw std::logic_error("");
     }
 
-    long out = val;
-    return out;
+    return val;
   }
 
   int minSum(int *mtr, size_t m, size_t n)
