@@ -1,78 +1,79 @@
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
-#include <cstdlib>
 
 namespace karpenkov {
-  int readToArray(int *array, size_t n, size_t m, std::ifstream& input, std::ofstream& output)
+std::ifstream &readToArray(int *array, size_t n, size_t m,std::ifstream &input)
   {
-    size_t index = 0, tmp;
-    while (input >> tmp) {
-      if (index >= n * m) {
-        std::cout << "Too much data in file" << '\n';
-        return 2;
-      }
-      array[index++] = tmp;
+  for (size_t i = 0; i < n * m; i++) {
+    if (!(input >> array[i])) {
+      break;
     }
-    if (index < n * m) {
-      std::cout << "Not enough data in file" << '\n';
-      return 2;
+  }
+  input.clear();
+  input.seekg(0, std::ios::beg);
+  return input;
+}
+
+size_t printCntColNsm(const int *array, size_t m, size_t n)
+  {
+  bool flag = false;
+  size_t num = 0, countColumn = n;
+  if (m*n == 0) {
+    return num;
+  }
+  for (size_t i = 0; i < m * n - 3; ++i) {
+    if (num == n) {
+      flag = false;
+      num = 0;
     }
-    output << n*m;
-    for (size_t i = 0; i < n * m; ++i) {
-      output << " "<< array[i];
+    if (array[i] == array[i + 3] && flag != true) {
+      --countColumn;
+      flag = true;
     }
+    ++num;
+  }
+  return num;
+}
+
+int printMaxSumSdg(int *array, size_t m, size_t n)
+  {
+  int max_sum = std::numeric_limits<int>::min();
+  if (n*m == 0) {
     return 0;
   }
-
-  void printCntColNsm(int *array, int m, int n) {
-    bool flag = false;
-    int num = 0, countCol = n;
-    for (int i = 0; i < m * n - 3; ++i) {
-      if (num == n) {
-        flag = false;
-        num = 0;
+  for (size_t diag = 1; diag < m; ++diag) {
+    int sum = 0;
+    size_t count = 0;
+    for (size_t i = 0; i < n; ++i) {
+      size_t j = i + diag;
+      if (j < m) {
+        sum += array[i * m + j];
+        ++count;
       }
-      if (array[i] == array[i + 3] && flag != true) {
-        --countCol;
-        flag = true;
-      }
-      ++num;
     }
-    std::cout << "CNT-COL-NSM - " << countCol << '\n';
+    if (count > 0 && sum > max_sum) {
+      max_sum = sum;
+    }
   }
-
-  void printMaxSumSdg(int *array, int m, int n) {
-    int max_sum = std::numeric_limits<int>::min();
-    for (int diag = 1; diag < m; ++diag) {
-      int sum = 0, count = 0;
-      for (int i = 0; i < n; ++i) {
-        int j = i + diag;
-        if (j < m) {
-          sum += array[i * m + j];
-          ++count;
-        }
-      }
-      if (count > 0 && sum > max_sum) {
-        max_sum = sum;
+  for (size_t diag = 1; diag < n; ++diag) {
+    int sum = 0;
+    size_t count = 0;
+    for (size_t i = 0; i < m; ++i) {
+      size_t j = i + diag;
+      if (j < n) {
+        sum += array[j * m + i];
+        ++count;
       }
     }
-    for (int diag = 1; diag < n; ++diag) {
-      int sum = 0, count = 0;
-      for (int i = 0; i < m; ++i) {
-        int j = i + diag;
-        if (j < n) {
-          sum += array[j * m + i];
-          ++count;
-        }
-      }
-      if (count > 0 && sum > max_sum) {
-        max_sum = sum;
-      }
+    if (count > 0 && sum > max_sum) {
+      max_sum = sum;
     }
-    std::cout << "MAX-SUM-SDG - " << max_sum << '\n';
   }
+  return max_sum;
+}
 }
 
 int main(int argc, char **argv)
@@ -85,29 +86,27 @@ int main(int argc, char **argv)
     std::cout << "Too many arguments" << '\n';
     return 1;
   }
-   char* endptr;
-   char* param = argv[1];
+  char *endptr = nullptr;
+  char *parameter = argv[1];
 
-   int num = std::strtol(param, &endptr, 10);
+  int num = std::strtol(parameter, std::addressof(endptr), 10);
 
-   if (*endptr != '\0') {
-     std::cout << "First parameter contains non-numeric symbol" << '\n';
-     return 1;
-   }
-  if (num > std::numeric_limits<int>::max() || num < std::numeric_limits<int>::min()) {
-    std::cout << "First parameter is too large or too small" << '\n';
+  if (*endptr != '\0') {
+    std::cout << "First parameter contains non-numeric symbol" << '\n';
     return 1;
   }
-   if (num < 1 || num > 2) {
-     std::cout << "First parametr is out of range" << '\n';
-   }
+
+  if (num < 1 || num > 2) {
+    std::cout << "First parametr is out of range" << '\n';
+  }
 
   std::ifstream input(argv[2]);
   if (!input.is_open()) {
     std::cout << "Cannot open file" << '\n';
     return 2;
   }
-  if (input.eof()) {
+
+  if (input.peek() == EOF) {
     std::cout << "File is empty" << '\n';
     return 2;
   }
@@ -118,29 +117,51 @@ int main(int argc, char **argv)
     return 2;
   }
 
-  const size_t fixedSize = m * n;
-
-  std::ofstream output(argv[3]);
+  int *arrayPtr = nullptr;
+  size_t maxSize = 10000;
+  int stackArray[maxSize];
 
   if (num == 1) {
-    int array[fixedSize];
-    if (karpenkov::readToArray(array, n, m, input, output) > 0){
-      return 2;
-    }
-    karpenkov::printCntColNsm(array, m, n);
-    karpenkov::printMaxSumSdg(array, m, n);
-  } else {
-    int *array = reinterpret_cast <int *> (malloc(n * m * sizeof(int)));
-    if (array == nullptr) {
+    arrayPtr = stackArray;
+  }
+  if (num == 2) {
+    arrayPtr = reinterpret_cast<int *>(malloc(n * m * sizeof(int)));
+    if (arrayPtr == nullptr) {
       std::cout << "Cannot allocate memory" << '\n';
       return 3;
     }
-    if (karpenkov::readToArray(array, n, m, input, output) > 0){
-      free(array);
-      return 2;
+  }
+
+  size_t indexCount = 0, tmp;
+  karpenkov::readToArray(arrayPtr, m, n, input);
+  while (input >> tmp) {
+    ++indexCount;
+  }
+  if (n*m != 0 && indexCount - 2 < m * n) {
+    std::cout << "Not enough data in file" << '\n';
+    if (num == 2) {
+      free(arrayPtr);
     }
-    karpenkov::printCntColNsm(array, m, n);
-    karpenkov::printMaxSumSdg(array, m, n);
-    free(array);
+    return 2;
+  }
+  if (n*m != 0 && indexCount - 2 > m * n) {
+    std::cout << "Too much data in file" << '\n';
+    if (num == 2) {
+      free(arrayPtr);
+    }
+    return 2;
+  }
+
+  std::ofstream output(argv[3]);
+  output << n * m;
+  for (size_t i = 0; i < n * m; ++i) {
+    output << " " << arrayPtr[i];
+  }
+
+  std::cout << "CNT_COL_NSM - " << karpenkov::printCntColNsm(arrayPtr, m, n) << '\n';
+  std::cout << "MAX_SUM_SDG - " << karpenkov::printMaxSumSdg(arrayPtr, m, n) << '\n';
+
+  if (num == 2) {
+    free(arrayPtr);
   }
 }
