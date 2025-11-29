@@ -149,7 +149,7 @@ int main(int argc, char **argv)
 
   if (in.peek() == std::ifstream::traits_type::eof())
   {
-    std::cerr << "File is empty";
+    std::cerr << "File is empty" << '\n';
     return 2;
   }
 
@@ -167,7 +167,7 @@ int main(int argc, char **argv)
   }
   if (alisov::input(in, matr, lng).fail())
   {
-    std::cerr << "Cant read matrix";
+    std::cerr << "Cant read matrix" << '\n';
     if (num == 2)
     {
       delete[] matr;
