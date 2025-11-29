@@ -1,13 +1,15 @@
 #include <algorithm>
+#include <cstring>
 #include <fstream>
 #include <iostream>
-#include <stdexcept>
-#include <cstring>
 #include <limits>
+#include <stdexcept>
 
 namespace alisov
 {
-    void input(std::istream &in, int *m, size_t lng)
+  const size_t matrix_size = 10000;
+
+  void input(std::istream &in, int *m, size_t lng)
   {
     for (size_t i = 0; i < lng; i++)
     {
@@ -40,7 +42,7 @@ namespace alisov
     int res = 1;
     for (int i = 0; i < b; i++)
     {
-      if (res > std::numeric_limits<int>::max() / a)
+      if (res > std::numeric_limits< int >::max() / a)
       {
         throw std::overflow_error("First parameter is out of range");
       }
@@ -48,43 +50,24 @@ namespace alisov
     }
     return res;
   }
-
-  bool isDig(char * argv)
+  int sti(const char *str)
   {
-    size_t l = std::strlen(argv);
-    for (size_t i=0;i<l;i++)
+    char *end = nullptr;
+    long val = std::strtol(str, std::addressof(end), 10);
+
+    if (*end != '\0')
     {
-      if(!('0' <= argv[i] && '9' >= argv[i]))
-      {
-        return false;
-      }
+      throw std::logic_error("");
     }
-    return true;
+
+    int out = static_cast< int >(val);
+    return out;
   }
 
-  int sti(char *str)
-  {
-    int res = 0;
-    int iLimit = std::numeric_limits<int>::max();
-    size_t len = std::strlen(str);
-
-    for (size_t i = 0; i < len; i++)
-    {
-      int temp = 0;
-      temp = alisov::myPow(10, len - i - 1);
-      if ((str[i] - '0') > iLimit / temp)
-      {
-        throw std::overflow_error("First parameter is out of range");
-      }
-      res += (str[i] - '0') * temp;
-    }
-    return res;
-  }
-
-  int minSum(int * mtr, size_t m, size_t n)
+  int minSum(int *mtr, size_t m, size_t n)
   {
     int sum;
-    int min = std::numeric_limits<int>::max();
+    int min = std::numeric_limits< int >::max();
     if (m + n < 2)
     {
       return 0;
@@ -94,8 +77,9 @@ namespace alisov
       sum = 0;
       for (size_t i = 0; i < m; ++i)
       {
-        if (k - i < n && i<=k) {
-          sum += mtr[i*n+(k-i)];
+        if (k - i < n && i <= k)
+        {
+          sum += mtr[i * n + (k - i)];
         }
       }
       min = (sum < min) ? sum : min;
@@ -103,7 +87,7 @@ namespace alisov
     return min;
   }
 
-  size_t ncl(int * mtr, size_t m, size_t n)
+  size_t ncl(int *mtr, size_t m, size_t n)
   {
     int ans1 = 0;
     size_t total = m * n;
@@ -123,14 +107,16 @@ namespace alisov
       {
         mas[j][0] = j + 1;
         mas[j][1] = 1;
-      }else
+      }
+      else
       {
         if (mtr[i] == mtr[i - n])
         {
           ++mas[j][1];
-        } else
+        }
+        else
         {
-          if(mas[j][1] > max_length)
+          if (mas[j][1] > max_length)
           {
             max_length = mas[j][1];
           }
@@ -150,58 +136,49 @@ namespace alisov
 
     return ans1;
   }
-}
+} // namespace alisov
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
-  if(argc<4)
+  if (argc < 4)
   {
     std::cerr << "Not enough arguments \n";
     return 1;
   }
-  if(argc>4)
+  if (argc > 4)
   {
     std::cerr << "Too many arguments \n";
     return 1;
   }
-  if(!alisov::isDig(argv[1]))
-  {
-    std::cerr << "first parameter is not a number \n";
-    return 1;
-  }
-
   int num = 0;
-
   try
   {
     num = alisov::sti(argv[1]);
-  } catch(const std::overflow_error &e)
+  } catch (const std::logic_error &)
   {
-    std::cerr<<e.what() << "\n";
+    std::cerr << "First parametr is not a numver\n";
     return 1;
   }
-  if(num!=1 && num!=2)
+  if (num != 1 && num != 2)
   {
-    std::cerr<<"First parameter is out of range \n";
+    std::cerr << "First parameter is out of range\n";
     return 1;
   }
 
-  size_t m,n;
+  size_t m, n;
   std::ifstream in(argv[2]);
   in >> m >> n;
-
-  if(!in.is_open())
+  if (in.fail())
   {
-    std::cerr<<"Not correct file";
-    return 2;
+    std::cerr << "Couldn't read size of matrix" << '\n';
   }
-  if(in.peek() == std::ifstream::traits_type::eof())
+  size_t lng = m * n;
+
+  if (in.peek() == std::ifstream::traits_type::eof())
   {
     std::cerr << "File is empty";
     return 2;
   }
-
-  size_t lng = 0;
 
   try
   {
@@ -212,29 +189,26 @@ int main(int argc, char ** argv)
     return 2;
   }
 
-  int a[10000] = {};
-  int *b = new int [lng];
   int *matr = nullptr;
 
   try
   {
-    if(num == 1)
+    if (num == 1)
     {
-      alisov::input(in, a, lng);
+      int a[alisov::matrix_size] = {};
       matr = a;
-      delete[] b;
     }
-    if(num == 2)
+    if (num == 2)
     {
-      alisov::input(in, b, lng);
+      int *b = new int[lng];
       matr = b;
     }
-    } catch(std::logic_error &e)
-    {
-      std::cerr<<e.what()<<"\n";
-      delete[] b;
-      return 2;
-    }
+    alisov::input(in, matr, lng);
+  } catch (std::logic_error &e)
+  {
+    std::cerr << e.what() << "\n";
+    return 2;
+  }
 
   std::ofstream out(argv[3]);
   size_t res1 = alisov::ncl(matr, m, n);
@@ -247,4 +221,3 @@ int main(int argc, char ** argv)
     delete[] matr;
   }
 }
-
