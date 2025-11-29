@@ -22,7 +22,7 @@ namespace alisov
     return in;
   }
 
-  int sti(const char *str)
+  long sti(const char *str)
   {
     char *end = nullptr;
     long val = std::strtol(str, std::addressof(end), 10);
@@ -32,13 +32,13 @@ namespace alisov
       throw std::logic_error("");
     }
 
-    int out = static_cast< int >(val);
+    long out = val;
     return out;
   }
 
   int minSum(int *mtr, size_t m, size_t n)
   {
-    int sum;
+    int sum = 0;
     int min = std::numeric_limits< int >::max();
     if (m + n < 2)
     {
@@ -149,10 +149,10 @@ int main(int argc, char **argv)
   size_t lng = m * n;
 
   int *matr = nullptr;
+  int a[alisov::matrix_size] = {};
 
   if (num == 1)
   {
-    int a[alisov::matrix_size] = {};
     matr = a;
   }
   else
