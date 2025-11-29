@@ -9,47 +9,19 @@ namespace alisov
 {
   const size_t matrix_size = 10000;
 
-  void input(std::istream &in, int *m, size_t lng)
+  std::istream &input(std::istream &in, int *m, size_t lng)
   {
     for (size_t i = 0; i < lng; i++)
     {
       in >> m[i];
       if (in.fail())
       {
-        throw std::logic_error("Cant read the matrix");
+        return in;
       }
     }
+    return in;
   }
 
-  size_t lengthInput(char *file)
-  {
-    std::ifstream in(file);
-    size_t a, b;
-    in >> a >> b;
-    if (in.fail())
-    {
-      throw std::logic_error("Couldn't read the size of matrix");
-    }
-    return a * b;
-  }
-
-  int myPow(int a, int b)
-  {
-    if (a == 0 || a == 1)
-    {
-      return a;
-    }
-    int res = 1;
-    for (int i = 0; i < b; i++)
-    {
-      if (res > std::numeric_limits< int >::max() / a)
-      {
-        throw std::overflow_error("First parameter is out of range");
-      }
-      res *= a;
-    }
-    return res;
-  }
   int sti(const char *str)
   {
     char *end = nullptr;
@@ -171,6 +143,7 @@ int main(int argc, char **argv)
   if (in.fail())
   {
     std::cerr << "Couldn't read size of matrix" << '\n';
+    return 2;
   }
   size_t lng = m * n;
 
@@ -180,37 +153,39 @@ int main(int argc, char **argv)
     return 2;
   }
 
-  try
-  {
-    lng = alisov::lengthInput(argv[2]);
-  } catch (const std::logic_error &e)
-  {
-    std::cerr << e.what() << '\n';
-    return 2;
-  }
-
   int *matr = nullptr;
 
-  try
+  if (num == 1)
   {
-    if (num == 1)
-    {
-      int a[alisov::matrix_size] = {};
-      matr = a;
-    }
+    int a[alisov::matrix_size] = {};
+    matr = a;
+  }
+  else
+  {
+    int *b = new int[lng];
+    matr = b;
+  }
+  if (alisov::input(in, matr, lng).fail())
+  {
+    std::cerr << "Cant read matrix";
     if (num == 2)
     {
-      int *b = new int[lng];
-      matr = b;
+      delete[] matr;
     }
-    alisov::input(in, matr, lng);
-  } catch (std::logic_error &e)
-  {
-    std::cerr << e.what() << "\n";
     return 2;
   }
 
   std::ofstream out(argv[3]);
+  if (!out.is_open())
+  {
+    std::cerr << "Cant open output file" << '\n';
+    if (num == 2)
+    {
+      delete[] matr;
+    }
+    return 2;
+  }
+
   size_t res1 = alisov::ncl(matr, m, n);
   int res2 = alisov::minSum(matr, m, n);
   out << "Answer for var-1: " << res1 << "\n";
