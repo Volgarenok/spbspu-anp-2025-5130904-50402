@@ -182,8 +182,8 @@ int main(int argc, char **argv)
 
   size_t res1 = alisov::ncl(matr, m, n);
   int res2 = alisov::minSum(matr, m, n);
-  out << "Answer for var-1: " << res1 << "\n";
-  out << "Answer for var-2: " << res2 << "\n";
+  out << "Answer for var-1: " << res1 << '\n';
+  out << "Answer for var-2: " << res2 << '\n';
 
   if (num == 2)
   {
