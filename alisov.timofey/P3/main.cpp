@@ -108,7 +108,7 @@ namespace alisov
 
     return ans1;
   }
-} // namespace alisov
+}
 
 int main(int argc, char **argv)
 {
@@ -126,7 +126,8 @@ int main(int argc, char **argv)
   try
   {
     num = alisov::sti(argv[1]);
-  } catch (const std::logic_error &)
+  }
+  catch (const std::logic_error &)
   {
     std::cerr << "First parametr is not a numver\n";
     return 1;
@@ -146,12 +147,6 @@ int main(int argc, char **argv)
     return 2;
   }
   size_t lng = m * n;
-
-  if (in.peek() == std::ifstream::traits_type::eof())
-  {
-    std::cerr << "File is empty" << '\n';
-    return 2;
-  }
 
   int *matr = nullptr;
 
