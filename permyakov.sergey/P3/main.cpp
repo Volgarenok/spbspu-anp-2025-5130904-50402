@@ -7,7 +7,7 @@ namespace permyakov
   void lftTopClk(int * arr1, int * arr, size_t n, size_t m);
   void lftBotCnt(int * arr2, int * arr, size_t n, size_t m);
   std::ifstream & arrInFromFile(std::ifstream & in, int * arr, size_t n, size_t m);
-  std::ofstream & arrOutInFile(std::ofstream & out, int * arr, size_t n, size_t m);
+  std::ofstream & arrOutInFile(std::ofstream & out, const int * arr, size_t n, size_t m);
 }
 
 int main(int argc, char ** argv)
@@ -40,18 +40,15 @@ int main(int argc, char ** argv)
     return 2;
   }
   int * arr = nullptr;
-  int * arr1 = nullptr;
-  int * arr2 = nullptr;
+  const size_t SIZE_OF_MATRIX = 10000;
+  int cArr[SIZE_OF_MATRIX]{};
   if (task == 1) {
-    const size_t SIZE_OF_MATRIX = 10000;
-    int cArr[SIZE_OF_MATRIX]{};
     arr = cArr;
   } else {
-    try {
-      arr = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));
-    } catch (std::bad_alloc()) {
-    std::cerr << "Failure to allocate memoty\n";
-    return 3;
+    arr = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));
+    if (arr == nullptr) {
+      std::cerr << "Failure to allocate memoty\n";
+      return 3;
     }
   }
   if (!per::arrInFromFile(input, arr, n, m)) {
@@ -61,23 +58,13 @@ int main(int argc, char ** argv)
     }
     return 2;
   }
-  try {
-    arr1 = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));;
-  } catch (std::bad_alloc()) {
-    std::cerr << "Failure to allocate memoty\n";
-    if (task == 2) {
-      free(arr);
-    }
-    return 3;
-  }
-  try {
-    arr2 = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));
-  } catch (std::bad_alloc()) {
+  int * arr1 = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));;
+  int * arr2 = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));
+  if (arr1 == nullptr || arr2 == nullptr) {
     std::cerr << "Failure to allocate memory\n";
-    free(arr1);
-    if (task == 2) {
-      free(arr);
-    }
+   free(arr1);
+    free(arr2);
+    free(arr);
     return 3;
   }
   per::lftTopClk(arr1, arr, n, m);
@@ -87,6 +74,7 @@ int main(int argc, char ** argv)
   per::arrOutInFile(output, arr1, n, m);
   output << '\n';
   per::arrOutInFile(output, arr2, n, m);
+  output << '\n';
   free(arr1);
   free(arr2);
   if (task == 2) {
@@ -105,25 +93,25 @@ void permyakov::lftTopClk(int * arr1, int * arr, size_t n, size_t m)
   size_t lef = 0, rig = m - 1, top = 0, bot = n - 1;
   size_t cnt = 1, i = 0, j = 0;
   while (cnt < n * m) {
-    while(j < rig){
+    while (j < rig) {
       arr1[i * m + j] -= cnt;
       cnt++;
       j++;
     }
     top++;
-    while(i < bot){
+    while (i < bot) {
       arr1[i * m + j] -= cnt;
       cnt++;
       i++;
     }
     rig--;
-    while(j > lef){
+    while (j > lef) {
       arr1[i * m + j] -= cnt;
       cnt++;
       j--;
     }
     bot--;
-    while(i > top){
+    while (i > top) {
       arr1[i * m + j] -= cnt;
       cnt++;
       i--;
@@ -146,25 +134,25 @@ void permyakov::lftBotCnt(int * arr2, int * arr, size_t n, size_t m)
   size_t lef = 0, rig = m - 1, top = 0, bot = n - 1;
   size_t cnt = 1, i = n - 1, j = 0;
   while (cnt < n * m) {
-    while(j < rig){
+    while (j < rig) {
       arr2[i * m + j] += cnt;
       cnt++;
       j++;
     }
     bot--;
-    while(i > top){
+    while (i > top) {
       arr2[i * m + j] += cnt;
       cnt++;
       i--;
     }
     rig--;
-    while(j > lef){
+    while (j > lef) {
       arr2[i * m + j] += cnt;
       cnt++;
       j--;
     }
     top++;
-    while(i < bot){
+    while (i < bot) {
       arr2[i * m + j] += cnt;
       cnt++;
       i++;
@@ -184,7 +172,7 @@ std::ifstream & permyakov::arrInFromFile(std::ifstream & in, int * arr, size_t n
   return in;
 }
 
-std::ofstream & permyakov::arrOutInFile(std::ofstream & out, int * arr, size_t n, size_t m)
+std::ofstream & permyakov::arrOutInFile(std::ofstream & out, const int * arr, size_t n, size_t m)
 {
   out << n << ' ' << m;
   for (size_t i = 0; i < n * m; ++i) {
