@@ -4,9 +4,9 @@
 namespace permyakov
 {
   char * addSymToStr(char * line, const char sym, size_t & size);
-  int cinStr(char * & line, size_t & size);
-  void latTwo(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine, const size_t size);
-  void uniTwo(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine);
+  char * inStr(std::istream & in, size_t & size);
+  void latTwo(const char * line1, size_t size1, const char * line2, size_t size2, char * newLine, size_t size);
+  void uniTwo(const char * line1, size_t size1, const char * line2, size_t size2, char * newLine);
 }
 
 int main()
@@ -20,16 +20,9 @@ int main()
   const size_t size2u = 4;
 
   try {
-    line1 = new char[size1 + 1];
-  } catch (std::bad_alloc()) {
+    line1 = per::inStr(std::cin, size1);
+  } catch (std:: bad_alloc()) {
     std::cerr << "Failure to allocate memory\n";
-    return 2;
-  }
-
-  line1[0] = '\0';
-  if (per::cinStr(line1, size1)) {
-    std::cerr << "Failure to allocate memory\n";
-    delete[] line1;
     return 2;
   }
 
@@ -97,22 +90,25 @@ char * permyakov::addSymToStr(char * line, const char sym, size_t & size)
   return line = newLine;
 }
 
-int permyakov::cinStr(char * & line, size_t & size)
+char * permyakov::inStr(std::istream & in, size_t & size)
 {
+  char * line = new char[size + 1];
+  line[0] = '\0';
   char sym = ' ';
-  std::cin.get(sym);
-  while (sym != '\n' && std::cin) {
+  in.get(sym);
+  while (sym != '\n' && in) {
     try {
       line = addSymToStr(line, sym, size);
-    } catch (std::bad_alloc()) {
-      return 1;
+    } catch (...) {
+      delete[] line;
+      throw;
     }
-    std::cin.get(sym);
+    in.get(sym);
   }
-  return 0;
+  return line;
 }
 
-void permyakov::latTwo(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine, const size_t size)
+void permyakov::latTwo(const char * line1, size_t size1, const char * line2, size_t size2, char * newLine, size_t size)
 {
   size_t istr = 0;
   for (size_t i = 0; i < size1; ++i) {
@@ -139,7 +135,7 @@ void permyakov::latTwo(const char * line1, const size_t size1, const char * line
   }
 }
 
-void permyakov::uniTwo(const char * line1, const size_t size1, const char * line2, const size_t size2, char * newLine)
+void permyakov::uniTwo(const char * line1, size_t size1, const char * line2, size_t size2, char * newLine)
 {
   size_t minSize = size1 < size2 ? size1 : size2;
   for (size_t i = 0; i < minSize; ++i) {
