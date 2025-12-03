@@ -60,9 +60,9 @@ int main(int argc, char ** argv)
   }
   int * arr1 = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));;
   int * arr2 = reinterpret_cast< int * >(malloc(sizeof(int) * n * m));
-  if (arr1 == nullptr || arr2 == nullptr) {
+  if (task == 2 && (arr1 == nullptr || arr2 == nullptr)) {
     std::cerr << "Failure to allocate memory\n";
-   free(arr1);
+    free(arr1);
     free(arr2);
     free(arr);
     return 3;
