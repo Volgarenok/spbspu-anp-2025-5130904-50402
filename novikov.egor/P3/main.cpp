@@ -264,6 +264,7 @@ int main(int argc, char* argv[])
       return 2;
     }
   }
+  input_stream >> std::ws;
   if (input_stream.peek() != std::ifstream::traits_type::eof())
   {
     std::cerr << "Invalid input file content" << "\n";
