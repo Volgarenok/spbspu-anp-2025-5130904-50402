@@ -216,12 +216,6 @@ int main(int argc, char* argv[])
     input_stream.close();
     return 2;
   }
-  else if (rows == 0 || cols == 0)
-  {
-    std::cerr << "Invalid input file content" << "\n";
-    input_stream.close();
-    return 2;
-  }
   if (use_fixed && rows * cols > MAX_FIXED_SIZE)
   {
     std::cerr << "Matrix too large for fixed array" << "\n";
