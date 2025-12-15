@@ -6,147 +6,10 @@
 namespace novikov
 {
   const size_t MAX_FIXED_SIZE = 10000;
-  const size_t MAX_LINE_LENGTH = 10000;
-  const size_t MAX_NUMBERS = 10002;
-
-  bool isNumber(const char* str)
-  {
-    if (str == nullptr || str[0] == '\0')
-    {
-      return false;
-    }
-    size_t start = 0;
-    if (str[0] == '-')
-    {
-      if (str[1] == '\0')
-      {
-        return false;
-      }
-      start = 1;
-    }
-    for (size_t i = start; str[i] != '\0'; i++)
-    {
-      if (!std::isdigit(str[i]))
-      {
-        return false;
-      }
-    }
-    return true;
-  }
 
   size_t getIndex(size_t i, size_t j, size_t cols)
   {
     return i * cols + j;
-  }
-
-  bool parseLine(const char* line, int* numbers, size_t* numbers_count)
-  {
-    *numbers_count = 0;
-    if (line == nullptr || line[0] == '\0')
-    {
-      return false;
-    }
-    size_t start_pos = 0;
-    size_t end_pos = 0;
-    while (line[start_pos] != '\0' && *numbers_count < MAX_NUMBERS)
-    {
-      while (line[start_pos] == ' ')
-      {
-        start_pos++;
-      }
-      if (line[start_pos] == '\0')
-      {
-        break;
-      }
-      end_pos = start_pos;
-      while (line[end_pos] != ' ' && line[end_pos] != '\0')
-      {
-        end_pos++;
-      }
-      size_t length = end_pos - start_pos;
-      char buffer[32];
-      if (length >= 32)
-      {
-        return false;
-      }
-      for (size_t i = 0; i < length; i++)
-      {
-        buffer[i] = line[start_pos + i];
-      }
-      buffer[length] = '\0';
-      if (!isNumber(buffer))
-      {
-        return false;
-      }
-      numbers[*numbers_count] = std::atoi(buffer);
-      (*numbers_count)++;
-      start_pos = end_pos;
-    }
-    return true;
-  }
-
-  bool readMatrixFromFile(std::ifstream& file, int* matrix_data, size_t* rows, size_t* cols)
-  {
-    char line[MAX_LINE_LENGTH];
-    if (!file.getline(line, MAX_LINE_LENGTH))
-    {
-      return false;
-    }
-    *rows = 0;
-    *cols = 0;
-    int numbers[MAX_NUMBERS];
-    size_t numbers_count = 0;
-    if (!parseLine(line, numbers, &numbers_count))
-    {
-      return false;
-    }
-    if (numbers_count < 2)
-    {
-      return false;
-    }
-    if (numbers[0] < 0 || numbers[1] < 0)
-    {
-      return false;
-    }
-    *rows = static_cast<size_t>(numbers[0]);
-    *cols = static_cast<size_t>(numbers[1]);
-    size_t expected_elements = *rows * *cols;
-    if (numbers_count != 2 + expected_elements)
-    {
-      return false;
-    }
-
-    if (matrix_data == nullptr)
-    {
-      return false;
-    }
-
-    size_t index = 0;
-    for (size_t i = 0; i < *rows; i++)
-    {
-      for (size_t j = 0; j < *cols; j++)
-      {
-        matrix_data[getIndex(i, j, *cols)] = numbers[2 + index];
-        index++;
-      }
-    }
-    return true;
-  }
-
-  void freeMatrix(int* matrix_data, bool use_fixed)
-  {
-    if (matrix_data == nullptr)
-    {
-      return;
-    }
-    if (use_fixed)
-    {
-      delete[] matrix_data;
-    }
-    else
-    {
-      std::free(matrix_data);
-    }
   }
 
   int countLocalMaxima(const int* matrix_data, size_t rows, size_t cols)
@@ -170,13 +33,13 @@ namespace novikov
             {
               continue;
             }
-            int neighbor_i = static_cast<int>(i) + di;
-            int neighbor_j = static_cast<int>(j) + dj;
-            if (neighbor_i >= 0 && neighbor_i < static_cast<int>(rows) &&
-              neighbor_j >= 0 && neighbor_j < static_cast<int>(cols))
+            int neighbor_i = static_cast < int > (i) + di;
+            int neighbor_j = static_cast < int > (j) + dj;
+            if (neighbor_i >= 0 && neighbor_i < static_cast < int >(rows) &&
+              neighbor_j >= 0 && neighbor_j < static_cast < int >(cols))
             {
-              int neighbor = matrix_data[getIndex(static_cast<size_t>(neighbor_i),
-                static_cast<size_t>(neighbor_j), cols)];
+              int neighbor = matrix_data[getIndex(static_cast < size_t >(neighbor_i),
+                static_cast < size_t >(neighbor_j), cols)];
               if (current <= neighbor)
               {
                 is_maxima = false;
@@ -213,7 +76,7 @@ namespace novikov
     int direction = 0;
     size_t i = top;
     size_t j = left;
-    while (current_value <= static_cast<int>(total_elements))
+    while (current_value <= static_cast < int > (total_elements))
     {
       matrix_data[getIndex(i, j, cols)] -= current_value;
       current_value++;
@@ -274,16 +137,20 @@ namespace novikov
 
   bool writeResultsToFile(std::ofstream& file, const int* matrix_data, size_t rows, size_t cols, int local_maxima_count)
   {
-    file << local_maxima_count << std::endl;
-    file << rows << " " << cols;
+    file << local_maxima_count;
+    file << "\n";
+    file << rows;
+    file << " ";
+    file << cols;
     for (size_t i = 0; i < rows; i++)
     {
       for (size_t j = 0; j < cols; j++)
       {
-        file << " " << matrix_data[getIndex(i, j, cols)];
+        file << " ";
+        file << matrix_data[getIndex(i, j, cols)];
       }
     }
-    file << std::endl;
+    file << "\n";
     return file.good();
   }
 }
@@ -293,90 +160,118 @@ int main(int argc, char* argv[])
   using namespace novikov;
   if (argc != 4)
   {
-    std::cerr << (argc < 4 ? "Not enough arguments" : "Too many arguments") << std::endl;
+    std::cerr << (argc < 4 ? "Not enough arguments" : "Too many arguments") << "\n";
     return 1;
   }
   const char* num_str = argv[1];
   const char* input_file = argv[2];
   const char* output_file = argv[3];
-  if (!isNumber(num_str))
+  if (num_str == nullptr || num_str[0] == '\0')
   {
-    std::cerr << "First parameter is not a number" << std::endl;
+    std::cerr << "First parameter is not a number" << "\n";
     return 1;
   }
-  int num = std::atoi(num_str);
+  bool is_negative = (num_str[0] == '-');
+  size_t start = (is_negative ? 1 : 0);
+  if (num_str[start] == '\0')
+  {
+    std::cerr << "First parameter is not a number" << "\n";
+    return 1;
+  }
+  for (size_t i = start; num_str[i] != '\0'; i++)
+  {
+    if (!std::isdigit(num_str[i]))
+    {
+      std::cerr << "First parameter is not a number" << "\n";
+      return 1;
+    }
+  }
+  int num = 0;
+  for (size_t i = start; num_str[i] != '\0'; i++)
+  {
+    num = num * 10 + (num_str[i] - '0');
+  }
+  if (is_negative)
+  {
+    num = -num;
+  }
   if (num != 1 && num != 2)
   {
-    std::cerr << "First parameter is out of range" << std::endl;
+    std::cerr << "First parameter is out of range" << "\n";
     return 1;
   }
   bool use_fixed = (num == 1);
-  size_t rows = 0;
-  size_t cols = 0;
   std::ifstream input_stream(input_file);
   if (!input_stream.is_open())
   {
-    std::cerr << "Cannot open input file" << std::endl;
+    std::cerr << "Cannot open input file" << "\n";
     return 2;
   }
-  char line[MAX_LINE_LENGTH];
-  if (!input_stream.getline(line, MAX_LINE_LENGTH))
+  size_t rows = 0;
+  size_t cols = 0;
+  input_stream >> rows >> cols;
+  if (input_stream.fail())
   {
-    std::cerr << "Invalid input file content" << std::endl;
+    std::cerr << "Invalid input file content" << "\n";
     input_stream.close();
     return 2;
   }
-  int numbers[MAX_NUMBERS];
-  size_t numbers_count = 0;
-  if (!parseLine(line, numbers, &numbers_count) || numbers_count < 2)
+  else if (rows == 0 || cols == 0)
   {
-    std::cerr << "Invalid input file content" << std::endl;
+    std::cerr << "Invalid input file content" << "\n";
     input_stream.close();
     return 2;
   }
-  if (numbers[0] < 0 || numbers[1] < 0)
+  if (use_fixed && rows * cols > MAX_FIXED_SIZE)
   {
-    std::cerr << "Invalid input file content" << std::endl;
-    input_stream.close();
-    return 2;
-  }
-  rows = static_cast<size_t>(numbers[0]);
-  cols = static_cast<size_t>(numbers[1]);
-  size_t expected_elements = rows * cols;
-  if (numbers_count != 2 + expected_elements)
-  {
-    std::cerr << "Invalid input file content" << std::endl;
-    input_stream.close();
-    return 2;
-  }
-  if (use_fixed && expected_elements > MAX_FIXED_SIZE)
-  {
-    std::cerr << "Matrix too large for fixed array" << std::endl;
+    std::cerr << "Matrix too large for fixed array" << "\n";
     input_stream.close();
     return 2;
   }
   int* matrix_data = nullptr;
+  int fixed_matrix[MAX_FIXED_SIZE];
   if (use_fixed)
   {
-    matrix_data = new int[rows * cols];
+    matrix_data = fixed_matrix;
   }
   else
   {
-    matrix_data = static_cast<int*>(std::malloc(rows * cols * sizeof(int)));
+    size_t size_bytes = rows * cols * sizeof(int);
+    if (rows > 0 && cols > 0 && size_bytes / sizeof(int) != rows * cols)
+    {
+      std::cerr << "Memory allocation failed" << "\n";
+      input_stream.close();
+      return 2;
+    }
+    matrix_data = static_cast < int* > (std::malloc(size_bytes));
     if (matrix_data == nullptr)
     {
-      std::cerr << "Memory allocation failed" << std::endl;
+      std::cerr << "Memory allocation failed" << "\n";
       input_stream.close();
       return 2;
     }
   }
-  input_stream.clear();
-  input_stream.seekg(0);
-  if (!readMatrixFromFile(input_stream, matrix_data, &rows, &cols))
+  for (size_t i = 0; i < rows * cols; i++)
   {
-    std::cerr << "Invalid input file content" << std::endl;
+    if (!(input_stream >> matrix_data[i]))
+    {
+      std::cerr << "Invalid input file content" << "\n";
+      input_stream.close();
+      if (!use_fixed)
+      {
+        std::free(matrix_data);
+      }
+      return 2;
+    }
+  }
+  if (input_stream.peek() != std::ifstream::traits_type::eof())
+  {
+    std::cerr << "Invalid input file content" << "\n";
     input_stream.close();
-    freeMatrix(matrix_data, use_fixed);
+    if (!use_fixed)
+    {
+      std::free(matrix_data);
+    }
     return 2;
   }
   input_stream.close();
@@ -385,18 +280,27 @@ int main(int argc, char* argv[])
   std::ofstream output_stream(output_file);
   if (!output_stream.is_open())
   {
-    std::cerr << "Cannot open output file" << std::endl;
-    freeMatrix(matrix_data, use_fixed);
+    std::cerr << "Cannot open output file" << "\n";
+    if (!use_fixed)
+    {
+      std::free(matrix_data);
+    }
     return 3;
   }
   if (!writeResultsToFile(output_stream, matrix_data, rows, cols, local_maxima_count))
   {
-    std::cerr << "Error writing to output file" << std::endl;
+    std::cerr << "Error writing to output file" << "\n";
     output_stream.close();
-    freeMatrix(matrix_data, use_fixed);
+    if (!use_fixed)
+    {
+      std::free(matrix_data);
+    }
     return 3;
   }
   output_stream.close();
-  freeMatrix(matrix_data, use_fixed);
+  if (!use_fixed)
+  {
+    std::free(matrix_data);
+  }
   return 0;
 }
