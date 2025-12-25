@@ -193,23 +193,6 @@ void strelnikov::Polygon::scale(double k)
   c_ = get_poly_C(data_, size_);
 }
 
-/*
-class Circle : public IShape {
-  public:
-    Circle(point_t, double);
-    double getArea() override;
-    rectangle_t getFrameRect() override;
-    void move(point_t) override;
-    void move(double, double) override;
-    void scale(double) override;
-    ~Circle() override = default;
-
-  private:
-    point_t cen_;
-    double rad_;
-  };
-*/
-
 strelnikov::Circle::Circle(point_t cen, double rad) : cen_(cen), rad_(rad)
 {}
 
@@ -240,4 +223,26 @@ void strelnikov::Circle::scale(double k)
 }
 
 int main()
-{}
+{
+  strelnikov::IShape** ishps = new strelnikov::IShape*[3];
+  strelnikov::Circle* circle = new strelnikov::Circle({3, 3}, 3);
+  strelnikov::Rectangle* rect = new strelnikov::Rectangle(4, 4, {0, 0});
+  strelnikov::point_t data[] = {
+      {3.5f, 2.0f}, {4.76f, 2.90f}, {4.27f, 4.44f}, {2.73f, 4.44f}, {2.24f, 2.90f}};
+  strelnikov::Polygon* poly = new strelnikov::Polygon(data, 5);
+  ishps[0] = circle;
+  ishps[1] = rect;
+  ishps[2] = poly;
+  for (size_t i = 0; i < 3; ++i) {
+    strelnikov::rectangle_t frame = ishps[i]->getFrameRect();
+    std::cout << "Фигура до изменения:\n"
+              << ishps[i]->getArea() << '\t' << "центр: (" << frame.c_.x_ << ' ' << frame.c_.y_
+              << ") ширина: " << frame.width_ << " высота: " << frame.width_ << '\n';
+    ishps[i]->move({1, 1});
+    ishps[i]->scale(2.5);
+    std::cout << "Фигура после изменения:\n"
+              << ishps[i]->getArea() << '\t' << "центр: (" << frame.c_.x_ << ';' << frame.c_.y_
+              << ") ширина: " << frame.width_ << " высота: " << frame.width_ << '\n';
+  }
+  return 0;
+}
