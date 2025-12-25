@@ -281,9 +281,9 @@ double strelnikov::computeTotalArea(strelnikov::IShape* const* ishps, size_t siz
 
 void strelnikov::printShapes(strelnikov::IShape* const* ishps, size_t size)
 {
-  double area = computeTotalArea(ishps, 3);
-  strelnikov::rectangle_t total_frame = computeGlobalFrameRect(ishps, 3);
-  for (size_t i = 0; i < 3; ++i) {
+  double area = computeTotalArea(ishps, size);
+  strelnikov::rectangle_t total_frame = computeGlobalFrameRect(ishps, size);
+  for (size_t i = 0; i < size; ++i) {
     strelnikov::rectangle_t frame = ishps[i]->getFrameRect();
     std::cout << ishps[i]->getArea() << '\t' << "центр: (" << frame.c_.x_ << ' ' << frame.c_.y_
               << ") ширина: " << frame.width_ << " высота: " << frame.width_ << '\n';
