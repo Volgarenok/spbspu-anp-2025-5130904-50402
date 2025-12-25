@@ -303,8 +303,17 @@ int main()
   ishps[0] = circle;
   ishps[1] = rect;
   ishps[2] = poly;
-  double k;
   double x, y;
+  std::cout << "Введите точку от которой нужно масштабироваться:\n";
+  std::cin >> x >> y;
+  if (!std::cin) {
+    delete circle;
+    delete rect;
+    delete poly;
+    delete[] ishps;
+    return 1;
+  }
+  double k;
   std::cout << "Введите коэф. масштабирования:\n";
   std::cin >> k;
   if (!std::cin) {
@@ -321,15 +330,7 @@ int main()
     delete[] ishps;
     return 2;
   }
-  std::cout << "Введите точку от которой нужно масштабироваться:\n";
-  std::cin >> x >> y;
-  if (!std::cin) {
-    delete circle;
-    delete rect;
-    delete poly;
-    delete[] ishps;
-    return 1;
-  }
+
   strelnikov::point_t move{x, y};
   std::cout << "Фигуры до изменения: \n";
   strelnikov::printShapes(ishps, 3);
