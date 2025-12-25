@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 namespace strelnikov {
+  constexpr double PI = 3.14;
   struct point_t {
     double x_, y_;
   };
@@ -169,28 +170,74 @@ strelnikov::rectangle_t strelnikov::Polygon::getFrameRect()
   return {max_x - min_x, max_y - min_y, {(min_x + max_x) / 2, (min_y + max_y) / 2}};
 }
 
-void strelnikov::Polygon::move(strelnikov::point_t p){
-  for(size_t i = 0; i < size_; ++i){
+void strelnikov::Polygon::move(strelnikov::point_t p)
+{
+  for (size_t i = 0; i < size_; ++i) {
     data_[i].x_ += p.x_;
     data_[i].y_ += p.y_;
   }
   c_ = get_poly_C(data_, size_);
 }
 
-void strelnikov::Polygon::move(double x, double y){
+void strelnikov::Polygon::move(double x, double y)
+{
   strelnikov::Polygon::move({x, y});
 }
 
 void strelnikov::Polygon::scale(double k)
 {
-  for(size_t i = 0; i < size_; ++i){
+  for (size_t i = 0; i < size_; ++i) {
     data_[i].x_ *= k;
     data_[i].y_ *= k;
   }
   c_ = get_poly_C(data_, size_);
 }
 
+/*
+class Circle : public IShape {
+  public:
+    Circle(point_t, double);
+    double getArea() override;
+    rectangle_t getFrameRect() override;
+    void move(point_t) override;
+    void move(double, double) override;
+    void scale(double) override;
+    ~Circle() override = default;
 
+  private:
+    point_t cen_;
+    double rad_;
+  };
+*/
+
+strelnikov::Circle::Circle(point_t cen, double rad) : cen_(cen), rad_(rad)
+{}
+
+double strelnikov::Circle::getArea()
+{
+  return strelnikov::PI * rad_ * rad_;
+}
+
+strelnikov::rectangle_t strelnikov::Circle::getFrameRect()
+{
+  return {(2 * rad_), (2 * rad_), cen_};
+}
+
+void strelnikov::Circle::move(strelnikov::point_t p)
+{
+  cen_ = p;
+}
+
+void strelnikov::Circle::move(double x, double y)
+{
+  strelnikov::Circle::move({cen_.x_ + x, cen_.y_ + y});
+}
+
+void strelnikov::Circle::scale(double k)
+{
+  cen_.x_ *= k;
+  cen_.y_ *= k;
+}
 
 int main()
 {}
