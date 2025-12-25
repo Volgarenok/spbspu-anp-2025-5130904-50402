@@ -69,7 +69,7 @@ namespace strelnikov {
   double computeTotalArea(strelnikov::IShape* const* ishps, size_t size);
   rectangle_t computeGlobalFrameRect(strelnikov::IShape* const* ishps, size_t size);
   void printShapes(strelnikov::IShape* const* ishps, size_t size);
-};
+}; // namespace strelnikov
 
 strelnikov::Rectangle::Rectangle(double wdth, double hght, point_t cntr) : rec_{wdth, hght, cntr}
 {}
@@ -233,7 +233,8 @@ void strelnikov::Circle::scale(double k)
   rad_ *= k;
 }
 
-strelnikov::rectangle_t strelnikov::computeGlobalFrameRect(strelnikov::IShape* const* ishps, size_t size)
+strelnikov::rectangle_t strelnikov::computeGlobalFrameRect(strelnikov::IShape* const* ishps,
+                                                           size_t size)
 {
   strelnikov::rectangle_t first = ishps[0]->getFrameRect();
   double min_x = first.c_.x_ - first.width_ / 2.0;
