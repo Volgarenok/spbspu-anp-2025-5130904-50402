@@ -64,9 +64,9 @@ namespace strelnikov {
 
   double get_tr_poly_S(point_t a, point_t b, point_t c);
   point_t get_tr_poly_C(point_t a, point_t b, point_t c);
-  point_t get_poly_C();
+  point_t get_poly_C(const strelnikov::point_t* data, size_t k);
 
-};
+}; // namespace strelnikov
 
 strelnikov::Rectangle::Rectangle(double wdth, double hght, point_t cntr) : rec_{wdth, hght, cntr}
 {}
@@ -98,7 +98,8 @@ void strelnikov::Rectangle::scale(double k)
   strelnikov::Rectangle::rec_.c_.y_ *= k;
 }
 
-double strelnikov::get_tr_poly_S(strelnikov::point_t a, strelnikov::point_t b, strelnikov::point_t c)
+double
+strelnikov::get_tr_poly_S(strelnikov::point_t a, strelnikov::point_t b, strelnikov::point_t c)
 {
   double res = a.x_ * (b.y_ - c.y_) + b.x_ * (c.y_ - a.y_) + c.x_ * (a.y_ - b.y_);
   if (res < 0) {
@@ -108,7 +109,8 @@ double strelnikov::get_tr_poly_S(strelnikov::point_t a, strelnikov::point_t b, s
   return res;
 }
 
-strelnikov::point_t strelnikov::get_tr_poly_C(strelnikov::point_t a, strelnikov::point_t b, strelnikov::point_t c)
+strelnikov::point_t
+strelnikov::get_tr_poly_C(strelnikov::point_t a, strelnikov::point_t b, strelnikov::point_t c)
 {
   double x = (a.x_ + b.x_ + c.x_) / 3.0;
   double y = (a.y_ + b.y_ + c.y_) / 3.0;
@@ -131,6 +133,61 @@ strelnikov::point_t strelnikov::get_poly_C(const strelnikov::point_t* data, size
     throw std::logic_error("Bad poly");
   }
   return {(sum_x / sum_s), (sum_y / sum_s)};
+}
+
+strelnikov::Polygon::Polygon(strelnikov::point_t* data, size_t size)
+    : data_(data), size_(size), c_{0, 0}
+{
+  if (size < 3 || !data) {
+    delete[] data_;
+    throw std::logic_error("Bad poly");
+  }
+  c_ = strelnikov::get_poly_C(data, size);
+}
+
+double strelnikov::Polygon::getArea()
+{
+  double res = 0;
+  for (size_t i = 1; i < (size_ - 1); ++i) {
+    res += get_tr_poly_S(data_[i], data_[i - 1], data_[0]);
+  }
+  return res;
+}
+
+strelnikov::rectangle_t strelnikov::Polygon::getFrameRect()
+{
+  double min_x = data_[0].x_;
+  double min_y = data_[0].y_;
+  double max_y = data_[0].y_;
+  double max_x = data_[0].x_;
+  for (size_t i = 1; i < size_; ++i) {
+    min_x = ((min_x < data_[i].x_) ? min_x : (data_[i].x_));
+    min_y = ((min_y < data_[i].y_) ? min_y : (data_[i].y_));
+    max_x = ((max_x > data_[i].x_) ? max_x : (data_[i].x_));
+    max_y = ((max_y > data_[i].y_) ? max_y : (data_[i].y_));
+  }
+  return {max_x - min_x, max_y - min_y, {(min_x + max_x) / 2, (min_y + max_y) / 2}};
+}
+
+void strelnikov::Polygon::move(strelnikov::point_t p){
+  for(size_t i = 0; i < size_; ++i){
+    data_[i].x_ += p.x_;
+    data_[i].y_ += p.y_;
+  }
+  c_ = get_poly_C(data_, size_);
+}
+
+void strelnikov::Polygon::move(double x, double y){
+  strelnikov::Polygon::move({x, y});
+}
+
+void strelnikov::Polygon::scale(double k)
+{
+  for(size_t i = 0; i < size_; ++i){
+    data_[i].x_ *= k;
+    data_[i].y_ *= k;
+  }
+  c_ = get_poly_C(data_, size_);
 }
 
 
