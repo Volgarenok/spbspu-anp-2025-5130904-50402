@@ -322,7 +322,7 @@ int main()
     return 2;
   }
   std::cout << "Введите точку от которой нужно масштабироваться:\n";
-  std::cin >> x, y;
+  std::cin >> x >> y;
   if (!std::cin) {
     delete circle;
     delete rect;
