@@ -16,7 +16,7 @@ namespace strelnikov {
     virtual ~Shape() = default;
     virtual double getArea() const noexcept = 0;
     virtual rectangle_t getFrameRect() const noexcept = 0;
-    virtual void move(point_t) noexcept= 0;
+    virtual void move(point_t) noexcept = 0;
     virtual void move(double, double) noexcept = 0;
     virtual void scale(double) noexcept = 0;
   };
@@ -145,16 +145,14 @@ strelnikov::point_t strelnikov::getPolyC(const point_t* data, size_t k)
   return {(sum_x / sum_s), (sum_y / sum_s)};
 }
 
-strelnikov::Polygon::Polygon(point_t* data, size_t size):
-  data_(new point_t[size]),
-  size_(size),
-  cen_{0, 0}
+strelnikov::Polygon::Polygon(point_t* data, size_t size)
+    : data_(new point_t[size]), size_(size), cen_{0, 0}
 {
   if (size < 3 || !data) {
     delete[] data_;
     throw std::logic_error("Bad poly");
   }
-  for(size_t i = 0; i < size; ++i){
+  for (size_t i = 0; i < size; ++i) {
     data_[i] = data[i];
   }
   cen_ = getPolyC(data, size);
@@ -165,13 +163,13 @@ strelnikov::Polygon::Polygon(const Polygon& p):
   size_(p.size_),
   cen_{p.cen_}
 {
-  for(size_t i = 0; i < size_; ++i){
+  for (size_t i = 0; i < size_; ++i) {
     data_[i] = p.data_[i];
   }
 }
 
-strelnikov::Polygon::Polygon(Polygon&& p) noexcept
-: data_(p.data_),
+strelnikov::Polygon::Polygon(Polygon&& p) noexcept:
+  data_(p.data_),
   size_(p.size_),
   cen_(p.cen_)
 {
@@ -187,20 +185,20 @@ strelnikov::Polygon::~Polygon()
 
 strelnikov::Polygon& strelnikov::Polygon::operator=(const Polygon& p)
 {
-  if(this == &p){
+  if (this == &p) {
     return *this;
   }
   point_t* tmp_data = nullptr;
-  try{
+  try {
     tmp_data = new point_t[p.size_];
-  }catch(...){
+  } catch (...) {
     return *this;
   }
   delete[] data_;
   data_ = tmp_data;
   size_ = p.size_;
   cen_ = p.cen_;
-  for(size_t i = 0; i < size_; ++i){
+  for (size_t i = 0; i < size_; ++i) {
     data_[i] = p.data_[i];
   }
   return *this;
@@ -208,7 +206,7 @@ strelnikov::Polygon& strelnikov::Polygon::operator=(const Polygon& p)
 
 strelnikov::Polygon& strelnikov::Polygon::operator=(Polygon&& p) noexcept
 {
-  if(this == &p){
+  if (this == &p) {
     return *this;
   }
   delete[] data_;
@@ -306,7 +304,8 @@ void strelnikov::Circle::scale(double k) noexcept
   rad_ *= k;
 }
 
-void strelnikov::scaleAll(Shape* const* ishps, const size_t size){
+void strelnikov::scaleAll(Shape* const* ishps, const size_t size)
+{
   double x, y;
   std::cout << "Введите точку от которой нужно масштабироваться:\n";
   std::cin >> x >> y;
@@ -320,12 +319,13 @@ void strelnikov::scaleAll(Shape* const* ishps, const size_t size){
   if (!std::cin || k <= 0) {
     throw std::logic_error("bad input");
   }
-  for(size_t i = 0; i < size; ++i){
+  for (size_t i = 0; i < size; ++i) {
     ishps[i]->move(move);
     ishps[i]->scale(k);
   }
 }
-strelnikov::rectangle_t strelnikov::computeGlobalFrameRect(const Shape* const* ishps, const size_t size)
+strelnikov::rectangle_t strelnikov::computeGlobalFrameRect(const Shape* const* ishps,
+  const size_t size)
 {
   rectangle_t first = ishps[0]->getFrameRect();
   double min_x = first.c.x - first.width / 2.0;
@@ -380,17 +380,23 @@ int main()
 {
   const int polyDataSize = 5;
   const int shapeSize = 3;
-  strelnikov::point_t data[polyDataSize] = {{3.5, 2.0}, {4.76, 2.90}, {4.27, 4.44}, {2.73, 4.44}, {2.24, 2.90}};
+  strelnikov::point_t data[polyDataSize] = {
+    {3.5, 2.0},
+    {4.76, 2.90},
+    {4.27, 4.44},
+    {2.73, 4.44},
+    {2.24, 2.90}
+  };
   strelnikov::Shape** ishps = nullptr;
   strelnikov::Circle* circle = nullptr;
   strelnikov::Rectangle* rect = nullptr;
   strelnikov::Polygon* poly = nullptr;
-  try{
+  try {
     ishps = new strelnikov::Shape*[shapeSize];
     circle = new strelnikov::Circle({3, 3}, 3);
     rect = new strelnikov::Rectangle(4, 4, {0, 0});
     poly = new strelnikov::Polygon(data, polyDataSize);
-  }catch(...){
+  } catch (...) {
     for (size_t i = 0; i < shapeSize; ++i) {
       delete ishps[i];
     }
@@ -400,13 +406,12 @@ int main()
   ishps[0] = circle;
   ishps[1] = rect;
   ishps[2] = poly;
-  
-  
+
   std::cout << "Фигуры до изменения: \n";
   strelnikov::printShapes(ishps, 3);
-  try{
+  try {
     strelnikov::scaleAll(ishps, shapeSize);
-  }catch(...){
+  } catch (...) {
     for (size_t i = 0; i < shapeSize; ++i) {
       delete ishps[i];
     }
