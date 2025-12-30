@@ -118,7 +118,7 @@ int main()
   char* buf = terentev::readLine(std::cin, cap, size);
   if (!buf)
   {
-    std::cerr << "no input\n"
+    std::cerr << "Error: no input\n";
     return 1;
   }
   std::size_t res_cap = size + 1;
