@@ -118,7 +118,8 @@ int main()
   char* buf = terentev::readLine(std::cin, cap, size);
   if (!buf)
   {
-    return 0;
+    std::cerr << "no input\n"
+    return 1;
   }
   std::size_t res_cap = size + 1;
   char* res = nullptr;
