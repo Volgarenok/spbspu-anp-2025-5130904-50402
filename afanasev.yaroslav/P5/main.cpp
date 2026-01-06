@@ -246,26 +246,72 @@ namespace afanasev
 
     double s_all = 0;
 
+    bool first_shape_found = false;
+
+    double x_max = 0;
+    double x_min = 0;
+    double y_max = 0;
+    double y_min = 0;
+
     for (size_t i = 0; i < cnt_shapes; i++)
     {
+      rectangle_t frame = shapes[i] -> getFrameRect();
+
       // площадь
       s_all += (shapes[i] -> getArea());
 
       std::cout << i << ") S = " << shapes[i] -> getArea();
 
       // Размер
-      std::cout << "; Размер ограничивающего прямоугольника: {h = " << shapes[i] -> getFrameRect().height;
-      std::cout << ", w = " << shapes[i] -> getFrameRect().width << '}';
+      std::cout << "; Размер ограничивающего прямоугольника: {h = " << frame.height;
+      std::cout << ", w = " << frame.width << '}';
 
       // Положение фигуры
-      std::cout << "; Координаты фигуры: {" << shapes[i] -> getFrameRect().pos.x;
-      std::cout << ", " << shapes[i] -> getFrameRect().pos.y << '}';
+      std::cout << "; Координаты фигуры: {" << frame.pos.x;
+      std::cout << ", " << frame.pos.y << '}';
 
       std::cout << '\n';
+
+      // Пересчитываем общий ограничивающий
+      double left = frame.pos.x - frame.width / 2;
+      double right = frame.pos.x + frame.width / 2;
+      double bottom = frame.pos.y - frame.height / 2;
+      double top = frame.pos.y + frame.height / 2;
+
+      // Если это первая найденная фигура, инициализируем границы
+      if (!first_shape_found)
+      {
+        x_min = left;
+        x_max = right;
+        y_min = bottom;
+        y_max = top;
+        first_shape_found = true;
+      }
+      else
+      {
+        // Обновляем границы общего ограничивающего прямоугольника
+        if (left < x_min)
+        {
+          x_min = left;
+        }
+        if (right > x_max)
+        {
+          x_max = right;
+        }
+        if (bottom < y_min)
+        {
+          y_min = bottom;
+        }
+        if (top > y_max)
+        {
+        y_max = top;
+        }
+      }
     }
-    
+
     std::cout << "Общая площадь: " << s_all;
-    
+    std::cout << '\n';
+    std::cout << "Общий ограничивающий: {h = " << y_max - y_min << ", w = " << x_max - x_min << '}';
     std::cout << '\n';
   }
 }
