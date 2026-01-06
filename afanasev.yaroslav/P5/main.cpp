@@ -51,9 +51,9 @@ namespace afanasev
       }
       width_ = w;
       height_ = h;
-      // центр для масштабирования
+
       center_ = pos;
-      // центр фигуры
+
       pos_ = pos;
     }
 
@@ -88,7 +88,6 @@ namespace afanasev
       width_ *= k;
       height_ *= k;
 
-      // Расстояние от "центра" до центра фигуры
       double vx = pos_.x - center_.x;
       double vy = pos_.y - center_.y;
 
@@ -112,9 +111,7 @@ namespace afanasev
         throw std::invalid_argument("radius must be > 0");
       }
       radius = r;
-      // центр для масштабирования
       center_ = pos;
-      // центр фигуры
       pos_ = pos;
     }
 
@@ -148,7 +145,6 @@ namespace afanasev
 
       radius *= k;
 
-      // Расстояние от "центра" до центра фигуры
       double vx = pos_.x - center_.x;
       double vy = pos_.y - center_.y;
 
@@ -162,7 +158,6 @@ namespace afanasev
     Circle c_min;
     Circle c_max;
 
-    // Центр масштабирования
     point_t center_;
 
   public:
@@ -185,7 +180,6 @@ namespace afanasev
         throw std::invalid_argument("circle is collision");
       }
 
-      // центр для масштабирования
       center_ = pos1;
     }
 
@@ -242,28 +236,23 @@ namespace afanasev
     {
       rectangle_t frame = shapes[i] -> getFrameRect();
 
-      // площадь
       s_all += (shapes[i] -> getArea());
 
       std::cout << i << ") S = " << shapes[i] -> getArea();
 
-      // Размер
       std::cout << "; Размер ограничивающего прямоугольника: {h = " << frame.height;
       std::cout << ", w = " << frame.width << '}';
 
-      // Положение фигуры
       std::cout << "; Координаты фигуры: {" << frame.pos.x;
       std::cout << ", " << frame.pos.y << '}';
 
       std::cout << '\n';
 
-      // Пересчитываем общий ограничивающий
       double left = frame.pos.x - frame.width / 2;
       double right = frame.pos.x + frame.width / 2;
       double bottom = frame.pos.y - frame.height / 2;
       double top = frame.pos.y + frame.height / 2;
 
-      // Если это первая найденная фигура, инициализируем границы
       if (!first_shape_found)
       {
         x_min = left;
@@ -274,7 +263,6 @@ namespace afanasev
       }
       else
       {
-        // Обновляем границы общего ограничивающего прямоугольника
         if (left < x_min)
         {
           x_min = left;
@@ -372,7 +360,6 @@ int main()
           double x = 0;
           double y = 0;
           std::cin >> x >> y;
-
           if (!std::cin)
           {
             throw std::logic_error("input error");
