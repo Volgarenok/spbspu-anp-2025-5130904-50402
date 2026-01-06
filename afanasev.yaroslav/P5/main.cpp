@@ -92,12 +92,71 @@ namespace afanasev
     }
   };
 
+  class Circle : public Shape
+  {
+    double radius;
+    point_t pos_;
+    point_t center_;
+
+  public:
+
+    Circle(double r, point_t pos)
+    {
+      if (r <= 0)
+      {
+        throw std::invalid_argument("radius must be > 0");
+      }
+      radius = r;
+      // центр для масштабирования
+      center_ = pos;
+      // центр фигуры
+      pos_ = pos;
+    }
+
+    double getArea() const override
+    {
+      return radius * radius * 3.1415;
+    }
+
+    rectangle_t getFrameRect() const override
+    {
+      return {radius * 2, radius * 2, pos_};
+    }
+
+    void move(const point_t& point) override
+    {
+      center_ = point;
+    }
+
+    void move(double dx, double dy) override
+    {
+      center_.x += dx;
+      center_.y += dy;
+    }
+
+    void scale(double k) override
+    {
+      if (k <= 0)
+      {
+        throw std::invalid_argument("coefficient must be > 0");
+      }
+
+      radius *= k;
+
+      // Расстояние от "центра" до центра фигуры
+      double vx = pos_.x - center_.x;
+      double vy = pos_.y - center_.y;
+
+      pos_.x += -vx + vx * k;
+      pos_.y += -vy + vy * k;
+    }
+  };
 
   void printShapesInfo(Shape ** const shapes, size_t cnt_shapes)
   {
     std::cout << "Существующие фигуры:" << '\n';
 
-    size_t s_all = 0;
+    double s_all = 0;
 
     for (size_t i = 0; i < cnt_shapes; i++)
     {
@@ -129,6 +188,7 @@ int main()
   using afanasev::rectangle_t;
   using afanasev::Shape;
   using afanasev::Rectangle;
+  using afanasev::Circle;
 
   size_t cnt_shapes = 3;
   Shape ** shapes = nullptr;
@@ -143,11 +203,15 @@ int main()
     return 1;
   }
 
+  for (size_t i = 0; i < cnt_shapes; i++)
+  {
+    shapes[i] = nullptr;
+  }
 
   try
   {
     shapes[0] = new Rectangle(2, 2, {2, 2});
-    shapes[1] = new Rectangle(3, 4, {5, 4});
+    shapes[1] = new Circle(2, {5, 5});
     shapes[2] = new Rectangle(3, 6, {11, 12});
 
     int n = 0;
@@ -229,7 +293,10 @@ int main()
 
       std::cout << '\n';
     }
-
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << "Ошибка: " << e.what() << std::endl;
 
     for (size_t i = 0; i < cnt_shapes; i++)
     {
@@ -237,11 +304,14 @@ int main()
     }
     delete[] shapes;
 
-    return 0;
-  }
-  catch (const std::exception& e)
-  {
-    std::cerr << "Ошибка: " << e.what() << std::endl;
     return 1;
   }
+
+  for (size_t i = 0; i < cnt_shapes; i++)
+  {
+    delete shapes[i];
+  }
+  delete[] shapes;
+
+  return 0;
 }
