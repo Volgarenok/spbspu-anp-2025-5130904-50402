@@ -159,22 +159,17 @@ namespace afanasev
 
   class Rubber : public Shape
   {
-    // Внутренний меньший
-    double r_1;
-    // Внешний больший
-    double r_2;
-
-    // Центр меньшего круга
-    point_t pos_1;
-    // Центр большего круга
-    point_t pos_2;
+    Circle c_min;
+    Circle c_max;
 
     // Центр масштабирования
     point_t center_;
 
   public:
 
-    Rubber(double r1, double r2, point_t pos1, point_t pos2)
+    Rubber(double r1, double r2, point_t pos1, point_t pos2):
+    c_min(r1, pos1),
+    c_max(r2, pos2)
     {
       if (r1 <= 0 || r2 <= 0 || r2 <= r1 || pos1 == pos2)
       {
@@ -190,25 +185,18 @@ namespace afanasev
         throw std::invalid_argument("circle is collision");
       }
 
-      r_1 = r1;
-      r_2 = r2;
-
       // центр для масштабирования
       center_ = pos1;
-      // центр фигуры
-      pos_1 = pos1;
-      // центр большего круга
-      pos_2 = pos2;
     }
 
     double getArea() const override
     {
-      return (r_2 * r_2 - r_1 * r_1) * 3.1415;
+      return c_max.getArea() - c_min.getArea();
     }
 
     rectangle_t getFrameRect() const override
     {
-      return {r_2 * 2, r_2 * 2, pos_2};
+      return c_max.getFrameRect();
     }
 
     void move(const point_t& point) override
@@ -229,14 +217,11 @@ namespace afanasev
         throw std::invalid_argument("coefficient must be > 0");
       }
 
-      r_1 *= k;
+      c_min.move(center_);
+      c_max.move(center_);
 
-      // Расстояние от "центра" до центра фигуры
-      double vx = pos_1.x - center_.x;
-      double vy = pos_1.y - center_.y;
-
-      pos_1.x += -vx + vx * k;
-      pos_1.y += -vy + vy * k;
+      c_min.scale(k);
+      c_max.scale(k);
     }
   };
 
