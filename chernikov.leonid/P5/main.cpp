@@ -1,185 +1,206 @@
-#include <iostream>;
-#include <cmath>;
+#include <iostream>
+#include <cmath>
+#include <algorithm>
+#include <stdexcept>
 namespace chernikov {
-  struct p_t {
+  struct point_t {
     double x;
     double y;
+    point_t(double x_val = 0, double y_val = 0) : x(x_val), y(y_val) {}
   };
-  struct r_t {
+  struct rectangle_t {
     double w;
     double h;
-    p_t pos;
+    point_t pos;
   };
-  struct IShape {
+  struct Shape {
     virtual void scale(double ct) = 0;
-    virtual ~IShape() = default;
-    virtual r_t getFrameRectangle() const = 0;
-    virtual void move(p_t pt) = 0;
+    virtual rectangle_t getFrameRectangle() const = 0;
+    virtual void move(point_t pt) = 0;
     virtual void move(double dx, double dy) = 0;
     virtual double getArea() const = 0;
+    virtual ~Shape() = default;
   };
-  struct Rectangle : IShape {
-    Rectangle(double w, double h, p_t mid);
-    void move(double dx, double dy) override;
-    void move(p_t pt) override;
-    double getArea() const override;
-    r_t getFrameRectangle() const override;
-    void scale(double ct) override;
+  struct Rectangle final: Shape {
+    Rectangle(double w, double h, point_t mid);
+    void move(double dx, double dy) noexcept override;
+    void move(point_t pt) noexcept override;
+    double getArea() const noexcept override;
+    rectangle_t getFrameRectangle()const noexcept override;
+    void scale(double ct) noexcept override;
   private:
-    double w, h;
-    p_t mid;
+    double w_, h_;
+    point_t mid_;
   };
-  struct Polygon : IShape {
-    Polygon(size_t size, p_t *points);
-    void move(double dx, double dy) override;
-    void move(p_t pt) override;
-    double getArea() const override;
-    r_t getFrameRectangle() const override;
-    void scale(double ct) override;
+  struct Polygon final: Shape {
+    Polygon(size_t size, point_t *points);
+    void move(double dx, double dy) noexcept override;
+    void move(point_t pt) noexcept override;
+    double getArea() const noexcept override;
+    rectangle_t getFrameRectangle() const noexcept override;
+    void scale(double ct) noexcept override;
     ~Polygon();
   private:
-    size_t size;
-    p_t *pts;
-    p_t mid;
+    double computeArea(point_t* pts, size_t size);
+    point_t computeCentroid(point_t* pts, size_t size);
+    size_t size_;
+    point_t *pts_;
+    point_t mid_;
   };
-  struct Diamond : IShape {
-    Diamond(double rad, p_t mid);
-    void move(double dx, double dy) override;
-    void move(p_t pt) override;
-    double getArea() const override;
-    r_t getFrameRectangle() const override;
-    void scale(double ct) override;
-    ~Diamond();
+  struct Diamond final: Shape {
+    Diamond(double rad, point_t mid);
+    void move(double dx, double dy) noexcept override;
+    void move(point_t pt) noexcept override;
+    double getArea() const noexcept override;
+    rectangle_t getFrameRectangle() const noexcept override;
+    void scale(double ct) noexcept override;
+    ~Diamond() = default;
   private:
-    double rad;
-    p_t mid;
+    double rad_;
+    point_t mid_;
   };
-  std::ostream &chernikov::output(std::ostream &os, IShape **shps, size_t size);
-  void chernikov::scaleFromPoint(IShape **shps, size_t size, p_t point, double ct);
-  chernikov::r_t chernikov::getTotalFrame(IShape **shps, size_t size);
+  std::ostream &output(std::ostream &os, const Shape **shps, size_t size);
+  void scaleFromPoint(Shape **shps, size_t size, point_t point, double ct);
+  rectangle_t getTotalFrame(const Shape **shps, size_t size);
 }
-int main() {
-  chernikov::Rectangle r(10, 2, {6, 8});
-  chernikov::p_t points[4] = {{0, 1}, {4, 6}, {3, 3}, {9.4, 3.3}};
-  chernikov::Diamond d(5.2, {5, 5});
+int main()
+{
+  chernikov::Rectangle r(10, 2, chernikov::point_t(6, 8));
+  chernikov::point_t points[4] = {
+    chernikov::point_t(0, 1),
+    chernikov::point_t(4, 6),
+    chernikov::point_t(3, 3),
+    chernikov::point_t(9.4, 3)
+  };
+  chernikov::Diamond d(5.2, chernikov::point_t(5, 5));
   try {
     chernikov::Polygon p(4, points);
-    chernikov::IShape *shps[3] = {std::addressof(r), std::addressof(d), std::addressof(p)};
+    chernikov::Shape *shps[3] = {std::addressof(r), std::addressof(d), std::addressof(p)};
     chernikov::output(std::cout, shps, 3);
-    chernikov::p_t point = {};
+    chernikov::point_t point = {};
     double ct = 0;
     if (!(std::cin >> point.x >> point.y >> ct)) {
       std::cerr << "failed to count input" << "\n";
-    return 1;
+      return 1;
     }
     if (ct <= 0) {
       std::cerr << "Negative coef" << "\n";
-    return 1;
+      return 1;
     }
     chernikov::scaleFromPoint(shps, 3, point, ct);
     chernikov::output(std::cout, shps, 3);
     } catch (std::bad_alloc &e) {
       std::cerr << "failed to allocate memory" << "\n";
-    return 2;
+      return 2;
   }
   return 0;
 }
 
-chernikov::Rectangle::Rectangle(double w, double h, p_t mid) :
-  IShape(), w(w), h(h), mid(mid)
-  {}
-void chernikov::Rectangle::move(p_t pt) {
-  mid = pt;
+chernikov::Rectangle::Rectangle(double w, double h, point_t mid) :
+   w_(w),
+   h_(h),
+   mid_(mid)
+{}
+void chernikov::Rectangle::move(point_t pt)
+{
+  mid_ = pt;
 }
-void chernikov::Rectangle::move(double dx, double dy) {
-  mid.x += dx;
-  mid.y += dy;
+void chernikov::Rectangle::move(double dx, double dy)
+{
+  mid_.x += dx;
+  mid_.y += dy;
 }
-double chernikov::Rectangle::getArea() const {
-  return w * h;
+double chernikov::Rectangle::getArea() const
+{
+  return w_ * h_;
 }
-chernikov::r_t chernikov::Rectangle::getFrameRectangle() const {
-  return {w, h, mid};
+chernikov::rectangle_t chernikov::Rectangle::getFrameRectangle() const
+{
+  return {w_, h_, mid_};
 }
-void chernikov::Rectangle::scale(double ct) {
-  w = w * ct;
-  h = h * ct;
-}
-
-chernikov::Diamond::Diamond(double rad, p_t mid) :
-  IShape(), rad(rad), mid(mid)
-  {}
-void chernikov::Diamond::move(p_t pt) {
-  mid = pt;
-}
-void chernikov::Diamond::move(double dx, double dy) {
-  mid.x += dx;
-  mid.y += dy;
-}
-double chernikov::Diamond::getArea() const {
-  return ((2 * rad) * (2 * rad)) / 2;
-}
-chernikov::r_t chernikov::Diamond::getFrameRectangle() const {
-  return {2 * rad, 2 * rad, mid};
-}
-void chernikov::Diamond::scale(double ct) {
-  rad = rad * ct;
+void chernikov::Rectangle::scale(double ct)
+{
+  w_ = w_ * ct;
+  h_ = h_ * ct;
 }
 
-chernikov::Polygon::Polygon(size_t size, p_t *points) :
-  IShape(), size(size), pts(size < 3 ? nullptr : new p_t[size]), mid{0, 0} {
+chernikov::Diamond::Diamond(double rad, point_t mid) :
+   rad_(rad),
+   mid_(mid)
+{}
+void chernikov::Diamond::move(point_t pt)
+{
+  mid_ = pt;
+}
+void chernikov::Diamond::move(double dx, double dy)
+{
+  mid_.x += dx;
+  mid_.y += dy;
+}
+double chernikov::Diamond::getArea() const
+{
+  return ((2 * rad_) * (2 * rad_)) / 2;
+}
+chernikov::rectangle_t chernikov::Diamond::getFrameRectangle() const
+{
+  return {2 * rad_, 2 * rad_, mid_};
+}
+void chernikov::Diamond::scale(double ct)
+{
+  rad_ = rad_ * ct;
+}
+chernikov::Polygon::~Polygon() 
+{
+   delete[] pts_;
+}
+chernikov::Polygon::Polygon(size_t size, point_t *points) :
+   size_(size), 
+   pts_(size < 3 ? nullptr : new point_t[size]), 
+   mid_{0, 0}
+{
   if (size < 3) {
     throw std::logic_error("Not a polygon");
   }
+  for (size_t i = 0; i < size; ++i) {
+        pts_[i] = points[i];
+    }
+    mid_ = computeCentroid(pts_, size_);
+}
+void chernikov::Polygon::move(double dx, double dy)
+{
+  for (size_t i = 0; i < size_; ++i) {
+    pts_[i].x += dx;
+    pts_[i].y += dy;
+  }
+  mid_.x += dx;
+  mid_.y += dy;
+}
+void chernikov::Polygon::move(point_t pt)
+{
+  double dx = pt.x - mid_.x;
+  double dy = pt.y - mid_.y;
+  move(dx, dy);
+}
+double chernikov::Polygon::getArea() const
+{
   double area = 0;
-  for (size_t i = 0; i < size; ++i) {
-    pts[i] = points[i];
-    size_t j = (i + 1) % size;
-    area += points[i].x * points[j].y;
-    area -= points[j].x * points[i].y;
-  }
-  area = std::abs(area) / 2;
-  double mod = 0.0;
-  for (size_t i = 0; i < size; ++i) {
-    size_t j = (i + 1) % size;
-    mod = (pts[i].x * pts[j].y - pts[j].x * pts[i].y);
-    mid.x += (pts[i].x + pts[j].x) * mod;
-    mid.y += (pts[i].y + pts[j].y) * mod;
-  }
-  mid.x /= (6.0 * area);
-  mid.y /= (6.0 * area);
-}
-void chernikov::Polygon::move(double dx, double dy) {
-  for (size_t i = 0; i < size; ++i) {
-    pts[i].x += dx;
-    pts[i].y += dy;
-  }
-  mid.x += dx;
-  mid.y += dy;
-}
-void chernikov::Polygon::move(p_t pt) {
-  double dx = pt.x - mid.x;
-  double dy = pt.y - mid.y;
-  this->move(dx, dy);
-}
-double chernikov::Polygon::getArea() const {
-  double area = 0;
-  for (size_t i = 0; i < size; ++i) {
-    size_t j = (i + 1) % size;
-    area += pts[i].x * pts[j].y;
-    area -= pts[j].x * pts[i].y;
+  for (size_t i = 0; i < size_; ++i) {
+    size_t j = (i + 1) % size_;
+    area += pts_[i].x * pts_[j].y;
+    area -= pts_[j].x * pts_[i].y;
   }
   area = std::abs(area) / 2;
   return area;
 }
-chernikov::r_t chernikov::Polygon::getFrameRectangle() const {
-  double maxx = pts[0].x, minx = pts[0].x;
-  double maxy = pts[0].y, miny = pts[0].y;
-  for (size_t i = 1; i < size; ++i) {
-    maxx = std::max(maxx, pts[i].x);
-    minx = std::min(minx, pts[i].x);
-    maxy = std::max(maxy, pts[i].y);
-    miny = std::min(miny, pts[i].y);
+chernikov::rectangle_t chernikov::Polygon::getFrameRectangle() const
+{
+  double maxx = pts_[0].x, minx = pts_[0].x;
+  double maxy = pts_[0].y, miny = pts_[0].y;
+  for (size_t i = 1; i < size_; ++i) {
+    maxx = std::max(maxx, pts_[i].x);
+    minx = std::min(minx, pts_[i].x);
+    maxy = std::max(maxy, pts_[i].y);
+    miny = std::min(miny, pts_[i].y);
   }
   double w = maxx - minx;
   double h = maxy - miny;
@@ -189,41 +210,40 @@ void chernikov::Polygon::scale(double ct)
 {
   --ct;
   double dx = 0, dy = 0;
-  for (size_t i = 0; i < size; ++i) {
-    dx = pts[i].x - mid.x;
-    dy = pts[i].y - mid.y;
-    pts[i].x += dx * ct;
-    pts[i].y += dy * ct;
+  for (size_t i = 0; i < size_; ++i) {
+    dx = pts_[i].x - mid_.x;
+    dy = pts_[i].y - mid_.y;
+    pts_[i].x += dx * ct;
+    pts_[i].y += dy * ct;
   }
 }
-std::ostream &chernikov::output(std::ostream &out, IShape **shps, size_t size) {
+std::ostream &chernikov::output(std::ostream &out, Shape **shps, size_t size)
+{
   double totalArea = 0.0;
   for (size_t i = 0; i < size; ++i) {
     double area = shps[i]->getArea();
-    r_t frame = shps[i]->getFrameRectangle();
     totalArea += area;
-    out << area << "\n";
-    out << frame.pos.x << frame.pos.y << "\n";
-    out << frame.w << frame.h << "\n";
   }
-  r_t totalFrame = getTotalFrame(shps, size);
+  rectangle_t totalFrame = getTotalFrame(shps, size);
   out << totalArea << "\n";
-  out << totalFrame.pos.x << totalFrame.pos.y << "\n";
-  out << totalFrame.w << totalFrame.h << "\n";
+  out << totalFrame.pos.x << " " << totalFrame.pos.y << "\n";
+  out << totalFrame.w << " " << totalFrame.h << "\n";
   return out;
 }
-void chernikov::scaleFromPoint(IShape **shps, size_t size, p_t point, double ct) {
+void chernikov::scaleFromPoint(Shape **shps, size_t size, point_t point, double ct)
+{
   for (size_t i = 0; i < size; ++i) {
     shps[i]->move(-point.x, -point.y);
     shps[i]->scale(ct);
     shps[i]->move(point.x, point.y);
   }
 }
-chernikov::r_t chernikov::getTotalFrame(IShape **shps, size_t size) {
+chernikov::rectangle_t chernikov::getTotalFrame(Shape **shps, size_t size)
+{
   if (size == 0) {
     return {0.0, 0.0, {0.0, 0.0}};
   }
-  r_t frame = shps[0]->getFrameRectangle();
+  rectangle_t frame = shps[0]->getFrameRectangle();
   double left = frame.pos.x - frame.w / 2.0;
   double right = frame.pos.x + frame.w / 2.0;
   double bottom = frame.pos.y - frame.h / 2.0;
@@ -234,23 +254,39 @@ chernikov::r_t chernikov::getTotalFrame(IShape **shps, size_t size) {
     double r = frame.pos.x + frame.w / 2.0;
     double b = frame.pos.y - frame.h / 2.0;
     double t = frame.pos.y + frame.h / 2.0;
-    if (l < left) {
-      left = l;
-    }
-    if (r > right) {
-      right = r;
-    }
-    if (b < bottom) {
-      bottom = b;
-    }
-    if (t > top) {
-      top = t;
-    }
+    left = std::min(left, l);
+    right = std::max(right, r);
+    bottom = std::min(bottom, b);
+    top = std::max(top, t);
   }
-  r_t total;
+  rectangle_t total;
   total.w = right - left;
   total.h = top - bottom;
   total.pos.x = (left + right) / 2.0;
   total.pos.y = (bottom + top) / 2.0;
   return total;
 }
+double chernikov::Polygon::computeArea(point_t* pts, size_t size)
+{
+  double area = 0.0;
+  for (size_t i = 0; i < size; ++i) {
+    size_t j = (i + 1) % size;
+    area += pts[i].x * pts[j].y - pts[j].x * pts[i].y;
+  }
+  return std::abs(area) / 2.0;
+}
+chernikov::point_t chernikov::Polygon::computeCentroid(point_t* pts, size_t size)
+{
+  double area = computeArea(pts, size);
+  point_t centroid{0, 0};  
+  for (size_t i = 0; i < size; ++i) {
+    size_t j = (i + 1) % size;
+    double factor = pts[i].x * pts[j].y - pts[j].x * pts[i].y;
+    centroid.x += (pts[i].x + pts[j].x) * factor;
+    centroid.y += (pts[i].y + pts[j].y) * factor;
+  }  
+  centroid.x /= (6.0 * area);
+  centroid.y /= (6.0 * area);
+  return centroid;
+}
+//EOF
