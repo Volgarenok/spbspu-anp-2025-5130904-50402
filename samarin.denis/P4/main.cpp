@@ -50,8 +50,13 @@ int main()
     delete[] result1;
     return 1;
   }
-  std::cout << result1 << "\n";
-  std::cout << result_without_vowels << "\n";
+
+  if (result1 != nullptr) {
+    std::cout << result1 << "\n";
+  }
+  if (result_without_vowels != nullptr) {
+    std::cout << result_without_vowels << "\n";
+  }
 
   delete[] first_string;
   delete[] result1;
