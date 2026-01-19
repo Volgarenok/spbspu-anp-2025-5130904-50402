@@ -15,10 +15,10 @@ namespace chernikov {
   };
   struct Shape {
     virtual void scale(double ct) = 0;
-    virtual rectangle_t getFrameRectangle() const = 0;
-    virtual void move(point_t pt) = 0;
-    virtual void move(double dx, double dy) = 0;
-    virtual double getArea() const = 0;
+    virtual rectangle_t getFrameRectangle() const noexcept = 0;
+    virtual void move(point_t pt) noexcept = 0;
+    virtual void move(double dx, double dy) noexcept = 0;
+    virtual double getArea() const noexcept = 0;
     virtual ~Shape() = default;
   };
   struct Rectangle final: Shape {
@@ -33,16 +33,21 @@ namespace chernikov {
     point_t mid_;
   };
   struct Polygon final: Shape {
+    ~Polygon();
+    Polygon(const Polygon& other);
+    Polygon(Polygon&& other) noexcept;
+    Polygon& operator=(const Polygon& other);
+    Polygon& operator=(Polygon&& other) noexcept;
+
     Polygon(size_t size, point_t *points);
     void move(double dx, double dy) noexcept override;
     void move(point_t pt) noexcept override;
     double getArea() const noexcept override;
     rectangle_t getFrameRectangle() const noexcept override;
     void scale(double ct) noexcept override;
-    ~Polygon();
   private:
-    double computeArea(point_t* pts, size_t size);
-    point_t computeCentroid(point_t* pts, size_t size);
+    double computeArea(point_t* pts, size_t size) const;
+    point_t computeCentroid(point_t* pts, size_t size) const;
     size_t size_;
     point_t *pts_;
     point_t mid_;
@@ -54,14 +59,13 @@ namespace chernikov {
     double getArea() const noexcept override;
     rectangle_t getFrameRectangle() const noexcept override;
     void scale(double ct) noexcept override;
-    ~Diamond() = default;
   private:
     double rad_;
     point_t mid_;
   };
-  std::ostream &output(std::ostream &os, const Shape **shps, size_t size);
+  std::ostream &output(std::ostream &os, const Shape *const *shps, size_t size);
   void scaleFromPoint(Shape **shps, size_t size, point_t point, double ct);
-  rectangle_t getTotalFrame(const Shape **shps, size_t size);
+  rectangle_t getTotalFrame(const Shape *const *shps, size_t size);
 }
 int main()
 {
@@ -149,14 +153,61 @@ void chernikov::Diamond::scale(double ct)
 {
   rad_ = rad_ * ct;
 }
-chernikov::Polygon::~Polygon() 
+chernikov::Polygon::~Polygon()
 {
    delete[] pts_;
 }
+chernikov::Polygon::Polygon(const Polygon& other) :
+  size_(other.size_),
+  pts_(new point_t[other.size_]),
+  mid_(other.mid_)
+{
+  for (size_t i = 0; i < size_; ++i) {
+    pts_[i] = other.pts_[i];
+  }
+}
+
+chernikov::Polygon::Polygon(Polygon&& other) noexcept :
+  size_(other.size_),
+  pts_(other.pts_),
+  mid_(other.mid_)
+{
+  other.size_ = 0;
+  other.pts_ = nullptr;
+  other.mid_ = point_t{0, 0};
+}
+
+chernikov::Polygon& chernikov::Polygon::operator=(const Polygon& other)
+{
+  if (this != &other) {
+    delete[] pts_;
+    size_ = other.size_;
+    pts_ = new point_t[size_];
+    mid_ = other.mid_;  
+    for (size_t i = 0; i < size_; ++i) {
+      pts_[i] = other.pts_[i];
+    }
+  }
+  return *this;
+}
+
+chernikov::Polygon& chernikov::Polygon::operator=(Polygon&& other) noexcept
+{
+  if (this != &other) {
+    delete[] pts_;  
+    size_ = other.size_;
+    pts_ = other.pts_;
+    mid_ = other.mid_;  
+    other.size_ = 0;
+    other.pts_ = nullptr;
+    other.mid_ = point_t{0, 0};
+  }
+  return *this;
+}
 chernikov::Polygon::Polygon(size_t size, point_t *points) :
-   size_(size), 
-   pts_(size < 3 ? nullptr : new point_t[size]), 
-   mid_{0, 0}
+   size_(size),
+   pts_(size < 3 ? nullptr : new point_t[size]),
+   mid_(computeCentroid(points, size))
 {
   if (size < 3) {
     throw std::logic_error("Not a polygon");
@@ -164,7 +215,6 @@ chernikov::Polygon::Polygon(size_t size, point_t *points) :
   for (size_t i = 0; i < size; ++i) {
         pts_[i] = points[i];
     }
-    mid_ = computeCentroid(pts_, size_);
 }
 void chernikov::Polygon::move(double dx, double dy)
 {
@@ -266,7 +316,7 @@ chernikov::rectangle_t chernikov::getTotalFrame(Shape **shps, size_t size)
   total.pos.y = (bottom + top) / 2.0;
   return total;
 }
-double chernikov::Polygon::computeArea(point_t* pts, size_t size)
+double chernikov::Polygon::computeArea(point_t* pts, size_t size) const
 {
   double area = 0.0;
   for (size_t i = 0; i < size; ++i) {
@@ -275,16 +325,16 @@ double chernikov::Polygon::computeArea(point_t* pts, size_t size)
   }
   return std::abs(area) / 2.0;
 }
-chernikov::point_t chernikov::Polygon::computeCentroid(point_t* pts, size_t size)
+chernikov::point_t chernikov::Polygon::computeCentroid(point_t* pts, size_t size) const
 {
   double area = computeArea(pts, size);
-  point_t centroid{0, 0};  
+  point_t centroid{0, 0};
   for (size_t i = 0; i < size; ++i) {
     size_t j = (i + 1) % size;
     double factor = pts[i].x * pts[j].y - pts[j].x * pts[i].y;
     centroid.x += (pts[i].x + pts[j].x) * factor;
     centroid.y += (pts[i].y + pts[j].y) * factor;
-  }  
+  }
   centroid.x /= (6.0 * area);
   centroid.y /= (6.0 * area);
   return centroid;
