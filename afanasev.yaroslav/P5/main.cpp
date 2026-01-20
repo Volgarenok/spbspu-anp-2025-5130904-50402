@@ -312,15 +312,11 @@ int main()
   return 0;
 }
 
-
-// point_t
 bool afanasev::point_t::operator==(const point_t& other) const noexcept
 {
   return x == other.x && y == other.y;
 }
 
-
-// Rectangle
 afanasev::Rectangle::Rectangle(double w, double h, const point_t & pos):
   width_(w),
   height_(h),
@@ -332,28 +328,23 @@ afanasev::Rectangle::Rectangle(double w, double h, const point_t & pos):
     throw std::invalid_argument("scale must be > 0");
   }
 }
-
 double afanasev::Rectangle::getArea() const noexcept
 {
   return width_ * height_;
 }
-
 afanasev::rectangle_t afanasev::Rectangle::getFrameRect() const noexcept
 {
   return {width_, height_, pos_};
 }
-
 void afanasev::Rectangle::move(const point_t & point) noexcept
 {
   center_ = point;
 }
-
 void afanasev::Rectangle::move(double dx, double dy) noexcept
 {
   center_.x += dx;
   center_.y += dy;
 }
-
 void afanasev::Rectangle::scale(double k)
 {
   if (k <= 0)
@@ -371,8 +362,6 @@ void afanasev::Rectangle::scale(double k)
   pos_.y += -vy + vy * k;
 }
 
-
-// Circle
 afanasev::Circle::Circle(double r, const point_t & pos):
   radius_(r),
   pos_(pos),
@@ -383,28 +372,23 @@ afanasev::Circle::Circle(double r, const point_t & pos):
     throw std::invalid_argument("radius must be > 0");
   }
 }
-
 double afanasev::Circle::getArea() const noexcept
 {
   return radius_ * radius_ * 3.1415;
 }
-
 afanasev::rectangle_t afanasev::Circle::getFrameRect() const noexcept
 {
   return {radius_ * 2, radius_ * 2, pos_};
 }
-
 void afanasev::Circle::move(const point_t & point) noexcept
 {
   center_ = point;
 }
-
 void afanasev::Circle::move(double dx, double dy) noexcept
 {
   center_.x += dx;
   center_.y += dy;
 }
-
 void afanasev::Circle::scale(double k)
 {
   if (k <= 0)
@@ -421,8 +405,6 @@ void afanasev::Circle::scale(double k)
   pos_.y += -vy + vy * k;
 }
 
-
-// Rubber
 afanasev::Rubber::Rubber(double r1, double r2, const point_t & pos1, const point_t & pos2):
   c_min_(r1, pos1),
   c_max_(r2, pos2),
@@ -442,28 +424,23 @@ afanasev::Rubber::Rubber(double r1, double r2, const point_t & pos1, const point
     throw std::invalid_argument("circle is collision");
   }
 }
-
 double afanasev::Rubber::getArea() const noexcept
 {
   return c_max_.getArea() - c_min_.getArea();
 }
-
 afanasev::rectangle_t afanasev::Rubber::getFrameRect() const noexcept
 {
   return c_max_.getFrameRect();
 }
-
 void afanasev::Rubber::move(const point_t & point) noexcept
 {
   center_ = point;
 }
-
 void afanasev::Rubber::move(double dx, double dy) noexcept
 {
   center_.x += dx;
   center_.y += dy;
 }
-
 void afanasev::Rubber::scale(double k)
 {
   if (k <= 0)
