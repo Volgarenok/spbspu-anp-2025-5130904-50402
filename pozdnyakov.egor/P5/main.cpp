@@ -2,6 +2,7 @@
 #include <cmath>
 #include <algorithm>
 #include <iomanip>
+#include <new>
 
 namespace pozdnyakov {
   struct point_t {
@@ -193,6 +194,14 @@ namespace pozdnyakov {
     shape->scale(k);
   }
 
+  void scaleShapes(Shape** shapes, size_t count, const point_t& target, double k) {
+    for (size_t i = 0; i < count; ++i) {
+      if (shapes[i]) {
+        scaleShapeAtPoint(shapes[i], target, k);
+      }
+    }
+  }
+
   void clearShapes(Shape** shapes, size_t count) {
     for (size_t i = 0; i < count; ++i) {
       delete shapes[i];
@@ -211,6 +220,8 @@ namespace pozdnyakov {
     bool first = true;
 
     for (size_t i = 0; i < count; ++i) {
+      if (!shapes[i]) continue;
+
       double area = shapes[i]->getArea();
       totalArea += area;
       rectangle_t frame = shapes[i]->getFrameRect();
@@ -261,11 +272,18 @@ int main() {
   using namespace pozdnyakov;
 
   const size_t count = 3;
-  Shape** shapes = new Shape * [count];
+  Shape** shapes = new Shape * [count] {};
 
-  shapes[0] = new Rectangle({ 5.0, 5.0 }, 10.0, 5.0);
-  shapes[1] = new Diamond({ 20.0, 5.0 }, 10.0, 10.0);
-  shapes[2] = new Triangle({ 0.0, 0.0 }, { 5.0, 10.0 }, { 10.0, 0.0 });
+  try {
+    shapes[0] = new Rectangle({ 5.0, 5.0 }, 10.0, 5.0);
+    shapes[1] = new Diamond({ 20.0, 5.0 }, 10.0, 10.0);
+    shapes[2] = new Triangle({ 0.0, 0.0 }, { 5.0, 10.0 }, { 10.0, 0.0 });
+  }
+  catch (const std::bad_alloc& e) {
+    std::cerr << "Memory allocation failed: " << e.what() << "\n";
+    clearShapes(shapes, count);
+    return 1;
+  }
 
   std::cout << "--- Before Scaling ---\n";
   printShapesInfo(shapes, count);
@@ -292,9 +310,7 @@ int main() {
     return 1;
   }
 
-  for (size_t i = 0; i < count; ++i) {
-    scaleShapeAtPoint(shapes[i], targetPoint, k);
-  }
+  scaleShapes(shapes, count, targetPoint, k);
 
   std::cout << "\n--- After Scaling ---\n";
   printShapesInfo(shapes, count);
