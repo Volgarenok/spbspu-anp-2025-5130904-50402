@@ -212,12 +212,18 @@ namespace pozdnyakov {
   void printShapesInfo(const Shape* const* shapes, size_t count) {
     std::cout << std::fixed << std::setprecision(1);
 
+    if (count == 0) return;
+
     double totalArea = 0.0;
-    double global_min_x = 0.0;
-    double global_max_x = 0.0;
-    double global_min_y = 0.0;
-    double global_max_y = 0.0;
-    bool first = true;
+
+    rectangle_t frame0 = shapes[0]->getFrameRect();
+    double half_w0 = frame0.width / 2.0;
+    double half_h0 = frame0.height / 2.0;
+
+    double global_min_x = frame0.pos.x - half_w0;
+    double global_max_x = frame0.pos.x + half_w0;
+    double global_min_y = frame0.pos.y - half_h0;
+    double global_max_y = frame0.pos.y + half_h0;
 
     for (size_t i = 0; i < count; ++i) {
       if (!shapes[i]) continue;
@@ -238,32 +244,22 @@ namespace pozdnyakov {
       double bottom = frame.pos.y - half_h;
       double top = frame.pos.y + half_h;
 
-      if (first) {
-        global_min_x = left;
-        global_max_x = right;
-        global_min_y = bottom;
-        global_max_y = top;
-        first = false;
-      }
-      else {
-        global_min_x = std::min(global_min_x, left);
-        global_max_x = std::max(global_max_x, right);
-        global_min_y = std::min(global_min_y, bottom);
-        global_max_y = std::max(global_max_y, top);
-      }
+      global_min_x = std::min(global_min_x, left);
+      global_max_x = std::max(global_max_x, right);
+      global_min_y = std::min(global_min_y, bottom);
+      global_max_y = std::max(global_max_y, top);
     }
 
     std::cout << "Total Area: " << totalArea << "\n";
 
-    if (!first) {
-      double global_w = global_max_x - global_min_x;
-      double global_h = global_max_y - global_min_y;
-      double global_cx = global_min_x + global_w / 2.0;
-      double global_cy = global_min_y + global_h / 2.0;
+    double global_w = global_max_x - global_min_x;
+    double global_h = global_max_y - global_min_y;
+    double global_cx = global_min_x + global_w / 2.0;
+    double global_cy = global_min_y + global_h / 2.0;
 
-      std::cout << "Global FrameRect: center=(" << global_cx << ", " << global_cy << ")"
-        << ", w=" << global_w << ", h=" << global_h << "\n";
-    }
+    std::cout << "Global FrameRect: center=(" << global_cx << ", " << global_cy << ")"
+      << ", w=" << global_w << ", h=" << global_h << "\n";
+
     std::cout << "-----------------------------------------------------------\n";
   }
 }
