@@ -17,112 +17,113 @@ namespace pozdnyakov {
 
   class Shape {
   public:
+    virtual ~Shape() = default;
     virtual double getArea() const = 0;
     virtual rectangle_t getFrameRect() const = 0;
     virtual void move(const point_t& pos) = 0;
     virtual void move(double dx, double dy) = 0;
     virtual void scale(double k) = 0;
     virtual const char* getName() const = 0;
-    virtual ~Shape() = default;
   };
 
-  class Rectangle : public Shape {
-  private:
-    rectangle_t frame;
+  class Rectangle final : public Shape {
   public:
-    Rectangle(const point_t& center, double width, double height) {
-      frame.pos = center;
-      frame.width = width;
-      frame.height = height;
+    Rectangle(const point_t& center, double width, double height) :
+      frame_{ width, height, center }
+    {
     }
 
     double getArea() const override {
-      return frame.width * frame.height;
+      return frame_.width * frame_.height;
     }
 
     rectangle_t getFrameRect() const override {
-      return frame;
+      return frame_;
     }
 
     void move(const point_t& pos) override {
-      frame.pos = pos;
+      frame_.pos = pos;
     }
 
     void move(double dx, double dy) override {
-      frame.pos.x += dx;
-      frame.pos.y += dy;
+      frame_.pos.x += dx;
+      frame_.pos.y += dy;
     }
 
     void scale(double k) override {
-      frame.width *= k;
-      frame.height *= k;
+      frame_.width *= k;
+      frame_.height *= k;
     }
 
     const char* getName() const override {
       return "Rectangle";
     }
+
+  private:
+    rectangle_t frame_;
   };
 
-  class Diamond : public Shape {
-  private:
-    point_t center;
-    double diag_h;
-    double diag_v;
-
+  class Diamond final : public Shape {
   public:
-    Diamond(const point_t& center, double diag_h, double diag_v)
-      : center(center), diag_h(diag_h), diag_v(diag_v) {
+    Diamond(const point_t& center, double diag_h, double diag_v) :
+      center_(center),
+      diag_h_(diag_h),
+      diag_v_(diag_v)
+    {
     }
 
     double getArea() const override {
-      return (diag_h * diag_v) / 2.0;
+      return (diag_h_ * diag_v_) / 2.0;
     }
 
     rectangle_t getFrameRect() const override {
-      return { diag_h, diag_v, center };
+      return { diag_h_, diag_v_, center_ };
     }
 
     void move(const point_t& pos) override {
-      center = pos;
+      center_ = pos;
     }
 
     void move(double dx, double dy) override {
-      center.x += dx;
-      center.y += dy;
+      center_.x += dx;
+      center_.y += dy;
     }
 
     void scale(double k) override {
-      diag_h *= k;
-      diag_v *= k;
+      diag_h_ *= k;
+      diag_v_ *= k;
     }
 
     const char* getName() const override {
       return "Diamond";
     }
+
+  private:
+    point_t center_;
+    double diag_h_;
+    double diag_v_;
   };
 
-  class Triangle : public Shape {
-  private:
-    point_t p1, p2, p3;
-
-    point_t getCenter() const {
-      return { (p1.x + p2.x + p3.x) / 3.0, (p1.y + p2.y + p3.y) / 3.0 };
-    }
-
+  class Triangle final : public Shape {
   public:
-    Triangle(const point_t& a, const point_t& b, const point_t& c)
-      : p1(a), p2(b), p3(c) {
+    Triangle(const point_t& a, const point_t& b, const point_t& c) :
+      p1_(a),
+      p2_(b),
+      p3_(c)
+    {
     }
 
     double getArea() const override {
-      return 0.5 * std::abs((p2.x - p1.x) * (p3.y - p1.y) - (p3.x - p1.x) * (p2.y - p1.y));
+      double term1 = (p2_.x - p1_.x) * (p3_.y - p1_.y);
+      double term2 = (p3_.x - p1_.x) * (p2_.y - p1_.y);
+      return 0.5 * std::abs(term1 - term2);
     }
 
     rectangle_t getFrameRect() const override {
-      double min_x = std::min({ p1.x, p2.x, p3.x });
-      double max_x = std::max({ p1.x, p2.x, p3.x });
-      double min_y = std::min({ p1.y, p2.y, p3.y });
-      double max_y = std::max({ p1.y, p2.y, p3.y });
+      double min_x = std::min(p1_.x, std::min(p2_.x, p3_.x));
+      double max_x = std::max(p1_.x, std::max(p2_.x, p3_.x));
+      double min_y = std::min(p1_.y, std::min(p2_.y, p3_.y));
+      double max_y = std::max(p1_.y, std::max(p2_.y, p3_.y));
 
       double width = max_x - min_x;
       double height = max_y - min_y;
@@ -140,23 +141,35 @@ namespace pozdnyakov {
     }
 
     void move(double dx, double dy) override {
-      p1.x += dx; p1.y += dy;
-      p2.x += dx; p2.y += dy;
-      p3.x += dx; p3.y += dy;
+      p1_.x += dx;
+      p1_.y += dy;
+      p2_.x += dx;
+      p2_.y += dy;
+      p3_.x += dx;
+      p3_.y += dy;
     }
 
     void scale(double k) override {
       point_t center = getCenter();
-      p1.x = center.x + (p1.x - center.x) * k;
-      p1.y = center.y + (p1.y - center.y) * k;
-      p2.x = center.x + (p2.x - center.x) * k;
-      p2.y = center.y + (p2.y - center.y) * k;
-      p3.x = center.x + (p3.x - center.x) * k;
-      p3.y = center.y + (p3.y - center.y) * k;
+      p1_.x = center.x + (p1_.x - center.x) * k;
+      p1_.y = center.y + (p1_.y - center.y) * k;
+      p2_.x = center.x + (p2_.x - center.x) * k;
+      p2_.y = center.y + (p2_.y - center.y) * k;
+      p3_.x = center.x + (p3_.x - center.x) * k;
+      p3_.y = center.y + (p3_.y - center.y) * k;
     }
 
     const char* getName() const override {
       return "Triangle";
+    }
+
+  private:
+    point_t p1_;
+    point_t p2_;
+    point_t p3_;
+
+    point_t getCenter() const {
+      return { (p1_.x + p2_.x + p3_.x) / 3.0, (p1_.y + p2_.y + p3_.y) / 3.0 };
     }
   };
 
@@ -169,13 +182,21 @@ namespace pozdnyakov {
     shape->scale(k);
   }
 
+  void clearShapes(Shape** shapes, size_t count) {
+    for (size_t i = 0; i < count; ++i) {
+      delete shapes[i];
+    }
+    delete[] shapes;
+  }
+
   void printShapesInfo(Shape** shapes, size_t count) {
     std::cout << std::fixed << std::setprecision(1);
 
     double totalArea = 0.0;
-
-    double global_min_x = 0, global_max_x = 0;
-    double global_min_y = 0, global_max_y = 0;
+    double global_min_x = 0.0;
+    double global_max_x = 0.0;
+    double global_min_y = 0.0;
+    double global_max_y = 0.0;
     bool first = true;
 
     for (size_t i = 0; i < count; ++i) {
@@ -196,15 +217,25 @@ namespace pozdnyakov {
       double top = frame.pos.y + half_h;
 
       if (first) {
-        global_min_x = left; global_max_x = right;
-        global_min_y = bottom; global_max_y = top;
+        global_min_x = left;
+        global_max_x = right;
+        global_min_y = bottom;
+        global_max_y = top;
         first = false;
       }
       else {
-        if (left < global_min_x) global_min_x = left;
-        if (right > global_max_x) global_max_x = right;
-        if (bottom < global_min_y) global_min_y = bottom;
-        if (top > global_max_y) global_max_y = top;
+        if (left < global_min_x) {
+          global_min_x = left;
+        }
+        if (right > global_max_x) {
+          global_max_x = right;
+        }
+        if (bottom < global_min_y) {
+          global_min_y = bottom;
+        }
+        if (top > global_max_y) {
+          global_max_y = top;
+        }
       }
     }
 
@@ -237,28 +268,24 @@ int main() {
   printShapesInfo(shapes, count);
 
   point_t targetPoint;
-  double k;
-
   std::cout << "Enter scaling center (x y): ";
   if (!(std::cin >> targetPoint.x >> targetPoint.y)) {
     std::cerr << "Invalid coordinates input.\n";
-    for (size_t i = 0; i < count; ++i) delete shapes[i];
-    delete[] shapes;
+    clearShapes(shapes, count);
     return 1;
   }
 
+  double k;
   std::cout << "Enter scaling coefficient (k >= 0): ";
   if (!(std::cin >> k)) {
     std::cerr << "Invalid input for coefficient.\n";
-    for (size_t i = 0; i < count; ++i) delete shapes[i];
-    delete[] shapes;
+    clearShapes(shapes, count);
     return 1;
   }
 
   if (k < 0.0) {
     std::cerr << "Scaling coefficient must be non-negative.\n";
-    for (size_t i = 0; i < count; ++i) delete shapes[i];
-    delete[] shapes;
+    clearShapes(shapes, count);
     return 1;
   }
 
@@ -269,10 +296,7 @@ int main() {
   std::cout << "\n--- After Scaling ---\n";
   printShapesInfo(shapes, count);
 
-  for (size_t i = 0; i < count; ++i) {
-    delete shapes[i];
-  }
-  delete[] shapes;
+  clearShapes(shapes, count);
 
   return 0;
 }
