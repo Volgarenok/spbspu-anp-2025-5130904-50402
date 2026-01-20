@@ -235,18 +235,10 @@ namespace pozdnyakov {
         first = false;
       }
       else {
-        if (left < global_min_x) {
-          global_min_x = left;
-        }
-        if (right > global_max_x) {
-          global_max_x = right;
-        }
-        if (bottom < global_min_y) {
-          global_min_y = bottom;
-        }
-        if (top > global_max_y) {
-          global_max_y = top;
-        }
+        global_min_x = std::min(global_min_x, left);
+        global_max_x = std::max(global_max_x, right);
+        global_min_y = std::min(global_min_y, bottom);
+        global_max_y = std::max(global_max_y, top);
       }
     }
 
