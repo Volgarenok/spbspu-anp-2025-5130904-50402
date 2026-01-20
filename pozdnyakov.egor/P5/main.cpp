@@ -17,6 +17,7 @@ namespace pozdnyakov {
 
   class Shape {
   public:
+    Shape() = default;
     virtual ~Shape() = default;
     virtual double getArea() const = 0;
     virtual rectangle_t getFrameRect() const = 0;
@@ -27,32 +28,12 @@ namespace pozdnyakov {
 
   class Rectangle final : public Shape {
   public:
-    Rectangle(const point_t& center, double width, double height) :
-      frame_{ width, height, center }
-    {
-    }
-
-    double getArea() const override {
-      return frame_.width * frame_.height;
-    }
-
-    rectangle_t getFrameRect() const override {
-      return frame_;
-    }
-
-    void move(const point_t& pos) override {
-      frame_.pos = pos;
-    }
-
-    void move(double dx, double dy) override {
-      frame_.pos.x += dx;
-      frame_.pos.y += dy;
-    }
-
-    void scale(double k) override {
-      frame_.width *= k;
-      frame_.height *= k;
-    }
+    Rectangle(const point_t& center, double width, double height);
+    double getArea() const override;
+    rectangle_t getFrameRect() const override;
+    void move(const point_t& pos) override;
+    void move(double dx, double dy) override;
+    void scale(double k) override;
 
   private:
     rectangle_t frame_;
@@ -60,34 +41,12 @@ namespace pozdnyakov {
 
   class Diamond final : public Shape {
   public:
-    Diamond(const point_t& center, double diag_h, double diag_v) :
-      center_(center),
-      diag_h_(diag_h),
-      diag_v_(diag_v)
-    {
-    }
-
-    double getArea() const override {
-      return (diag_h_ * diag_v_) / 2.0;
-    }
-
-    rectangle_t getFrameRect() const override {
-      return { diag_h_, diag_v_, center_ };
-    }
-
-    void move(const point_t& pos) override {
-      center_ = pos;
-    }
-
-    void move(double dx, double dy) override {
-      center_.x += dx;
-      center_.y += dy;
-    }
-
-    void scale(double k) override {
-      diag_h_ *= k;
-      diag_v_ *= k;
-    }
+    Diamond(const point_t& center, double diag_h, double diag_v);
+    double getArea() const override;
+    rectangle_t getFrameRect() const override;
+    void move(const point_t& pos) override;
+    void move(double dx, double dy) override;
+    void scale(double k) override;
 
   private:
     point_t center_;
@@ -97,68 +56,133 @@ namespace pozdnyakov {
 
   class Triangle final : public Shape {
   public:
-    Triangle(const point_t& a, const point_t& b, const point_t& c) :
-      p1_(a),
-      p2_(b),
-      p3_(c)
-    {
-    }
-
-    double getArea() const override {
-      double term1 = (p2_.x - p1_.x) * (p3_.y - p1_.y);
-      double term2 = (p3_.x - p1_.x) * (p2_.y - p1_.y);
-      return 0.5 * std::abs(term1 - term2);
-    }
-
-    rectangle_t getFrameRect() const override {
-      double min_x = std::min(p1_.x, std::min(p2_.x, p3_.x));
-      double max_x = std::max(p1_.x, std::max(p2_.x, p3_.x));
-      double min_y = std::min(p1_.y, std::min(p2_.y, p3_.y));
-      double max_y = std::max(p1_.y, std::max(p2_.y, p3_.y));
-
-      double width = max_x - min_x;
-      double height = max_y - min_y;
-
-      point_t rect_pos = { min_x + width / 2.0, min_y + height / 2.0 };
-
-      return { width, height, rect_pos };
-    }
-
-    void move(const point_t& pos) override {
-      point_t current_center = getCenter();
-      double dx = pos.x - current_center.x;
-      double dy = pos.y - current_center.y;
-      move(dx, dy);
-    }
-
-    void move(double dx, double dy) override {
-      p1_.x += dx;
-      p1_.y += dy;
-      p2_.x += dx;
-      p2_.y += dy;
-      p3_.x += dx;
-      p3_.y += dy;
-    }
-
-    void scale(double k) override {
-      point_t center = getCenter();
-      p1_.x = center.x + (p1_.x - center.x) * k;
-      p1_.y = center.y + (p1_.y - center.y) * k;
-      p2_.x = center.x + (p2_.x - center.x) * k;
-      p2_.y = center.y + (p2_.y - center.y) * k;
-      p3_.x = center.x + (p3_.x - center.x) * k;
-      p3_.y = center.y + (p3_.y - center.y) * k;
-    }
+    Triangle(const point_t& a, const point_t& b, const point_t& c);
+    double getArea() const override;
+    rectangle_t getFrameRect() const override;
+    void move(const point_t& pos) override;
+    void move(double dx, double dy) override;
+    void scale(double k) override;
 
   private:
     point_t p1_;
     point_t p2_;
     point_t p3_;
 
-    point_t getCenter() const {
-      return { (p1_.x + p2_.x + p3_.x) / 3.0, (p1_.y + p2_.y + p3_.y) / 3.0 };
-    }
+    point_t getCenter() const;
   };
+
+  Rectangle::Rectangle(const point_t& center, double width, double height) :
+    frame_{ width, height, center }
+  {
+  }
+
+  double Rectangle::getArea() const {
+    return frame_.width * frame_.height;
+  }
+
+  rectangle_t Rectangle::getFrameRect() const {
+    return frame_;
+  }
+
+  void Rectangle::move(const point_t& pos) {
+    frame_.pos = pos;
+  }
+
+  void Rectangle::move(double dx, double dy) {
+    frame_.pos.x += dx;
+    frame_.pos.y += dy;
+  }
+
+  void Rectangle::scale(double k) {
+    frame_.width *= k;
+    frame_.height *= k;
+  }
+
+  Diamond::Diamond(const point_t& center, double diag_h, double diag_v) :
+    center_(center),
+    diag_h_(diag_h),
+    diag_v_(diag_v)
+  {
+  }
+
+  double Diamond::getArea() const {
+    return (diag_h_ * diag_v_) / 2.0;
+  }
+
+  rectangle_t Diamond::getFrameRect() const {
+    return { diag_h_, diag_v_, center_ };
+  }
+
+  void Diamond::move(const point_t& pos) {
+    center_ = pos;
+  }
+
+  void Diamond::move(double dx, double dy) {
+    center_.x += dx;
+    center_.y += dy;
+  }
+
+  void Diamond::scale(double k) {
+    diag_h_ *= k;
+    diag_v_ *= k;
+  }
+
+  Triangle::Triangle(const point_t& a, const point_t& b, const point_t& c) :
+    p1_(a),
+    p2_(b),
+    p3_(c)
+  {
+  }
+
+  double Triangle::getArea() const {
+    double term1 = (p2_.x - p1_.x) * (p3_.y - p1_.y);
+    double term2 = (p3_.x - p1_.x) * (p2_.y - p1_.y);
+    return 0.5 * std::abs(term1 - term2);
+  }
+
+  rectangle_t Triangle::getFrameRect() const {
+    double min_x = std::min(p1_.x, std::min(p2_.x, p3_.x));
+    double max_x = std::max(p1_.x, std::max(p2_.x, p3_.x));
+    double min_y = std::min(p1_.y, std::min(p2_.y, p3_.y));
+    double max_y = std::max(p1_.y, std::max(p2_.y, p3_.y));
+
+    double width = max_x - min_x;
+    double height = max_y - min_y;
+
+    point_t rect_pos = { min_x + width / 2.0, min_y + height / 2.0 };
+
+    return { width, height, rect_pos };
+  }
+
+  void Triangle::move(const point_t& pos) {
+    point_t current_center = getCenter();
+    double dx = pos.x - current_center.x;
+    double dy = pos.y - current_center.y;
+    move(dx, dy);
+  }
+
+  void Triangle::move(double dx, double dy) {
+    p1_.x += dx;
+    p1_.y += dy;
+    p2_.x += dx;
+    p2_.y += dy;
+    p3_.x += dx;
+    p3_.y += dy;
+  }
+
+  void Triangle::scale(double k) {
+    point_t center = getCenter();
+    p1_.x = center.x + (p1_.x - center.x) * k;
+    p1_.y = center.y + (p1_.y - center.y) * k;
+    p2_.x = center.x + (p2_.x - center.x) * k;
+    p2_.y = center.y + (p2_.y - center.y) * k;
+    p3_.x = center.x + (p3_.x - center.x) * k;
+    p3_.y = center.y + (p3_.y - center.y) * k;
+  }
+
+  point_t Triangle::getCenter() const {
+    return { (p1_.x + p2_.x + p3_.x) / 3.0, (p1_.y + p2_.y + p3_.y) / 3.0 };
+  }
 
   void scaleShapeAtPoint(Shape* shape, const point_t& target, double k) {
     point_t center = shape->getFrameRect().pos;
