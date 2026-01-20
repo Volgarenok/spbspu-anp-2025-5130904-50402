@@ -97,7 +97,7 @@ namespace afanasev
 
   void printShapesInfo(Shape const * const * const shapes, size_t cnt_shapes)
   {
-    std::cout << "Существующие фигуры:" << '\n';
+    std::cout << "\nСуществующие фигуры:" << '\n';
 
     double s_all = 0;
 
@@ -196,6 +196,12 @@ int main()
       {
         printShapesInfo(shapes, cnt_shapes);
 
+        if (std::cin.eof())
+        {
+          n = -1;
+          break;
+        }
+
         std::cout << "\nМеняем фигуру индекса:" << i << '\n';
         std::cout << "Введите x, y и коэффицент k через пробел:\n";
         double k = 0;
@@ -210,7 +216,7 @@ int main()
         shapes[shape]->move({x, y});
         shapes[shape]->scale(k);
 
-        std::cout << "Масштабирован в " << k << " раз, относительно {";
+        std::cout << "\nМасштабирован в " << k << " раз, относительно {";
         std::cout << x << ", " << y << "}\n";
       }
     }
