@@ -23,7 +23,6 @@ namespace pozdnyakov {
     virtual void move(const point_t& pos) = 0;
     virtual void move(double dx, double dy) = 0;
     virtual void scale(double k) = 0;
-    virtual const char* getName() const = 0;
   };
 
   class Rectangle final : public Shape {
@@ -53,10 +52,6 @@ namespace pozdnyakov {
     void scale(double k) override {
       frame_.width *= k;
       frame_.height *= k;
-    }
-
-    const char* getName() const override {
-      return "Rectangle";
     }
 
   private:
@@ -92,10 +87,6 @@ namespace pozdnyakov {
     void scale(double k) override {
       diag_h_ *= k;
       diag_v_ *= k;
-    }
-
-    const char* getName() const override {
-      return "Diamond";
     }
 
   private:
@@ -159,10 +150,6 @@ namespace pozdnyakov {
       p3_.y = center.y + (p3_.y - center.y) * k;
     }
 
-    const char* getName() const override {
-      return "Triangle";
-    }
-
   private:
     point_t p1_;
     point_t p2_;
@@ -204,7 +191,7 @@ namespace pozdnyakov {
       totalArea += area;
       rectangle_t frame = shapes[i]->getFrameRect();
 
-      std::cout << shapes[i]->getName()
+      std::cout << "Shape " << i
         << ": Area=" << area
         << ", FrameCenter=(" << frame.pos.x << ", " << frame.pos.y << ")"
         << ", w=" << frame.width << ", h=" << frame.height << "\n";
