@@ -19,21 +19,21 @@ namespace pozdnyakov {
   public:
     Shape() = default;
     virtual ~Shape() = default;
-    virtual double getArea() const = 0;
-    virtual rectangle_t getFrameRect() const = 0;
-    virtual void move(const point_t& pos) = 0;
-    virtual void move(double dx, double dy) = 0;
-    virtual void scale(double k) = 0;
+    virtual double getArea() const noexcept = 0;
+    virtual rectangle_t getFrameRect() const noexcept = 0;
+    virtual void move(const point_t& pos) noexcept = 0;
+    virtual void move(double dx, double dy) noexcept = 0;
+    virtual void scale(double k) noexcept = 0;
   };
 
   class Rectangle final : public Shape {
   public:
     Rectangle(const point_t& center, double width, double height);
-    double getArea() const override;
-    rectangle_t getFrameRect() const override;
-    void move(const point_t& pos) override;
-    void move(double dx, double dy) override;
-    void scale(double k) override;
+    double getArea() const noexcept override;
+    rectangle_t getFrameRect() const noexcept override;
+    void move(const point_t& pos) noexcept override;
+    void move(double dx, double dy) noexcept override;
+    void scale(double k) noexcept override;
 
   private:
     rectangle_t frame_;
@@ -42,11 +42,11 @@ namespace pozdnyakov {
   class Diamond final : public Shape {
   public:
     Diamond(const point_t& center, double diag_h, double diag_v);
-    double getArea() const override;
-    rectangle_t getFrameRect() const override;
-    void move(const point_t& pos) override;
-    void move(double dx, double dy) override;
-    void scale(double k) override;
+    double getArea() const noexcept override;
+    rectangle_t getFrameRect() const noexcept override;
+    void move(const point_t& pos) noexcept override;
+    void move(double dx, double dy) noexcept override;
+    void scale(double k) noexcept override;
 
   private:
     point_t center_;
@@ -57,18 +57,18 @@ namespace pozdnyakov {
   class Triangle final : public Shape {
   public:
     Triangle(const point_t& a, const point_t& b, const point_t& c);
-    double getArea() const override;
-    rectangle_t getFrameRect() const override;
-    void move(const point_t& pos) override;
-    void move(double dx, double dy) override;
-    void scale(double k) override;
+    double getArea() const noexcept override;
+    rectangle_t getFrameRect() const noexcept override;
+    void move(const point_t& pos) noexcept override;
+    void move(double dx, double dy) noexcept override;
+    void scale(double k) noexcept override;
 
   private:
     point_t p1_;
     point_t p2_;
     point_t p3_;
 
-    point_t getCenter() const;
+    point_t getCenter() const noexcept;
   };
 
   Rectangle::Rectangle(const point_t& center, double width, double height) :
@@ -76,24 +76,24 @@ namespace pozdnyakov {
   {
   }
 
-  double Rectangle::getArea() const {
+  double Rectangle::getArea() const noexcept {
     return frame_.width * frame_.height;
   }
 
-  rectangle_t Rectangle::getFrameRect() const {
+  rectangle_t Rectangle::getFrameRect() const noexcept {
     return frame_;
   }
 
-  void Rectangle::move(const point_t& pos) {
+  void Rectangle::move(const point_t& pos) noexcept {
     frame_.pos = pos;
   }
 
-  void Rectangle::move(double dx, double dy) {
+  void Rectangle::move(double dx, double dy) noexcept {
     frame_.pos.x += dx;
     frame_.pos.y += dy;
   }
 
-  void Rectangle::scale(double k) {
+  void Rectangle::scale(double k) noexcept {
     frame_.width *= k;
     frame_.height *= k;
   }
@@ -105,24 +105,24 @@ namespace pozdnyakov {
   {
   }
 
-  double Diamond::getArea() const {
+  double Diamond::getArea() const noexcept {
     return (diag_h_ * diag_v_) / 2.0;
   }
 
-  rectangle_t Diamond::getFrameRect() const {
+  rectangle_t Diamond::getFrameRect() const noexcept {
     return { diag_h_, diag_v_, center_ };
   }
 
-  void Diamond::move(const point_t& pos) {
+  void Diamond::move(const point_t& pos) noexcept {
     center_ = pos;
   }
 
-  void Diamond::move(double dx, double dy) {
+  void Diamond::move(double dx, double dy) noexcept {
     center_.x += dx;
     center_.y += dy;
   }
 
-  void Diamond::scale(double k) {
+  void Diamond::scale(double k) noexcept {
     diag_h_ *= k;
     diag_v_ *= k;
   }
@@ -134,13 +134,13 @@ namespace pozdnyakov {
   {
   }
 
-  double Triangle::getArea() const {
+  double Triangle::getArea() const noexcept {
     double term1 = (p2_.x - p1_.x) * (p3_.y - p1_.y);
     double term2 = (p3_.x - p1_.x) * (p2_.y - p1_.y);
     return 0.5 * std::abs(term1 - term2);
   }
 
-  rectangle_t Triangle::getFrameRect() const {
+  rectangle_t Triangle::getFrameRect() const noexcept {
     double min_x = std::min(p1_.x, std::min(p2_.x, p3_.x));
     double max_x = std::max(p1_.x, std::max(p2_.x, p3_.x));
     double min_y = std::min(p1_.y, std::min(p2_.y, p3_.y));
@@ -154,14 +154,14 @@ namespace pozdnyakov {
     return { width, height, rect_pos };
   }
 
-  void Triangle::move(const point_t& pos) {
+  void Triangle::move(const point_t& pos) noexcept {
     point_t current_center = getCenter();
     double dx = pos.x - current_center.x;
     double dy = pos.y - current_center.y;
     move(dx, dy);
   }
 
-  void Triangle::move(double dx, double dy) {
+  void Triangle::move(double dx, double dy) noexcept {
     p1_.x += dx;
     p1_.y += dy;
     p2_.x += dx;
@@ -170,7 +170,7 @@ namespace pozdnyakov {
     p3_.y += dy;
   }
 
-  void Triangle::scale(double k) {
+  void Triangle::scale(double k) noexcept {
     point_t center = getCenter();
     p1_.x = center.x + (p1_.x - center.x) * k;
     p1_.y = center.y + (p1_.y - center.y) * k;
@@ -180,7 +180,7 @@ namespace pozdnyakov {
     p3_.y = center.y + (p3_.y - center.y) * k;
   }
 
-  point_t Triangle::getCenter() const {
+  point_t Triangle::getCenter() const noexcept {
     return { (p1_.x + p2_.x + p3_.x) / 3.0, (p1_.y + p2_.y + p3_.y) / 3.0 };
   }
 
@@ -200,7 +200,7 @@ namespace pozdnyakov {
     delete[] shapes;
   }
 
-  void printShapesInfo(Shape** shapes, size_t count) {
+  void printShapesInfo(const Shape* const* shapes, size_t count) {
     std::cout << std::fixed << std::setprecision(1);
 
     double totalArea = 0.0;
