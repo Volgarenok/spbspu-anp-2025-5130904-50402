@@ -192,106 +192,27 @@ int main()
 
     while (n != -1)
     {
-      printShapesInfo(shapes, cnt_shapes);
-
-      std::cout << "\nВведите номер фигуры:\n";
-
-      std::cin >> shape;
-      if (!std::cin)
+      for (size_t i = 0; i < cnt_shapes; i++)
       {
-        throw std::logic_error("input error");
-      }
-      if (shape >= cnt_shapes)
-      {
-        std::cout << "Нет фигуры с таким номером" << '\n';
-      }
-      else
-      {
-        std::cout << "\nДействия:\n";
-        std::cout << "0) переместить центр масштабирования на x и y (move(x, y)):" << '\n';
-        std::cout << "1) сместить центр масштабирования на dx и dy (move(dx, dy)):" << '\n';
-        std::cout << "2) масштабировать на коофицент k относительно центра ";
-        std::cout << "масштабирования (scale(k)):" << '\n';
-        std::cout << "3) УЛЬТРА МЕГА ФУНКЦИЯ КОМБО 3000! масштабировать на ";
-        std::cout << "коофицент k относительно x и y:" << '\n';
-        std::cout << "введите номер нужного действия" << '\n';
+        printShapesInfo(shapes, cnt_shapes);
 
-        std::cin >> n;
+        std::cout << "\nМеняем фигуру индекса:" << i << '\n';
+        std::cout << "Введите x, y и коэффицент k через пробел:\n";
+        double k = 0;
+        double x = 0;
+        double y = 0;
+        std::cin >> x >> y;
+        std::cin >> k;
         if (!std::cin)
         {
           throw std::logic_error("input error");
         }
+        shapes[shape]->move({x, y});
+        shapes[shape]->scale(k);
 
-        if (!n)
-        {
-          std::cout << "\nВведите x и y точки для перемещения центра:\n";
-          double x = 0;
-          double y = 0;
-          std::cin >> x >> y;
-          if (!std::cin)
-          {
-            throw std::logic_error("input error");
-          }
-          shapes[shape]->move({x, y});
-          std::cout << "Центр перемещён в {" << x << ", " << y << "}\n";
-        }
-        else if (n == 1)
-        {
-          std::cout << "\nВведите dx и dy точки для смещения центра:\n";
-          double x = 0;
-          double y = 0;
-          std::cin >> x >> y;
-          if (!std::cin)
-          {
-            throw std::logic_error("input error");
-          }
-          shapes[shape]->move(x, y);
-          std::cout << "Центр смещён на {" << x << ", " << y << "}\n";
-        }
-        else if (n == 2)
-        {
-          std::cout << "\nВведите k для масштабирования относительно центра:\n";
-          double k = 0;
-          std::cin >> k;
-          if (!std::cin)
-          {
-            throw std::logic_error("input error");
-          }
-          shapes[shape]->scale(k);
-          std::cout << "Масштаб изменён в " << k << " раз" << '\n';
-        }
-        else if (n == 3)
-        {
-          std::cout << "\nВведите k для масштабирования относительно центра:\n";
-          double k = 0;
-          std::cin >> k;
-          if (!std::cin)
-          {
-            throw std::logic_error("input error");
-          }
-
-          std::cout << "\nВведите x и y центра для масштабирования:\n";
-          double x = 0;
-          double y = 0;
-          std::cin >> x >> y;
-          if (!std::cin)
-          {
-            throw std::logic_error("input error");
-          }
-
-          shapes[shape]->move({x, y});
-          shapes[shape]->scale(k);
-
-          std::cout << "Масштабирован в " << k << " раз, относительно {";
-          std::cout << x << ", " << y << "}\n";
-        }
-        else
-        {
-          std::cout << "несуществующее действие" << '\n';
-        }
+        std::cout << "Масштабирован в " << k << " раз, относительно {";
+        std::cout << x << ", " << y << "}\n";
       }
-
-      std::cout << '\n';
     }
   }
   catch (const std::exception& e)
