@@ -31,7 +31,7 @@ namespace strelnikov {
     void scale(double) noexcept override;
 
   private:
-    rectangle_t rec;
+    rectangle_t rec_;
   };
 
   class Polygon final: public Shape {
@@ -69,45 +69,46 @@ namespace strelnikov {
     double rad_;
   };
 
-  double getTrPolyS(const point_t a, const point_t b, const point_t c);
-  point_t getTrPolyC(const point_t a, const point_t b, const point_t c);
-  point_t getPolyC(const point_t* data, const size_t k);
-  void scaleAll(Shape* const* ishps, const size_t size);
-  rectangle_t computeGlobalFrameRect(const Shape* const* ishps, const size_t size);
-  double computeTotalArea(const Shape* const* ishps, const size_t size);
-  void printShapes(const Shape* const* ishps, const size_t size);
+  double getTrPolyS(point_t a, point_t b, point_t c);
+  point_t getTrPolyC(point_t a, point_t b, point_t c);
+  point_t getPolyC(const point_t* data, size_t k);
+  void scaleAll(Shape* const* ishps, size_t size, point_t move, double k);
+  rectangle_t computeGlobalFrameRect(const Shape* const* ishps, size_t size);
+  double computeTotalArea(const Shape* const* ishps, size_t size);
+  void printRectangle(const rectangle_t& rect);
+  void printShapes(const Shape* const* ishps, size_t size);
 };
 
 strelnikov::Rectangle::Rectangle(double wdth, double hght, point_t cntr):
-  rec{wdth, hght, cntr}
+  rec_{wdth, hght, cntr}
 {}
 
 double strelnikov::Rectangle::getArea() const noexcept
 {
-  return rec.height * rec.width;
+  return rec_.height * rec_.width;
 }
 
 strelnikov::rectangle_t strelnikov::Rectangle::getFrameRect() const noexcept
 {
-  return rec;
+  return rec_;
 }
 
 void strelnikov::Rectangle::move(point_t p) noexcept
 {
-  rec.c = p;
+  rec_.c = p;
 }
 
 void strelnikov::Rectangle::move(double x, double y) noexcept
 {
-  move({rec.c.x + x, rec.c.y + y});
+  move({rec_.c.x + x, rec_.c.y + y});
 }
 
 void strelnikov::Rectangle::scale(double k) noexcept
 {
-  rec.c.x *= k;
-  rec.c.y *= k;
-  rec.height *= k;
-  rec.width *= k;
+  rec_.c.x *= k;
+  rec_.c.y *= k;
+  rec_.height *= k;
+  rec_.width *= k;
 }
 
 double strelnikov::getTrPolyS(point_t a, point_t b, point_t c)
@@ -145,24 +146,29 @@ strelnikov::point_t strelnikov::getPolyC(const point_t* data, size_t k)
   return {(sum_x / sum_s), (sum_y / sum_s)};
 }
 
-strelnikov::Polygon::Polygon(point_t* data, size_t size)
-    : data_(new point_t[size]), size_(size), cen_{0, 0}
+strelnikov::Polygon::Polygon(point_t* data, size_t size):
+  data_(new(std::nothrow) point_t[size]),
+  size_(size),
+  cen_(getPolyC(data_, size))
 {
-  if (size < 3 || !data) {
+  if (size < 3 || !data_) {
     delete[] data_;
     throw std::logic_error("Bad poly");
   }
   for (size_t i = 0; i < size; ++i) {
     data_[i] = data[i];
   }
-  cen_ = getPolyC(data, size);
 }
 
 strelnikov::Polygon::Polygon(const Polygon& p):
-  data_(new point_t[p.size_]),
+  data_(new(std::nothrow) point_t[p.size_]),
   size_(p.size_),
   cen_{p.cen_}
 {
+  if(size_ < 3 || !data_) {
+    delete[] data_;
+    throw std::logic_error("Bad poly while in copy constructor");
+  }
   for (size_t i = 0; i < size_; ++i) {
     data_[i] = p.data_[i];
   }
@@ -191,7 +197,7 @@ strelnikov::Polygon& strelnikov::Polygon::operator=(const Polygon& p)
   point_t* tmp_data = nullptr;
   try {
     tmp_data = new point_t[p.size_];
-  } catch (...) {
+  } catch (std::bad_alloc) {
     return *this;
   }
   delete[] data_;
@@ -304,26 +310,14 @@ void strelnikov::Circle::scale(double k) noexcept
   rad_ *= k;
 }
 
-void strelnikov::scaleAll(Shape* const* ishps, const size_t size)
+void strelnikov::scaleAll(Shape* const* ishps, size_t size, point_t move, double k)
 {
-  double x, y;
-  std::cout << "Введите точку от которой нужно масштабироваться:\n";
-  std::cin >> x >> y;
-  if (!std::cin) {
-    throw std::logic_error("bad input");
-  }
-  strelnikov::point_t move{x, y};
-  double k;
-  std::cout << "Введите коэф. масштабирования:\n";
-  std::cin >> k;
-  if (!std::cin || k <= 0) {
-    throw std::logic_error("bad input");
-  }
   for (size_t i = 0; i < size; ++i) {
     ishps[i]->move(move);
     ishps[i]->scale(k);
   }
 }
+
 strelnikov::rectangle_t strelnikov::computeGlobalFrameRect(const Shape* const* ishps,
   const size_t size)
 {
@@ -353,7 +347,7 @@ strelnikov::rectangle_t strelnikov::computeGlobalFrameRect(const Shape* const* i
   return {width, height, center};
 }
 
-double strelnikov::computeTotalArea(const Shape* const* ishps, const size_t size)
+double strelnikov::computeTotalArea(const Shape* const* ishps, size_t size)
 {
   double res = 0.0;
   for (size_t i = 0; i < size; ++i) {
@@ -361,19 +355,26 @@ double strelnikov::computeTotalArea(const Shape* const* ishps, const size_t size
   }
   return res;
 }
+void strelnikov::printRectangle(const rectangle_t& rect) {
+  std::cout << "центр=(" << rect.c.x << ", " << rect.c.y
+    << ") ширина=" << rect.width << " высота=" << rect.height;
+}
 
-void strelnikov::printShapes(const Shape* const* ishps, const size_t size)
+void strelnikov::printShapes(const Shape* const* ishps, size_t size)
 {
   double area = computeTotalArea(ishps, size);
   rectangle_t total_frame = computeGlobalFrameRect(ishps, size);
+  
   for (size_t i = 0; i < size; ++i) {
-    rectangle_t frame = ishps[i]->getFrameRect();
-    std::cout << ishps[i]->getArea() << '\t' << "центр: (" << frame.c.x << ' ' << frame.c.y
-      << ") ширина: " << frame.width << " высота: " << frame.width << '\n';
+    std::cout << ishps[i]->getArea() << '\t';
+    printRectangle(ishps[i]->getFrameRect());
+    std::cout << '\n';
   }
-  std::cout << "площадь всех фигур: " << area << '\n'
-    << "Общая рамка : ширина=" << total_frame.width << ", высота=" << total_frame.height
-    << ", центр=(" << total_frame.c.x << ", " << total_frame.c.y << ")\n";
+  
+  std::cout << "площадь всех фигур: " << area << '\n';
+  std::cout << "Общая рамка: ";
+  printRectangle(total_frame);
+  std::cout << '\n';
 }
 
 int main()
@@ -396,10 +397,10 @@ int main()
     circle = new strelnikov::Circle({3, 3}, 3);
     rect = new strelnikov::Rectangle(4, 4, {0, 0});
     poly = new strelnikov::Polygon(data, polyDataSize);
-  } catch (...) {
-    for (size_t i = 0; i < shapeSize; ++i) {
-      delete ishps[i];
-    }
+  } catch (const std::bad_alloc &e) {
+    delete circle;
+    delete rect;
+    delete poly;
     delete[] ishps;
     return 1;
   }
@@ -409,15 +410,32 @@ int main()
 
   std::cout << "Фигуры до изменения: \n";
   strelnikov::printShapes(ishps, 3);
+
+  double x, y;
+  std::cout << "Введите точку от которой нужно масштабироваться:\n";
+  std::cin >> x >> y;
+  if (!std::cin) {
+    return 2;
+  }
+  strelnikov::point_t move{x, y};
+  double k;
+  std::cout << "Введите коэф. масштабирования:\n";
+  std::cin >> k;
+  if(!std::cin || k <= 0){
+    for (size_t i = 0; i < shapeSize; ++i) {
+      delete ishps[i];
+    }
+    delete[] ishps;
+  }
+
   try {
-    strelnikov::scaleAll(ishps, shapeSize);
-  } catch (...) {
+    strelnikov::scaleAll(ishps, shapeSize, {x, y}, k);
+  } catch (const std::logic_error &e) {
     for (size_t i = 0; i < shapeSize; ++i) {
       delete ishps[i];
     }
     delete[] ishps;
     return 1;
-    return 2;
   }
   std::cout << "Фигуры после изменения: \n";
   strelnikov::printShapes(ishps, 3);
