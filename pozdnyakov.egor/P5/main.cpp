@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <new>
+#include <stdexcept>
 
 namespace pozdnyakov {
   struct point_t {
@@ -24,7 +25,12 @@ namespace pozdnyakov {
     virtual rectangle_t getFrameRect() const noexcept = 0;
     virtual void move(const point_t& pos) noexcept = 0;
     virtual void move(double dx, double dy) noexcept = 0;
-    virtual void scale(double k) noexcept = 0;
+
+    void scale(double k);
+    void unsafeScale(double k) noexcept;
+
+  private:
+    virtual void doScale(double k) noexcept = 0;
   };
 
   class Rectangle final : public Shape {
@@ -34,10 +40,10 @@ namespace pozdnyakov {
     rectangle_t getFrameRect() const noexcept override;
     void move(const point_t& pos) noexcept override;
     void move(double dx, double dy) noexcept override;
-    void scale(double k) noexcept override;
 
   private:
     rectangle_t frame_;
+    void doScale(double k) noexcept override;
   };
 
   class Diamond final : public Shape {
@@ -47,12 +53,12 @@ namespace pozdnyakov {
     rectangle_t getFrameRect() const noexcept override;
     void move(const point_t& pos) noexcept override;
     void move(double dx, double dy) noexcept override;
-    void scale(double k) noexcept override;
 
   private:
     point_t center_;
     double diag_h_;
     double diag_v_;
+    void doScale(double k) noexcept override;
   };
 
   class Triangle final : public Shape {
@@ -62,7 +68,6 @@ namespace pozdnyakov {
     rectangle_t getFrameRect() const noexcept override;
     void move(const point_t& pos) noexcept override;
     void move(double dx, double dy) noexcept override;
-    void scale(double k) noexcept override;
 
   private:
     point_t p1_;
@@ -70,7 +75,19 @@ namespace pozdnyakov {
     point_t p3_;
 
     point_t getCenter() const noexcept;
+    void doScale(double k) noexcept override;
   };
+
+  void Shape::scale(double k) {
+    if (k < 0.0) {
+      throw std::invalid_argument("Scaling coefficient must be non-negative");
+    }
+    doScale(k);
+  }
+
+  void Shape::unsafeScale(double k) noexcept {
+    doScale(k);
+  }
 
   Rectangle::Rectangle(const point_t& center, double width, double height) :
     frame_{ width, height, center }
@@ -94,7 +111,7 @@ namespace pozdnyakov {
     frame_.pos.y += dy;
   }
 
-  void Rectangle::scale(double k) noexcept {
+  void Rectangle::doScale(double k) noexcept {
     frame_.width *= k;
     frame_.height *= k;
   }
@@ -123,7 +140,7 @@ namespace pozdnyakov {
     center_.y += dy;
   }
 
-  void Diamond::scale(double k) noexcept {
+  void Diamond::doScale(double k) noexcept {
     diag_h_ *= k;
     diag_v_ *= k;
   }
@@ -171,7 +188,7 @@ namespace pozdnyakov {
     p3_.y += dy;
   }
 
-  void Triangle::scale(double k) noexcept {
+  void Triangle::doScale(double k) noexcept {
     point_t center = getCenter();
     p1_.x = center.x + (p1_.x - center.x) * k;
     p1_.y = center.y + (p1_.y - center.y) * k;
@@ -300,13 +317,14 @@ int main() {
     return 1;
   }
 
-  if (k < 0.0) {
-    std::cerr << "Scaling coefficient must be non-negative.\n";
+  try {
+    scaleShapes(shapes, count, targetPoint, k);
+  }
+  catch (const std::exception& e) {
+    std::cerr << "Error during scaling: " << e.what() << "\n";
     clearShapes(shapes, count);
     return 1;
   }
-
-  scaleShapes(shapes, count, targetPoint, k);
 
   std::cout << "\n--- After Scaling ---\n";
   printShapesInfo(shapes, count);
