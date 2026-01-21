@@ -25,7 +25,7 @@ char *alisov::getline(std::istream &in, size_t &size)
   }
   while (in)
   {
-    if (size == cap)
+    if (size + 1 >= cap)
     {
       alisov::expand(&str, size, cap);
     }
@@ -111,7 +111,7 @@ void alisov::expand(char **str, size_t size, size_t &cap)
   }
   for (size_t i = 0; i < size; ++i)
   {
-    tmp[i] = *str[i];
+    tmp[i] = (*str)[i];
   }
   free(*str);
   *str = tmp;
