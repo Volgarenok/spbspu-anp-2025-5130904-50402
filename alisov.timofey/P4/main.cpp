@@ -23,26 +23,31 @@ char *alisov::getline(std::istream &in, size_t &size)
   {
     return nullptr;
   }
-  while (in)
+  char c;
+  while (in >> c && c != '\n')
   {
-    if (size + 1 >= cap)
+    if (size == cap)
     {
       alisov::expand(&str, size, cap);
     }
     if (str == nullptr)
     {
+      if (is_skipws)
+      {
+        in >> std::skipws;
+      }
       return nullptr;
     }
     in >> str[size];
-    if (in.eof())
-    {
-      break;
-    }
     size++;
   }
-  if (!in || size == 0)
+  if (in.fail() && !in.eof())
   {
     free(str);
+    if (is_skipws)
+    {
+      in >> std::skipws;
+    }
     return nullptr;
   }
   str[size] = '\0';
