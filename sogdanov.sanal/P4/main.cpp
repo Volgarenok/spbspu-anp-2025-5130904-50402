@@ -70,8 +70,7 @@ namespace sogdanov
   char * rmvVow(char * str, char * res)
   {
     const char * mask = "AEIOUaeiou";
-    excSnd(str, mask, res);
-    return res;
+    return excSnd(str, mask, res);
   }
 }
 int main()
@@ -83,8 +82,10 @@ int main()
   const char * mask = "abc";
   try {
     str = sogdanov::getLine(std::cin, size);
-    k1 = new char[size];
-    k2 = new char[size];
+    k1 = new char[size + 1];
+    k1[size] = '\0';
+    k2 = new char[size + 1];
+    k2[size] = '\0';
   } catch (const std::bad_alloc &) {
     delete[] k1;
     delete[] k2;
