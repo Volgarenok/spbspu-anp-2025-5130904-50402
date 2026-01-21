@@ -120,4 +120,37 @@ int main()
 {
   size_t size = 0;
   char *str = alisov::getline(std::cin, size);
+  if (str == nullptr)
+  {
+    free(str);
+    std::cerr << "Cant read line\n";
+    return 1;
+  }
+  const size_t dgt_size = 5;
+  char strDgt[dgt_size + 1] = "g1h2k";
+  char *res1 = static_cast< char * >(malloc(size + 1));
+  char *res2 = static_cast< char * >(malloc(size + dgt_size + 1));
+  if (res1 == nullptr || res2 == nullptr)
+  {
+    free(str);
+    free(res1);
+    free(res2);
+    std::cerr << "Memory error\n";
+    return 1;
+  }
+  alisov::rmvVow(str, size, res1);
+  alisov::dgtSnd(str, size, strDgt, dgt_size, res2);
+  if (res1 == nullptr || res2 == nullptr)
+  {
+    free(str);
+    free(res1);
+    free(res2);
+    std::cerr << "Error during conversion\n";
+    return 1;
+  }
+  std::cout << "1. " << res1 << '\n';
+  std::cout << "2. " << res2 << '\n';
+  free(str);
+  free(res1);
+  free(res2);
 }
