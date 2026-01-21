@@ -20,7 +20,7 @@ namespace sogdanov
   private:
     virtual void positiveScale(double k) noexcept = 0;
   };
-  struct Rectangle final : Shape {
+  struct Rectangle final: Shape {
     Rectangle(double width, double height, point_t p);
     double getArea() const noexcept override;
     rectangle_t getFrameRect() const noexcept override;
@@ -32,7 +32,7 @@ namespace sogdanov
     point_t pos_;
     void positiveScale(double k) noexcept override;
   };
-  struct Xquare final : Shape {
+  struct Xquare final: Shape {
     Xquare(double d, point_t p);
     double getArea() const noexcept override;
     rectangle_t getFrameRect() const noexcept override;
@@ -43,7 +43,7 @@ namespace sogdanov
     point_t pos_;
     void positiveScale(double k) noexcept override;
   };
-  struct Diamond final : Shape {
+  struct Diamond final: Shape {
     Diamond(double diagx, double diagy, point_t p);
     double getArea() const noexcept override;
     rectangle_t getFrameRect() const noexcept override;
