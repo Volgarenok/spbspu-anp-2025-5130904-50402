@@ -38,7 +38,7 @@ char *alisov::getline(std::istream &in, size_t &size)
       }
       return nullptr;
     }
-    in >> str[size];
+    c >> str[size];
     size++;
   }
   if (in.fail() && !in.eof())
@@ -153,8 +153,8 @@ int main()
     std::cerr << "Error during conversion\n";
     return 1;
   }
-  std::cout << "1. " << res1 << '\n';
-  std::cout << "2. " << res2 << '\n';
+  std::cout << res1 << '\n';
+  std::cout << res2 << '\n';
   free(str);
   free(res1);
   free(res2);
