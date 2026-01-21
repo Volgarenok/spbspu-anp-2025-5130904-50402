@@ -54,10 +54,10 @@ namespace sogdanov
     point_t pos_;
   };
   void scaleFromPoint(Shape * shps[], double k, size_t size, point_t pt);
-  double leftX(const rectangle_t& r);
-  double rightX(const rectangle_t& r);
-  double botY(const rectangle_t& r);
-  double topY(const rectangle_t& r);
+  double leftX(const rectangle_t & r);
+  double rightX(const rectangle_t & r);
+  double botY(const rectangle_t & r);
+  double topY(const rectangle_t & r);
   rectangle_t totalFrame(Shape * shps[], size_t size);
   void output(Shape * shps[], size_t size);
 }
