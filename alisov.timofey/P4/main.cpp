@@ -6,7 +6,7 @@ namespace alisov
 {
   void expand(char **str, size_t size, size_t &cap);
   char *getline(std::istream &in, size_t &k);
-  void rmvVow(const char *str, size_t s, char *res);
+  void rmvVow(const char *str, char *res);
   void dgtSnd(const char *str1, size_t s1, const char *str2, size_t s2, char *res);
 }
 char *alisov::getline(std::istream &in, size_t &size)
@@ -105,7 +105,7 @@ void expand(char **str, size_t size, size_t &cap)
 
   if (tmp == nullptr)
   {
-    free(str);
+    free(*str);
     *str = nullptr;
     return;
   }
@@ -113,7 +113,7 @@ void expand(char **str, size_t size, size_t &cap)
   {
     tmp[i] = *str[i];
   }
-  free(str);
+  free(*str);
   *str = tmp;
 }
 int main()
@@ -138,7 +138,7 @@ int main()
     std::cerr << "Memory error\n";
     return 1;
   }
-  alisov::rmvVow(str, size, res1);
+  alisov::rmvVow(str, res1);
   alisov::dgtSnd(str, size, strDgt, dgt_size, res2);
   if (res1 == nullptr || res2 == nullptr)
   {
