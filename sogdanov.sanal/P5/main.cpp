@@ -18,7 +18,7 @@ namespace sogdanov
     virtual void move(double dx, double dy) = 0;
     virtual void scale(double k) = 0;
   };
-  struct Rectangle: Shape {
+  struct Rectangle final : Shape {
     Rectangle(double width, double height, point_t p);
     double getArea() const override;
     rectangle_t getFrameRect() const override;
@@ -30,7 +30,7 @@ namespace sogdanov
     double height_;
     point_t pos_;
   };
-  struct Xquare: Shape {
+  struct Xquare final : Shape {
     Xquare(double d, point_t p);
     double getArea() const override;
     rectangle_t getFrameRect() const override;
@@ -41,7 +41,7 @@ namespace sogdanov
     double d_;
     point_t pos_;
   };
-  struct Diamond: Shape {
+  struct Diamond final : Shape {
     Diamond(double diagx, double diagy, point_t p);
     double getArea() const override;
     rectangle_t getFrameRect() const override;
