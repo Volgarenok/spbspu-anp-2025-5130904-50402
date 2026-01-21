@@ -12,19 +12,19 @@ namespace sogdanov
   };
   struct Shape {
     virtual ~Shape() = default;
-    virtual double getArea() const = 0;
-    virtual rectangle_t getFrameRect() const = 0;
-    virtual void move(const point_t p) = 0;
-    virtual void move(double dx, double dy) = 0;
-    virtual void scale(double k) = 0;
+    virtual double getArea() const noexcept = 0;
+    virtual rectangle_t getFrameRect() const noexcept = 0;
+    virtual void move(const point_t p) noexcept = 0;
+    virtual void move(double dx, double dy) noexcept = 0;
+    virtual void scale(double k) noexcept = 0;
   };
   struct Rectangle final : Shape {
     Rectangle(double width, double height, point_t p);
-    double getArea() const override;
-    rectangle_t getFrameRect() const override;
-    void move(const point_t p) override;
-    void move(double dx, double dy) override;
-    void scale(double k) override;
+    double getArea() const override noexcept;
+    rectangle_t getFrameRect() const override noexcept;
+    void move(const point_t p) override noexcept;
+    void move(double dx, double dy) override noexcept;
+    void scale(double k) override noexcept;
   private:
     double width_;
     double height_;
@@ -32,22 +32,22 @@ namespace sogdanov
   };
   struct Xquare final : Shape {
     Xquare(double d, point_t p);
-    double getArea() const override;
-    rectangle_t getFrameRect() const override;
-    void move(double dx, double dy) override;
-    void move(const point_t p) override;
-    void scale(double k) override;
+    double getArea() const override noexcept;
+    rectangle_t getFrameRect() const override noexcept;
+    void move(double dx, double dy) override noexcept;
+    void move(const point_t p) override noexcept;
+    void scale(double k) override noexcept;
   private:
     double d_;
     point_t pos_;
   };
   struct Diamond final : Shape {
     Diamond(double diagx, double diagy, point_t p);
-    double getArea() const override;
-    rectangle_t getFrameRect() const override;
-    void move(double dx, double dy) override;
-    void move(const point_t p) override;
-    void scale(double k) override;
+    double getArea() const override noexcept;
+    rectangle_t getFrameRect() const override noexcept;
+    void move(double dx, double dy) override noexcept;
+    void move(const point_t p) override noexcept;
+    void scale(double k) override noexcept;
   private:
     double diagx_;
     double diagy_;
@@ -81,24 +81,24 @@ int main()
 sogdanov::Rectangle::Rectangle(double width, double height, point_t p):
   sogdanov::Shape(), width(width_), height(height_), p(pos_)
 {}
-double sogdanov::Rectangle::getArea() const
+double sogdanov::Rectangle::getArea() const noexcept
 {
   return width_ * height_;
 }
-sogdanov::rectangle_t sogdanov::Rectangle::getFrameRect() const
+sogdanov::rectangle_t sogdanov::Rectangle::getFrameRect() const noexcept
 {
   return sogdanov::rectangle_t{width_, height_, pos_};
 }
-void sogdanov::Rectangle::move(const point_t p)
+void sogdanov::Rectangle::move(const point_t p) noexcept
 {
   pos_ = p;
 }
-void sogdanov::Rectangle::move(double dx, double dy)
+void sogdanov::Rectangle::move(double dx, double dy) noexcept
 {
   pos_.x += dx;
   pos_.y += dy;
 }
-void sogdanov::Rectangle::scale(double k)
+void sogdanov::Rectangle::scale(double k) noexcept
 {
   width_ *= k;
   height_ *= k;
@@ -106,48 +106,48 @@ void sogdanov::Rectangle::scale(double k)
 sogdanov::Xquare::Xquare(double d, point_t p):
   d_(d), pos_(p)
 {}
-double sogdanov::Xquare::getArea() const
+double sogdanov::Xquare::getArea() const noexcept
 {
   return (d_ * d_) / 2.0;
 }
-sogdanov::rectangle_t sogdanov::Xquare::getFrameRect() const
+sogdanov::rectangle_t sogdanov::Xquare::getFrameRect() const noexcept
 {
   return sogdanov::rectangle_t{d_, d_, pos_};
 }
-void sogdanov::Xquare::move(double dx, double dy)
+void sogdanov::Xquare::move(double dx, double dy) noexcept
 {
   pos_.x += dx;
   pos_.y += dy;
 }
-void sogdanov::Xquare::move(point_t p)
+void sogdanov::Xquare::move(point_t p) noexcept
 {
   pos_ = p;
 }
-void sogdanov::Xquare::scale(double k)
+void sogdanov::Xquare::scale(double k) noexcept
 {
   d_ *= k;
 }
 sogdanov::Diamond::Diamond(double diagx, double diagy, point_t p):
   diagx_(diagx), diagy_(diagy), pos_(p);
 {}
-double sogdanov::Diamond::getArea() const
+double sogdanov::Diamond::getArea() const noexcept
 {
   return (diagx_ * diagy_) / 2.0;
 }
-sogdanov::rectangle_t sogdanov::Diamond::getFrameRect() const
+sogdanov::rectangle_t sogdanov::Diamond::getFrameRect() const noexcept
 {
   return sogdanov::rectangle_t{diagx_, diagy_, pos_};
 }
-void sogdanov::Diamond::move(double dx, double dy)
+void sogdanov::Diamond::move(double dx, double dy) noexcept
 {
   pos_.x += dx;
   pos_.y += dy;
 }
-void sogdanov::Diamond::move(const point_t p)
+void sogdanov::Diamond::move(const point_t p) noexcept
 {
   pos_ = p;
 }
-void sogdanov::Diamond::scale(double k)
+void sogdanov::Diamond::scale(double k) noexcept
 {
   diagx *= k;
   diagy *= k;
