@@ -53,7 +53,7 @@ char *alisov::getline(std::istream &in, size_t &size)
   return str;
 }
 
-void rmvVow(const char *str, char *res)
+void alisov::rmvVow(const char *str, char *res)
 {
   if (str == nullptr)
   {
@@ -75,7 +75,7 @@ void rmvVow(const char *str, char *res)
   res[r] = '\0';
 }
 
-void dgtSnd(const char *str1, size_t s1, const char *str2, size_t s2, char *res)
+void alisov::dgtSnd(const char *str1, size_t s1, const char *str2, size_t s2, char *res)
 {
   size_t i = 0;
 
@@ -97,7 +97,7 @@ void dgtSnd(const char *str1, size_t s1, const char *str2, size_t s2, char *res)
   res[i] = '\0';
 }
 
-void expand(char **str, size_t size, size_t &cap)
+void alisov::expand(char **str, size_t size, size_t &cap)
 {
   char *tmp = nullptr;
   cap *= 2;
