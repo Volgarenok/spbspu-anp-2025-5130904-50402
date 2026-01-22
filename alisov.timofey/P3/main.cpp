@@ -37,12 +37,12 @@ namespace alisov
 
   int minSum(int *mtr, size_t m, size_t n)
   {
-    int sum = 0;
-    int min = std::numeric_limits< int >::max();
     if (m + n < 2)
     {
       return 0;
     }
+    int sum = 0;
+    int min = std::numeric_limits< int >::max();
     for (size_t k = 0; k <= m + n - 2; ++k)
     {
       sum = 0;
@@ -53,7 +53,7 @@ namespace alisov
           sum += mtr[i * n + (k - i)];
         }
       }
-      min = (sum < min) ? sum : min;
+      min = std::min(sum, min);
     }
     return min;
   }
@@ -64,9 +64,10 @@ namespace alisov
     size_t total = m * n;
     int max_length = 0;
 
-    int (*mas)[2] = new int[n][2];
+    int **mas = new int *[n];
     for (size_t i = 0; i < n; ++i)
     {
+      mas[i] = new int[2];
       mas[i][0] = -1;
       mas[i][1] = 0;
     }
