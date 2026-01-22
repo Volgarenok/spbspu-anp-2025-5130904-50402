@@ -183,7 +183,7 @@ chernikov::Polygon& chernikov::Polygon::operator=(const Polygon& other)
     delete[] pts_;
     size_ = other.size_;
     pts_ = new point_t[size_];
-    mid_ = other.mid_;  
+    mid_ = other.mid_;
     for (size_t i = 0; i < size_; ++i) {
       pts_[i] = other.pts_[i];
     }
@@ -194,10 +194,10 @@ chernikov::Polygon& chernikov::Polygon::operator=(const Polygon& other)
 chernikov::Polygon& chernikov::Polygon::operator=(Polygon&& other) noexcept
 {
   if (this != &other) {
-    delete[] pts_;  
+    delete[] pts_;
     size_ = other.size_;
     pts_ = other.pts_;
-    mid_ = other.mid_;  
+    mid_ = other.mid_;
     other.size_ = 0;
     other.pts_ = nullptr;
     other.mid_ = point_t{0, 0};
