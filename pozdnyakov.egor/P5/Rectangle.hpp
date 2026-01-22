@@ -3,8 +3,10 @@
 
 #include "Shape.hpp"
 
-namespace pozdnyakov {
-  class Rectangle final : public Shape {
+namespace pozdnyakov
+{
+  class Rectangle final: public Shape
+  {
   public:
     Rectangle(const point_t& center, double width, double height);
     double getArea() const noexcept override;

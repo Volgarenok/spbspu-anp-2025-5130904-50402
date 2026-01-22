@@ -3,8 +3,10 @@
 
 #include "baseTypes.hpp"
 
-namespace pozdnyakov {
-  class Shape {
+namespace pozdnyakov
+{
+  class Shape
+  {
   public:
     Shape() = default;
     virtual ~Shape() = default;

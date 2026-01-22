@@ -4,7 +4,8 @@
 #include <cstddef>
 #include "Shape.hpp"
 
-namespace pozdnyakov {
+namespace pozdnyakov
+{
   void scaleShapeAtPoint(Shape* shape, const point_t& target, double k);
   void scaleShapes(Shape** shapes, size_t count, const point_t& target, double k);
   void clearShapes(Shape** shapes, size_t count);
@@ -12,3 +13,4 @@ namespace pozdnyakov {
 }
 
 #endif
+

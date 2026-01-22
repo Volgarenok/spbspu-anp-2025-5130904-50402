@@ -3,8 +3,10 @@
 
 #include "Shape.hpp"
 
-namespace pozdnyakov {
-  class Triangle final : public Shape {
+namespace pozdnyakov
+{
+  class Triangle final: public Shape
+  {
   public:
     Triangle(const point_t& a, const point_t& b, const point_t& c);
     double getArea() const noexcept override;

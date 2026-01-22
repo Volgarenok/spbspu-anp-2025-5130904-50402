@@ -3,8 +3,10 @@
 #include <iomanip>
 #include <algorithm>
 
-namespace pozdnyakov {
-  void scaleShapeAtPoint(Shape* shape, const point_t& target, double k) {
+namespace pozdnyakov
+{
+  void scaleShapeAtPoint(Shape* shape, const point_t& target, double k)
+  {
     point_t center = shape->getFrameRect().pos;
     double dx = (center.x - target.x) * (k - 1.0);
     double dy = (center.y - target.y) * (k - 1.0);
@@ -13,25 +15,34 @@ namespace pozdnyakov {
     shape->scale(k);
   }
 
-  void scaleShapes(Shape** shapes, size_t count, const point_t& target, double k) {
-    for (size_t i = 0; i < count; ++i) {
-      if (shapes[i]) {
+  void scaleShapes(Shape** shapes, size_t count, const point_t& target, double k)
+  {
+    for (size_t i = 0; i < count; ++i)
+    {
+      if (shapes[i])
+      {
         scaleShapeAtPoint(shapes[i], target, k);
       }
     }
   }
 
-  void clearShapes(Shape** shapes, size_t count) {
-    for (size_t i = 0; i < count; ++i) {
+  void clearShapes(Shape** shapes, size_t count)
+  {
+    for (size_t i = 0; i < count; ++i)
+    {
       delete shapes[i];
     }
     delete[] shapes;
   }
 
-  void printShapesInfo(const Shape* const* shapes, size_t count) {
+  void printShapesInfo(const Shape* const* shapes, size_t count)
+  {
     std::cout << std::fixed << std::setprecision(1);
 
-    if (count == 0) return;
+    if (count == 0)
+    {
+      return;
+    }
 
     double totalArea = 0.0;
 
@@ -44,8 +55,12 @@ namespace pozdnyakov {
     double global_min_y = frame0.pos.y - half_h0;
     double global_max_y = frame0.pos.y + half_h0;
 
-    for (size_t i = 0; i < count; ++i) {
-      if (!shapes[i]) continue;
+    for (size_t i = 0; i < count; ++i)
+    {
+      if (!shapes[i])
+      {
+        continue;
+      }
 
       double area = shapes[i]->getArea();
       totalArea += area;

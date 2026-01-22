@@ -3,8 +3,10 @@
 
 #include "Shape.hpp"
 
-namespace pozdnyakov {
-  class Diamond final : public Shape {
+namespace pozdnyakov
+{
+  class Diamond final: public Shape
+  {
   public:
     Diamond(const point_t& center, double diag_h, double diag_v);
     double getArea() const noexcept override;
