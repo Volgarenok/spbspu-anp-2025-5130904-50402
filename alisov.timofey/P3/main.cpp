@@ -64,10 +64,10 @@ namespace alisov
     size_t total = m * n;
     int max_length = 0;
 
-    size_t **mas = new size_t *[n];
+    int **mas = new int *[n];
     for (size_t i = 0; i < n; ++i)
     {
-      mas[i] = new size_t[2];
+      mas[i] = new int[2];
       mas[i][0] = -1;
       mas[i][1] = 0;
     }
@@ -104,6 +104,10 @@ namespace alisov
         ans1 = mas[i][0];
         max_length = mas[i][1];
       }
+    }
+    for (size_t i = 0; i < n; ++i)
+    {
+      delete[] mas[i];
     }
     delete[] mas;
     return ans1;
