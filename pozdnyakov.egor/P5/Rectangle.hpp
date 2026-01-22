@@ -8,10 +8,10 @@ namespace pozdnyakov
   class Rectangle final: public Shape
   {
   public:
-    Rectangle(const point_t& center, double width, double height);
+    Rectangle(const point_t &center, double width, double height) noexcept;
     double getArea() const noexcept override;
     rectangle_t getFrameRect() const noexcept override;
-    void move(const point_t& pos) noexcept override;
+    void move(const point_t &pos) noexcept override;
     void move(double dx, double dy) noexcept override;
 
   private:

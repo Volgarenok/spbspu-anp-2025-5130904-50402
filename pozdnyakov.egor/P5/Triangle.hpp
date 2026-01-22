@@ -8,10 +8,10 @@ namespace pozdnyakov
   class Triangle final: public Shape
   {
   public:
-    Triangle(const point_t& a, const point_t& b, const point_t& c);
+    Triangle(const point_t &a, const point_t &b, const point_t &c) noexcept;
     double getArea() const noexcept override;
     rectangle_t getFrameRect() const noexcept override;
-    void move(const point_t& pos) noexcept override;
+    void move(const point_t &pos) noexcept override;
     void move(double dx, double dy) noexcept override;
 
   private:

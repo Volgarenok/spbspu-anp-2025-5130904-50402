@@ -8,10 +8,10 @@ namespace pozdnyakov
   class Diamond final: public Shape
   {
   public:
-    Diamond(const point_t& center, double diag_h, double diag_v);
+    Diamond(const point_t &center, double diag_h, double diag_v) noexcept;
     double getArea() const noexcept override;
     rectangle_t getFrameRect() const noexcept override;
-    void move(const point_t& pos) noexcept override;
+    void move(const point_t &pos) noexcept override;
     void move(double dx, double dy) noexcept override;
 
   private:
