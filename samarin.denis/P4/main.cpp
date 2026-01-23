@@ -8,9 +8,9 @@ namespace samarin {
   const size_t kExtendSize = 30;
   const size_t kAsciiTableSize = 256;
   const size_t kInitialResultSize = 50;
-  char * getline(std::istream & in, size_t & res_size);
+  char * getline(std::istream & in, size_t & res_size, char *& input_string, size_t & capacity);
   char * cut(char * str, size_t size);
-  void findDifference(char * first_string, const char * second_string, size_t & s, char * final_string);
+  char * findDifference(char * first_string, const char * second_string, size_t & s, char *& final_string);
   char * extend(char * s1, size_t & size, size_t k);
   char * latinVowelDelete(char * str, size_t size_before, size_t & size_after, char * final_string);
 }
@@ -19,13 +19,17 @@ namespace samarin {
 int main()
 {
   size_t size = 0;
+  size_t capacity = samarin::kInitialBufferSize;
+  char * input_string = new char[capacity];
   char * first_string = nullptr;
   try {
-    first_string = samarin::getline(std::cin, size);
+    first_string = samarin::getline(std::cin, size, input_string, capacity);
   } catch (const std::exception & e) {
+    delete[] input_string;
     return 1;
   }
   if (size == 0) {
+    delete[] first_string;
     first_string = new char[1];
     first_string[0] = '\0';
   }
@@ -37,9 +41,10 @@ int main()
   char * result1 = nullptr;
   char * result_without_vowels = nullptr;
 
-   try {
-     result1 = samarin::findDifference(first_string, second_string, dif_count);
-   } catch (const std::exception & e) {
+  try {
+    char * final_string_diff = new char[samarin::kInitialResultSize];
+    result1 = samarin::findDifference(first_string, second_string, dif_count, final_string_diff);
+  } catch (const std::exception & e) {
     delete[] first_string;
     return 1;
   }
@@ -67,10 +72,8 @@ int main()
   return 0;
 }
 
-char * samarin::getline(std::istream & in, size_t & res_size)
+char * samarin::getline(std::istream & in, size_t & res_size, char *& input_string, size_t & capacity)
 {
-  size_t capacity = kInitialBufferSize;
-  char * input_string = new char[capacity];
   bool is_skipws = in.flags() & std::ios::skipws;
   if (is_skipws) {
     in >> std::noskipws;
@@ -79,26 +82,21 @@ char * samarin::getline(std::istream & in, size_t & res_size)
   char character;
   while (in >> character) {
     if (res_size >= capacity) {
-      input_string = samarin::extend(input_string, capacity, kExtendSize);
+      char* new_input_string = samarin::extend(input_string, capacity, kExtendSize);
+      delete[] input_string;
+      input_string = new_input_string;
     }
 
     input_string[res_size] = character;
     res_size++;
   }
   if ((in.fail() && !in.eof()) || in.bad()) {
-    delete[] input_string;
     res_size = 0;
     throw std::runtime_error("Input stream error: failed to read data");
   }
 
-  try {
-    char * result = samarin::cut(input_string, res_size);
-    delete[] input_string;
-    return result;
-  } catch (const std::exception & e) {
-    delete[] input_string;
-    throw;
-  }
+  input_string[res_size] = '\0';
+  return input_string;
 }
 
 char * samarin::cut(char * str, size_t size)
@@ -111,17 +109,15 @@ char * samarin::cut(char * str, size_t size)
   return temp;
 }
 
-char * samarin::findDifference(char * first_string, const char * second_string, size_t & s)
+char * samarin::findDifference(char * first_string, const char * second_string, size_t & s, char *& final_string)
 {
   if (!first_string || !second_string) {
-    return nullptr;
+    throw std::invalid_argument("Null pointer passed to findDifference");
   }
   size_t counter = 0;
   size_t size_result = kInitialResultSize;
-  char * result = nullptr;
-  char * final_string = new char[size_result];
-  bool check[kAsciiTableSize]();
-  bool check2[kAsciiTableSize]();
+  bool check[kAsciiTableSize] = {};
+  bool check2[kAsciiTableSize] = {};
 
 
   for (char * p = first_string; *p; p++) {
@@ -136,7 +132,9 @@ char * samarin::findDifference(char * first_string, const char * second_string, 
         final_string[counter] = *p;
         counter++;
       } else {
-        final_string = samarin::extend (final_string, size_result, kExtendSize);
+        char* new_final_string = samarin::extend(final_string, size_result, kExtendSize);
+        delete[] final_string;
+        final_string = new_final_string;
         final_string[counter] = *p;
         counter++;
       }
@@ -148,33 +146,26 @@ char * samarin::findDifference(char * first_string, const char * second_string, 
         final_string[counter] = *p;
         counter++;
       } else {
-        final_string = samarin::extend(final_string, size_result, kExtendSize);
+        char* new_final_string = samarin::extend(final_string, size_result, kExtendSize);
+        delete[] final_string;
+        final_string = new_final_string;
         final_string[counter] = *p;
         counter++;
       }
     }
   }
   s = counter;
-  delete[] check;
-  delete[] check2;
-  try {
-    result = samarin::cut(final_string, s);
-    delete[] final_string;
-    return result;
-  } catch (const std::bad_alloc & e) {
-    delete[] final_string;
-    throw;
-  }
+  final_string[s] = '\0';
+  return final_string;
 }
 
 char * samarin::latinVowelDelete(char * str, size_t size_before, size_t & size_after, char * final_string)
 {
   if (!str || !size_before) {
-    return nullptr;
+    throw std::invalid_argument("Invalid arguments passed to latinVowelDelete");
   }
   size_t counter = 0;
   const char * vowels = "AaEeIiOoUuYy";
-  char * result = nullptr;
   bool vowels_check[kAsciiTableSize] = {};
   for (const char * p = vowels; *p; p++) {
     vowels_check[static_cast<unsigned char>(*p)] = true;
@@ -187,14 +178,8 @@ char * samarin::latinVowelDelete(char * str, size_t size_before, size_t & size_a
   }
   size_after = counter;
 
-  try {
-    result = samarin::cut(final_string, size_after);
-    delete[] final_string;
-    return result;
-  } catch (const std::bad_alloc & e) {
-    delete[] final_string;
-    throw e;
-  }
+  final_string[size_after] = '\0';
+  return final_string;
 }
 
 char * samarin::extend(char * s1, size_t & size, const size_t k)
@@ -203,8 +188,6 @@ char * samarin::extend(char * s1, size_t & size, const size_t k)
   for (size_t i = 0; i < size; i++) {
     temp[i] = s1[i];
   }
-  delete[] s1;
-  s1 = temp;
   size = size + k;
-  return s1;
+  return temp;
 }
