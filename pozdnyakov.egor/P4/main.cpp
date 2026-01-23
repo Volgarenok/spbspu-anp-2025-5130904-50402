@@ -1,66 +1,64 @@
 #include <iostream>
-#include <new>
 #include <stdexcept>
+#include <new>
 #include "stringOps.hpp"
 
 int main()
 {
   using namespace pozdnyakov;
 
+  char **words = nullptr;
+  size_t wordsCount = 0;
+
+  try {
+    words = inputString(std::cin, wordsCount);
+  } catch (const std::bad_alloc &) {
+    std::cerr << "Memory allocation error\n";
+    if (words != nullptr) {
+      cleanupWords(words, wordsCount);
+    }
+    return 2;
+  }
+
+  if (wordsCount == 0) {
+    std::cerr << "Empty input\n";
+    return 1;
+  }
+
   const char OLD_CHAR = 'c';
   const char NEW_CHAR = 'b';
-  const char* SECOND_STRING = "def_ghk";
+  const char *SECOND_STRING = "def_ghk";
 
-  char* inputStr = nullptr;
-  char* result1 = nullptr;
-  char* result2 = nullptr;
-  size_t inputSize = 0;
+  char *result1 = nullptr;
+  char *result2 = nullptr;
 
-  try
-  {
-    inputStr = readString(std::cin, inputSize);
+  try {
+    for (size_t i = 0; i < wordsCount; ++i) {
+      char *currentWord = words[i];
+      size_t len = getLength(currentWord);
 
-    if (inputStr[0] == '\0')
-    {
-      std::cerr << "Empty input\n";
-      delete[] inputStr;
-      return 1;
+      result1 = new char[len + 1];
+      result1[len] = '\0';
+      replaceChars(currentWord, result1, OLD_CHAR, NEW_CHAR);
+      std::cout << result1 << '\n';
+      delete[] result1;
+      result1 = nullptr;
+
+      result2 = new char[ALPHABET_SIZE + 1];
+      result2[ALPHABET_SIZE] = '\0';
+      mergeLatinLetters(currentWord, SECOND_STRING, result2);
+      std::cout << result2 << '\n';
+      delete[] result2;
+      result2 = nullptr;
     }
-
-    result1 = new char[inputSize + 1];
-    result1[inputSize] = '\0';
-    replaceChars(inputStr, result1, OLD_CHAR, NEW_CHAR);
-    std::cout << result1 << '\n';
-
-    result2 = new char[ALPHABET_SIZE + 1];
-    result2[ALPHABET_SIZE] = '\0';
-    mergeLatinLetters(inputStr, SECOND_STRING, result2);
-    std::cout << result2 << '\n';
-
-    delete[] result1;
-    delete[] result2;
-    delete[] inputStr;
-
-    return 0;
-  }
-  catch (const std::bad_alloc&)
-  {
+  } catch (const std::bad_alloc &) {
     std::cerr << "Memory allocation error\n";
-
     delete[] result1;
     delete[] result2;
-    delete[] inputStr;
-
+    cleanupWords(words, wordsCount);
     return 2;
   }
-  catch (const std::runtime_error& e)
-  {
-    std::cerr << "Error: " << e.what() << '\n';
+  cleanupWords(words, wordsCount);
 
-    delete[] inputStr;
-    delete[] result1;
-    delete[] result2;
-
-    return 2;
-  }
+  return 0;
 }
