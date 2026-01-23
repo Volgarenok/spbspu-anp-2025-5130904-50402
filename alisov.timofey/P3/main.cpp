@@ -63,60 +63,66 @@ namespace alisov
     int ans1 = 0;
     size_t total = m * n;
     int max_length = 0;
-
-    int **mas = new int *[n];
-    if (!mas)
+    int **mas = nullptr;
+    try
     {
-      return 0;
-    }
-    for (size_t i = 0; i < n; ++i)
-    {
-      mas[i] = new int[2];
-      if (!mas[i])
+      int **mas = new int *[n];
+      for (size_t i = 0; i < n; ++i)
       {
-        for (size_t k = 0; k < n; ++k)
-        {
-          delete[] mas[k];
-        }
-        delete[] mas;
-        return 0;
+        mas[i] = nullptr;
       }
-      mas[i][0] = -1;
-      mas[i][1] = 0;
-    }
-
-    for (size_t i = 0; i < total; ++i)
-    {
-      size_t j = i % n;
-      if (mas[j][0] == -1)
+      for (size_t i = 0; i < n; ++i)
       {
-        mas[j][0] = j + 1;
-        mas[j][1] = 1;
+        mas[i] = new int[2];
+        mas[i][0] = -1;
+        mas[i][1] = 0;
       }
-      else
+
+      for (size_t i = 0; i < total; ++i)
       {
-        if (mtr[i] == mtr[i - n])
+        size_t j = i % n;
+        if (mas[j][0] == -1)
         {
-          ++mas[j][1];
+          mas[j][0] = j + 1;
+          mas[j][1] = 1;
         }
         else
         {
-          if (mas[j][1] > max_length)
+          if (mtr[i] == mtr[i - n])
           {
-            max_length = mas[j][1];
+            ++mas[j][1];
           }
-          mas[j][1] = 1;
+          else
+          {
+            if (mas[j][1] > max_length)
+            {
+              max_length = mas[j][1];
+            }
+            mas[j][1] = 1;
+          }
+        }
+      }
+
+      for (size_t i = 0; i < n; ++i)
+      {
+        if (max_length < mas[i][1])
+        {
+          ans1 = mas[i][0];
+          max_length = mas[i][1];
         }
       }
     }
-
-    for (size_t i = 0; i < n; ++i)
+    catch (const std::bad_alloc &)
     {
-      if (max_length < mas[i][1])
+      if (mas)
       {
-        ans1 = mas[i][0];
-        max_length = mas[i][1];
+        for (size_t i = 0; i < n; ++i)
+        {
+          delete[] mas[i];
+        }
+        delete[] mas;
       }
+      return 0;
     }
     for (size_t i = 0; i < n; ++i)
     {
