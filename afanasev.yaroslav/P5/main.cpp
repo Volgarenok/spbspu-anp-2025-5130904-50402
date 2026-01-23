@@ -98,9 +98,9 @@ namespace afanasev
     point_t center_;
   };
 
-  rectangle_t calculateOverallFrameRect(const Shape ** shapes, size_t cnt_shapes) noexcept;
+  rectangle_t calculateOverallFrameRect(const Shape * const * shapes, size_t cnt_shapes) noexcept;
 
-  void printShapesInfo(const Shape ** shapes, size_t cnt_shapes) noexcept;
+  void printShapesInfo(const Shape * const * shapes, size_t cnt_shapes) noexcept;
 
   void scaleAllShapes(Shape ** shapes, size_t cnt_shapes, double x, double y, double k) noexcept;
 }
@@ -138,7 +138,7 @@ int main()
     shapes[1] = new Circle(2, {2, 2});
     shapes[2] = new Rubber(2, 4, {5, 5}, {4, 4});
 
-    printShapesInfo(const_cast<const Shape**>(shapes), cnt_shapes);
+    printShapesInfo(shapes, cnt_shapes);
 
 
     std::cout << "\nМеняем фигуры:" << '\n';
@@ -159,7 +159,7 @@ int main()
     std::cout << "\nМасштабирован в " << k << " раз, относительно {";
     std::cout << x << ", " << y << "}\n";
 
-    printShapesInfo(const_cast<const Shape**>(shapes), cnt_shapes);
+    printShapesInfo(shapes, cnt_shapes);
   }
   catch (const std::exception & e)
   {
@@ -320,7 +320,7 @@ void afanasev::Rubber::scale(double k) noexcept
   c_max_.scale(k);
 }
 
-afanasev::rectangle_t afanasev::calculateOverallFrameRect(const Shape ** shapes,
+afanasev::rectangle_t afanasev::calculateOverallFrameRect(const Shape * const * shapes,
   size_t cnt_shapes) noexcept
 {
   double x_min = std::numeric_limits<double>::max();
@@ -352,7 +352,7 @@ afanasev::rectangle_t afanasev::calculateOverallFrameRect(const Shape ** shapes,
   return {width, height, center};
 }
 
-void afanasev::printShapesInfo(const Shape ** shapes, size_t cnt_shapes) noexcept
+void afanasev::printShapesInfo(const Shape * const * shapes, size_t cnt_shapes) noexcept
 {
   std::cout << "\nСуществующие фигуры:" << '\n';
 
@@ -370,7 +370,7 @@ void afanasev::printShapesInfo(const Shape ** shapes, size_t cnt_shapes) noexcep
     std::cout << ", w = " << frame.width << '}';
 
     std::cout << "; Координаты фигуры: {" << frame.pos.x;
-    std::cout << ", " << frame.pos.y << '}\n';
+    std::cout << ", " << frame.pos.y << "}\n";
   }
 
   rectangle_t overall_frame = calculateOverallFrameRect(shapes, cnt_shapes);
