@@ -114,7 +114,7 @@ char * samarin::findDifference(char * first_string, const char * second_string, 
   if (!first_string || !second_string) {
     throw std::invalid_argument("Null pointer passed to findDifference");
   }
-  size_t counter = 0;
+  s = 0;
   size_t size_result = kInitialResultSize;
   bool check[kAsciiTableSize] = {};
   bool check2[kAsciiTableSize] = {};
@@ -128,33 +128,32 @@ char * samarin::findDifference(char * first_string, const char * second_string, 
   }
   for (char * p = first_string; *p; p++) {
     if (!check2[static_cast<unsigned char>(*p)]) {
-      if (counter < size_result) {
-        final_string[counter] = *p;
-        counter++;
+      if (s < size_result) {
+        final_string[s] = *p;
+        s++;
       } else {
         char* new_final_string = samarin::extend(final_string, size_result, kExtendSize);
         delete[] final_string;
         final_string = new_final_string;
-        final_string[counter] = *p;
-        counter++;
+        final_string[s] = *p;
+        s++;
       }
     }
   }
   for (const char * p = second_string; *p; p++) {
     if (!check[static_cast<unsigned char>(*p)]) {
-      if (counter < size_result) {
-        final_string[counter] = *p;
-        counter++;
+      if (s < size_result) {
+        final_string[s] = *p;
+        s++;
       } else {
         char* new_final_string = samarin::extend(final_string, size_result, kExtendSize);
         delete[] final_string;
         final_string = new_final_string;
-        final_string[counter] = *p;
-        counter++;
+        final_string[s] = *p;
+        s++;
       }
     }
   }
-  s = counter;
   final_string[s] = '\0';
   return final_string;
 }
