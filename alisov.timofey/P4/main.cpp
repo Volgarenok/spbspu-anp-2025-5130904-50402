@@ -48,6 +48,15 @@ char *alisov::getline(std::istream &in, size_t &size)
     }
     size++;
   }
+  if (size == 0 && !in)
+  {
+    free(str);
+    if (is_skipws)
+    {
+      in >> std::skipws;
+    }
+    return nullptr;
+  }
   str[size] = '\0';
   if (is_skipws)
   {
