@@ -66,7 +66,7 @@ namespace alisov
     int **mas = nullptr;
     try
     {
-      int **mas = new int *[n];
+      mas = new int *[n];
       for (size_t i = 0; i < n; ++i)
       {
         mas[i] = nullptr;
