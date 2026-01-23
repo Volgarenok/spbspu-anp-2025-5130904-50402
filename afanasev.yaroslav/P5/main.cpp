@@ -330,7 +330,7 @@ afanasev::rectangle_t afanasev::calculateOverallFrameRect(const Shape * const * 
 
   for (size_t i = 0; i < cnt_shapes; i++) {
     rectangle_t frame = shapes[i]->getFrameRect();
-      
+
     double left = frame.pos.x - frame.width / 2;
     double right = frame.pos.x + frame.width / 2;
     double bottom = frame.pos.y - frame.height / 2;
