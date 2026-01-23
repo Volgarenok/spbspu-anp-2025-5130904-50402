@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 
 namespace afanasev
 {
@@ -28,19 +29,12 @@ namespace afanasev
     virtual void move(const point_t & point) noexcept = 0;
     virtual void move(double dx, double dy) noexcept = 0;
 
-    virtual void scale(double k) = 0;
+    void checkScale(double k);
+
+    virtual void scale(double k) noexcept = 0;
   };
 
-  class ScalableShape : public Shape
-  {
-  public:
-    void scale(double k) final override;
-
-  protected:
-    virtual void doScale(double k) noexcept = 0;
-  };
-
-  class Rectangle final: public ScalableShape
+  class Rectangle final: public Shape
   {
   public:
     Rectangle(double w, double h, const point_t & pos);
@@ -53,8 +47,7 @@ namespace afanasev
 
     void move(double dx, double dy) noexcept override;
 
-  protected:
-    void doScale(double k) noexcept override;
+    void scale(double k) noexcept override;
 
   private:
     double width_;
@@ -63,7 +56,7 @@ namespace afanasev
     point_t center_;
   };
 
-  class Circle final: public ScalableShape
+  class Circle final: public Shape
   {
   public:
     Circle(double r, const point_t & pos);
@@ -76,8 +69,7 @@ namespace afanasev
 
     void move(double dx, double dy) noexcept override;
 
-  protected:
-    void doScale(double k) noexcept override;
+    void scale(double k) noexcept override;
 
   private:
     double radius_;
@@ -85,7 +77,7 @@ namespace afanasev
     point_t center_;
   };
 
-  class Rubber final: public ScalableShape
+  class Rubber final: public Shape
   {
   public:
     Rubber(double r1, double r2, const point_t & pos1, const point_t & pos2);
@@ -98,8 +90,7 @@ namespace afanasev
 
     void move(double dx, double dy) noexcept override;
 
-  protected:
-    void doScale(double k) noexcept override;
+    void scale(double k) noexcept override;
 
   private:
     Circle c_min_;
@@ -107,9 +98,11 @@ namespace afanasev
     point_t center_;
   };
 
+  rectangle_t calculateOverallFrameRect(const Shape ** shapes, size_t cnt_shapes) noexcept;
+
   void printShapesInfo(const Shape ** shapes, size_t cnt_shapes) noexcept;
 
-  void scaleAllShapes(Shape ** shapes, size_t cnt_shapes);
+  void scaleAllShapes(Shape ** shapes, size_t cnt_shapes, double x, double y, double k) noexcept;
 }
 
 int main()
@@ -147,7 +140,24 @@ int main()
 
     printShapesInfo(const_cast<const Shape**>(shapes), cnt_shapes);
 
-    scaleAllShapes(shapes, cnt_shapes);
+
+    std::cout << "\nМеняем фигуры:" << '\n';
+    std::cout << "Введите x, y и коэффицент k через пробел:\n";
+    double k = 0;
+    double x = 0;
+    double y = 0;
+    std::cin >> x >> y;
+    std::cin >> k;
+
+    if (!std::cin)
+    {
+      throw std::logic_error("input error");
+    }
+
+    scaleAllShapes(shapes, cnt_shapes, x, y, k);
+
+    std::cout << "\nМасштабирован в " << k << " раз, относительно {";
+    std::cout << x << ", " << y << "}\n";
 
     printShapesInfo(const_cast<const Shape**>(shapes), cnt_shapes);
   }
@@ -178,13 +188,13 @@ bool afanasev::operator==(const point_t & a, const point_t & b) noexcept
   return a.x == b.x && a.y == b.y;
 }
 
-void afanasev::ScalableShape::scale(double k)
+void afanasev::Shape::checkScale(double k)
 {
   if (k <= 0)
   {
     throw std::invalid_argument("coefficient must be > 0");
   }
-  doScale(k);
+  scale(k);
 }
 
 afanasev::Rectangle::Rectangle(double w, double h, const point_t & pos):
@@ -215,7 +225,7 @@ void afanasev::Rectangle::move(double dx, double dy) noexcept
   center_.x += dx;
   center_.y += dy;
 }
-void afanasev::Rectangle::doScale(double k) noexcept
+void afanasev::Rectangle::scale(double k) noexcept
 {
   width_ *= k;
   height_ *= k;
@@ -254,7 +264,7 @@ void afanasev::Circle::move(double dx, double dy) noexcept
   center_.x += dx;
   center_.y += dy;
 }
-void afanasev::Circle::doScale(double k) noexcept
+void afanasev::Circle::scale(double k) noexcept
 {
   radius_ *= k;
 
@@ -301,7 +311,7 @@ void afanasev::Rubber::move(double dx, double dy) noexcept
   center_.x += dx;
   center_.y += dy;
 }
-void afanasev::Rubber::doScale(double k) noexcept
+void afanasev::Rubber::scale(double k) noexcept
 {
   c_min_.move(center_);
   c_max_.move(center_);
@@ -310,48 +320,17 @@ void afanasev::Rubber::doScale(double k) noexcept
   c_max_.scale(k);
 }
 
-void afanasev::printShapesInfo(const Shape ** shapes, size_t cnt_shapes) noexcept
+afanasev::rectangle_t afanasev::calculateOverallFrameRect(const Shape ** shapes,
+  size_t cnt_shapes) noexcept
 {
-  std::cout << "\nСуществующие фигуры:" << '\n';
+  double x_min = std::numeric_limits<double>::max();
+  double x_max = std::numeric_limits<double>::lowest();
+  double y_min = std::numeric_limits<double>::max();
+  double y_max = std::numeric_limits<double>::lowest();
 
-  double s_all = 0;
-
-  double x_max = 0;
-  double x_min = 0;
-  double y_max = 0;
-  double y_min = 0;
-
-  rectangle_t first_frame = shapes[0]->getFrameRect();
-  x_min = first_frame.pos.x - first_frame.width / 2;
-  x_max = first_frame.pos.x + first_frame.width / 2;
-  y_min = first_frame.pos.y - first_frame.height / 2;
-  y_max = first_frame.pos.y + first_frame.height / 2;
-
-  std::cout << "0) S = " << shapes[0]->getArea();
-  std::cout << "; Размер ограничивающего прямоугольника: {h = " << first_frame.height;
-  std::cout << ", w = " << first_frame.width << '}';
-  std::cout << "; Координаты фигуры: {" << first_frame.pos.x;
-  std::cout << ", " << first_frame.pos.y << '}';
-  std::cout << '\n';
-
-  s_all += shapes[0]->getArea();
-
-  for (size_t i = 1; i < cnt_shapes; i++)
-  {
+  for (size_t i = 0; i < cnt_shapes; i++) {
     rectangle_t frame = shapes[i]->getFrameRect();
-
-    s_all += (shapes[i]->getArea());
-
-    std::cout << i << ") S = " << shapes[i]->getArea();
-
-    std::cout << "; Размер ограничивающего прямоугольника: {h = " << frame.height;
-    std::cout << ", w = " << frame.width << '}';
-
-    std::cout << "; Координаты фигуры: {" << frame.pos.x;
-    std::cout << ", " << frame.pos.y << '}';
-
-    std::cout << '\n';
-
+      
     double left = frame.pos.x - frame.width / 2;
     double right = frame.pos.x + frame.width / 2;
     double bottom = frame.pos.y - frame.height / 2;
@@ -363,34 +342,55 @@ void afanasev::printShapesInfo(const Shape ** shapes, size_t cnt_shapes) noexcep
     y_max = std::max(top, y_max);
   }
 
+  double width = x_max - x_min;
+  double height = y_max - y_min;
+  point_t center = {
+    (x_min + x_max) / 2,
+    (y_min + y_max) / 2
+  };
+
+  return {width, height, center};
+}
+
+void afanasev::printShapesInfo(const Shape ** shapes, size_t cnt_shapes) noexcept
+{
+  std::cout << "\nСуществующие фигуры:" << '\n';
+
+  double s_all = 0;
+
+  for (size_t i = 0; i < cnt_shapes; i++)
+  {
+    rectangle_t frame = shapes[i]->getFrameRect();
+
+    s_all += (shapes[i]->getArea());
+
+    std::cout << i << ") S = " << shapes[i]->getArea();
+
+    std::cout << "; Размер ограничивающего прямоугольника: {h = " << frame.height;
+    std::cout << ", w = " << frame.width << '}';
+
+    std::cout << "; Координаты фигуры: {" << frame.pos.x;
+    std::cout << ", " << frame.pos.y << '}\n';
+  }
+
+  rectangle_t overall_frame = calculateOverallFrameRect(shapes, cnt_shapes);
+
   std::cout << "Общая площадь: " << s_all;
   std::cout << '\n';
   std::cout << "Общий ограничивающий: {h = ";
-  std::cout << y_max - y_min << ", w = " << x_max - x_min << '}';
+  std::cout << overall_frame.height << ", w = " << overall_frame.width << '}';
   std::cout << '\n';
 }
 
-void afanasev::scaleAllShapes(afanasev::Shape ** shapes, size_t cnt_shapes)
+void afanasev::scaleAllShapes(afanasev::Shape ** shapes, size_t cnt_shapes,
+  double x, double y, double k) noexcept
 {
-  std::cout << "\nМеняем фигуры:" << '\n';
-  std::cout << "Введите x, y и коэффицент k через пробел:\n";
-  double k = 0;
-  double x = 0;
-  double y = 0;
-  std::cin >> x >> y;
-  std::cin >> k;
+  shapes[0]->move({x, y});
+  shapes[0]->checkScale(k);
 
-  if (!std::cin)
-  {
-    throw std::logic_error("input error");
-  }
-
-  for (size_t i = 0; i < cnt_shapes; i++)
+  for (size_t i = 1; i < cnt_shapes; i++)
   {
     shapes[i]->move({x, y});
     shapes[i]->scale(k);
   }
-
-  std::cout << "\nМасштабирован в " << k << " раз, относительно {";
-  std::cout << x << ", " << y << "}\n";
 }
