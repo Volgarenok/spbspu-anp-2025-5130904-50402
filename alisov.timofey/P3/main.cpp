@@ -65,9 +65,22 @@ namespace alisov
     int max_length = 0;
 
     int **mas = new int *[n];
+    if (!mas)
+    {
+      return 0;
+    }
     for (size_t i = 0; i < n; ++i)
     {
       mas[i] = new int[2];
+      if (!mas[i])
+      {
+        for (size_t k = 0; k < n; ++k)
+        {
+          delete[] mas[k];
+        }
+        delete[] mas;
+        return 0;
+      }
       mas[i][0] = -1;
       mas[i][1] = 0;
     }
