@@ -1,7 +1,7 @@
 #ifndef COMPOSITE_SHAPE_HPP
 #define COMPOSITE_SHAPE_HPP
 
-#include "shape.hpp"
+#include "Shape.hpp"
 #include <cstddef>
 
 namespace pozdnyakov

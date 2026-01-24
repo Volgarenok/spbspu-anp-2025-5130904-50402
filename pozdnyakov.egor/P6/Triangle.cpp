@@ -1,4 +1,4 @@
-#include "triangle.hpp"
+#include "Triangle.hpp"
 #include <algorithm>
 #include <cmath>
 

@@ -1,4 +1,4 @@
-#include "diamond.hpp"
+#include "Diamond.hpp"
 
 pozdnyakov::Diamond::Diamond(const point_t &center, double diag_h, double diag_v) noexcept:
   center_(center),

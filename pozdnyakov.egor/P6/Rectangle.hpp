@@ -1,7 +1,7 @@
 #ifndef RECTANGLE_HPP
 #define RECTANGLE_HPP
 
-#include "shape.hpp"
+#include "Shape.hpp"
 
 namespace pozdnyakov
 {

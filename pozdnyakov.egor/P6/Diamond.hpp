@@ -1,7 +1,7 @@
 #ifndef DIAMOND_HPP
 #define DIAMOND_HPP
 
-#include "shape.hpp"
+#include "Shape.hpp"
 
 namespace pozdnyakov
 {

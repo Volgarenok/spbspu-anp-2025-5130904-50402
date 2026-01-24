@@ -1,9 +1,9 @@
 #include <iostream>
 #include <iomanip>
 #include <new>
-#include "rectangle.hpp"
-#include "diamond.hpp"
-#include "triangle.hpp"
+#include "Rectangle.hpp"
+#include "Diamond.hpp"
+#include "Triangle.hpp"
 #include "compositeShape.hpp"
 
 void printInfo(const pozdnyakov::Shape &shape, const std::string &name)
