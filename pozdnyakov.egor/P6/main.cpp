@@ -400,8 +400,24 @@ int main()
 
     printInfo(composite, "Composite initial");
 
-    composite.scale(2.0);
-    printInfo(composite, "Composite scaled x2");
+    double dx = 0.0;
+    double dy = 0.0;
+    double k = 0.0;
+
+    if (!(std::cin >> dx >> dy >> k)) {
+      std::cerr << "Incorrect input\n";
+      return 1;
+    }
+
+    if (k < 0.0) {
+      std::cerr << "Invalid scale coefficient\n";
+      return 1;
+    }
+
+    composite.move(dx, dy);
+    composite.scale(k);
+
+    printInfo(composite, "Composite scaled");
 
     CompositeShape copy = composite;
     copy.move(100.0, 100.0);
@@ -409,10 +425,10 @@ int main()
     printInfo(composite, "Original");
     printInfo(copy, "Copy");
   } catch (const std::bad_alloc &e) {
-    std::cerr << "Memory allocation failed. " << e.what() << "\n";
+    std::cerr << "Memory allocation failed " << e.what() << "\n";
     return 2;
   } catch (const std::exception &e) {
-    std::cerr << "Error. " << e.what() << "\n";
+    std::cerr << "Error " << e.what() << "\n";
     return 1;
   }
 
