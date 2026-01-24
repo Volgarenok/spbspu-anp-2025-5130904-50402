@@ -29,7 +29,7 @@ namespace pozdnyakov
 
     virtual double getArea() const noexcept = 0;
     virtual rectangle_t getFrameRect() const noexcept = 0;
-    virtual void move(const point_t& pos) noexcept = 0;
+    virtual void move(const point_t &pos) noexcept = 0;
     virtual void move(double dx, double dy) noexcept = 0;
 
     virtual void scale(double k)
@@ -40,7 +40,7 @@ namespace pozdnyakov
       doScale(k);
     }
 
-    virtual Shape* clone() const = 0;
+    virtual Shape *clone() const = 0;
 
     void unsafeScale(double k) noexcept
     {
@@ -51,13 +51,12 @@ namespace pozdnyakov
     virtual void doScale(double k) noexcept = 0;
   };
 
-  class Rectangle final : public Shape
+  class Rectangle final: public Shape
   {
   public:
-    Rectangle(const point_t& center, double width, double height) noexcept :
-      frame_{ width, height, center }
-    {
-    }
+    Rectangle(const point_t &center, double width, double height) noexcept:
+      frame_{width, height, center}
+    {}
 
     double getArea() const noexcept override
     {
@@ -69,7 +68,7 @@ namespace pozdnyakov
       return frame_;
     }
 
-    void move(const point_t& pos) noexcept override
+    void move(const point_t &pos) noexcept override
     {
       frame_.pos = pos;
     }
@@ -80,7 +79,7 @@ namespace pozdnyakov
       frame_.pos.y += dy;
     }
 
-    Shape* clone() const override
+    Shape *clone() const override
     {
       return new Rectangle(*this);
     }
@@ -95,15 +94,14 @@ namespace pozdnyakov
     }
   };
 
-  class Diamond final : public Shape
+  class Diamond final: public Shape
   {
   public:
-    Diamond(const point_t& center, double diag_h, double diag_v) noexcept :
+    Diamond(const point_t &center, double diag_h, double diag_v) noexcept:
       center_(center),
       diag_h_(diag_h),
       diag_v_(diag_v)
-    {
-    }
+    {}
 
     double getArea() const noexcept override
     {
@@ -112,10 +110,10 @@ namespace pozdnyakov
 
     rectangle_t getFrameRect() const noexcept override
     {
-      return { diag_h_, diag_v_, center_ };
+      return {diag_h_, diag_v_, center_};
     }
 
-    void move(const point_t& pos) noexcept override
+    void move(const point_t &pos) noexcept override
     {
       center_ = pos;
     }
@@ -126,7 +124,7 @@ namespace pozdnyakov
       center_.y += dy;
     }
 
-    Shape* clone() const override
+    Shape *clone() const override
     {
       return new Diamond(*this);
     }
@@ -143,13 +141,14 @@ namespace pozdnyakov
     }
   };
 
-  class Triangle final : public Shape
+  class Triangle final: public Shape
   {
   public:
-    Triangle(const point_t& a, const point_t& b, const point_t& c) noexcept :
-      p1_(a), p2_(b), p3_(c)
-    {
-    }
+    Triangle(const point_t &a, const point_t &b, const point_t &c) noexcept:
+      p1_(a),
+      p2_(b),
+      p3_(c)
+    {}
 
     double getArea() const noexcept override
     {
@@ -160,15 +159,15 @@ namespace pozdnyakov
 
     rectangle_t getFrameRect() const noexcept override
     {
-      double min_x = std::min({ p1_.x, p2_.x, p3_.x });
-      double max_x = std::max({ p1_.x, p2_.x, p3_.x });
-      double min_y = std::min({ p1_.y, p2_.y, p3_.y });
-      double max_y = std::max({ p1_.y, p2_.y, p3_.y });
+      double min_x = std::min({p1_.x, p2_.x, p3_.x});
+      double max_x = std::max({p1_.x, p2_.x, p3_.x});
+      double min_y = std::min({p1_.y, p2_.y, p3_.y});
+      double max_y = std::max({p1_.y, p2_.y, p3_.y});
 
-      return { max_x - min_x, max_y - min_y, {(min_x + max_x) / 2.0, (min_y + max_y) / 2.0} };
+      return {max_x - min_x, max_y - min_y, {(min_x + max_x) / 2.0, (min_y + max_y) / 2.0}};
     }
 
-    void move(const point_t& pos) noexcept override
+    void move(const point_t &pos) noexcept override
     {
       point_t center = getFrameRect().pos;
       double dx = pos.x - center.x;
@@ -178,12 +177,15 @@ namespace pozdnyakov
 
     void move(double dx, double dy) noexcept override
     {
-      p1_.x += dx; p1_.y += dy;
-      p2_.x += dx; p2_.y += dy;
-      p3_.x += dx; p3_.y += dy;
+      p1_.x += dx;
+      p1_.y += dy;
+      p2_.x += dx;
+      p2_.y += dy;
+      p3_.x += dx;
+      p3_.y += dy;
     }
 
-    Shape* clone() const override
+    Shape *clone() const override
     {
       return new Triangle(*this);
     }
@@ -203,22 +205,26 @@ namespace pozdnyakov
     }
   };
 
-  class CompositeShape final : public Shape
+  class CompositeShape final: public Shape
   {
   public:
-    CompositeShape() : count_(0), capacity_(0), shapes_(nullptr) {}
+    CompositeShape():
+      count_(0),
+      capacity_(0),
+      shapes_(nullptr)
+    {}
 
-    CompositeShape(const CompositeShape& other) :
+    CompositeShape(const CompositeShape &other):
       count_(other.count_),
       capacity_(other.count_),
-      shapes_(new Shape* [other.count_])
+      shapes_(new Shape *[other.count_])
     {
       for (size_t i = 0; i < count_; ++i) {
         shapes_[i] = other.shapes_[i]->clone();
       }
     }
 
-    CompositeShape(CompositeShape&& other) noexcept :
+    CompositeShape(CompositeShape &&other) noexcept:
       count_(other.count_),
       capacity_(other.capacity_),
       shapes_(other.shapes_)
@@ -228,7 +234,7 @@ namespace pozdnyakov
       other.shapes_ = nullptr;
     }
 
-    CompositeShape& operator=(const CompositeShape& other)
+    CompositeShape &operator=(const CompositeShape &other)
     {
       if (this != &other) {
         CompositeShape temp(other);
@@ -237,7 +243,7 @@ namespace pozdnyakov
       return *this;
     }
 
-    CompositeShape& operator=(CompositeShape&& other) noexcept
+    CompositeShape &operator=(CompositeShape &&other) noexcept
     {
       if (this != &other) {
         CompositeShape temp(std::move(other));
@@ -254,14 +260,14 @@ namespace pozdnyakov
       delete[] shapes_;
     }
 
-    void addShape(Shape* shape)
+    void addShape(Shape *shape)
     {
       if (!shape) {
         throw std::invalid_argument("Null shape");
       }
       if (count_ >= capacity_) {
         size_t newCap = (capacity_ == 0) ? 1 : capacity_ * 2;
-        Shape** newShapes = new Shape * [newCap];
+        Shape **newShapes = new Shape *[newCap];
         for (size_t i = 0; i < count_; ++i) {
           newShapes[i] = shapes_[i];
         }
@@ -297,13 +303,13 @@ namespace pozdnyakov
     rectangle_t getFrameRect() const noexcept override
     {
       if (count_ == 0) {
-        return { 0.0, 0.0, {0.0, 0.0} };
+        return {0.0, 0.0, {0.0, 0.0}};
       }
 
-      double minX = std::numeric_limits<double>::infinity();
-      double maxX = -std::numeric_limits<double>::infinity();
-      double minY = std::numeric_limits<double>::infinity();
-      double maxY = -std::numeric_limits<double>::infinity();
+      double minX = std::numeric_limits< double >::infinity();
+      double maxX = -std::numeric_limits< double >::infinity();
+      double minY = std::numeric_limits< double >::infinity();
+      double maxY = -std::numeric_limits< double >::infinity();
 
       for (size_t i = 0; i < count_; ++i) {
         rectangle_t frame = shapes_[i]->getFrameRect();
@@ -313,10 +319,10 @@ namespace pozdnyakov
         maxY = std::max(maxY, frame.pos.y + frame.height / 2.0);
       }
 
-      return { maxX - minX, maxY - minY, {(minX + maxX) / 2.0, (minY + maxY) / 2.0} };
+      return {maxX - minX, maxY - minY, {(minX + maxX) / 2.0, (minY + maxY) / 2.0}};
     }
 
-    void move(const point_t& pos) noexcept override
+    void move(const point_t &pos) noexcept override
     {
       point_t center = getFrameRect().pos;
       move(pos.x - center.x, pos.y - center.y);
@@ -334,7 +340,7 @@ namespace pozdnyakov
       Shape::scale(k);
     }
 
-    Shape* clone() const override
+    Shape *clone() const override
     {
       return new CompositeShape(*this);
     }
@@ -347,7 +353,7 @@ namespace pozdnyakov
   private:
     size_t count_;
     size_t capacity_;
-    Shape** shapes_;
+    Shape **shapes_;
 
     void doScale(double k) noexcept override
     {
@@ -362,7 +368,7 @@ namespace pozdnyakov
       }
     }
 
-    void swap(CompositeShape& other) noexcept
+    void swap(CompositeShape &other) noexcept
     {
       std::swap(count_, other.count_);
       std::swap(capacity_, other.capacity_);
@@ -370,12 +376,56 @@ namespace pozdnyakov
     }
   };
 
-  void printInfo(const Shape& shape, const std::string& name)
+  void printInfo(const Shape &shape, const std::string &name)
   {
     std::cout << "Info for " << name << ":\n";
     std::cout << "  Area: " << shape.getArea() << "\n";
     rectangle_t frame = shape.getFrameRect();
-    std::cout << "  Frame: pos(" << frame.pos.x << ", " << frame.pos.y
-      << "), w=" << frame.width << ", h=" << frame.height << "\n\n";
+    std::cout << "  Frame: pos(" << frame.pos.x << ", " << frame.pos.y << "), w=" << frame.width
+              << ", h=" << frame.height << "\n\n";
   }
+}
+
+int main()
+{
+  using namespace pozdnyakov;
+
+  std::cout << std::fixed << std::setprecision(1);
+
+  std::cout << "Creating CompositeShape\n";
+  CompositeShape composite;
+
+  try {
+    composite.addShape(new Rectangle({5.0, 5.0}, 10.0, 5.0));
+    composite.addShape(new Diamond({20.0, 5.0}, 10.0, 10.0));
+    composite.addShape(new Triangle({0.0, 0.0}, {5.0, 10.0}, {10.0, 0.0}));
+  } catch (const std::exception &e) {
+    std::cerr << "Error: " << e.what() << "\n";
+    return 1;
+  }
+
+  printInfo(composite, "Composite");
+
+  std::cout << "Scaling CompositeShape\n";
+  composite.scale(2.0);
+  printInfo(composite, "Composite");
+
+  std::cout << "Testing Deep Copy\n";
+  CompositeShape copy = composite;
+
+  copy.move(100.0, 100.0);
+
+  printInfo(composite, "Original");
+  printInfo(copy, "Copy");
+
+  rectangle_t origFrame = composite.getFrameRect();
+  rectangle_t copyFrame = copy.getFrameRect();
+
+  if (std::abs(origFrame.pos.x - copyFrame.pos.x) > 1.0) {
+    std::cout << "Original and Copy are independent\n";
+  } else {
+    std::cout << "Original moved with Copy\n";
+  }
+
+  return 0;
 }
