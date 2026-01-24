@@ -39,6 +39,7 @@ namespace pozdnyakov
       }
       doScale(k);
     }
+
     virtual Shape* clone() const = 0;
 
     void unsafeScale(double k) noexcept
@@ -201,4 +202,180 @@ namespace pozdnyakov
       p3_.y = center.y + (p3_.y - center.y) * k;
     }
   };
+
+  class CompositeShape final : public Shape
+  {
+  public:
+    CompositeShape() : count_(0), capacity_(0), shapes_(nullptr) {}
+
+    CompositeShape(const CompositeShape& other) :
+      count_(other.count_),
+      capacity_(other.count_),
+      shapes_(new Shape* [other.count_])
+    {
+      for (size_t i = 0; i < count_; ++i) {
+        shapes_[i] = other.shapes_[i]->clone();
+      }
+    }
+
+    CompositeShape(CompositeShape&& other) noexcept :
+      count_(other.count_),
+      capacity_(other.capacity_),
+      shapes_(other.shapes_)
+    {
+      other.count_ = 0;
+      other.capacity_ = 0;
+      other.shapes_ = nullptr;
+    }
+
+    CompositeShape& operator=(const CompositeShape& other)
+    {
+      if (this != &other) {
+        CompositeShape temp(other);
+        swap(temp);
+      }
+      return *this;
+    }
+
+    CompositeShape& operator=(CompositeShape&& other) noexcept
+    {
+      if (this != &other) {
+        CompositeShape temp(std::move(other));
+        swap(temp);
+      }
+      return *this;
+    }
+
+    ~CompositeShape() override
+    {
+      for (size_t i = 0; i < count_; ++i) {
+        delete shapes_[i];
+      }
+      delete[] shapes_;
+    }
+
+    void addShape(Shape* shape)
+    {
+      if (!shape) {
+        throw std::invalid_argument("Null shape");
+      }
+      if (count_ >= capacity_) {
+        size_t newCap = (capacity_ == 0) ? 1 : capacity_ * 2;
+        Shape** newShapes = new Shape * [newCap];
+        for (size_t i = 0; i < count_; ++i) {
+          newShapes[i] = shapes_[i];
+        }
+        delete[] shapes_;
+        shapes_ = newShapes;
+        capacity_ = newCap;
+      }
+      shapes_[count_++] = shape;
+    }
+
+    void removeShape(size_t index)
+    {
+      if (index >= count_) {
+        throw std::out_of_range("Index out of range");
+      }
+      delete shapes_[index];
+      for (size_t i = index; i < count_ - 1; ++i) {
+        shapes_[i] = shapes_[i + 1];
+      }
+      shapes_[count_ - 1] = nullptr;
+      count_--;
+    }
+
+    double getArea() const noexcept override
+    {
+      double total = 0.0;
+      for (size_t i = 0; i < count_; ++i) {
+        total += shapes_[i]->getArea();
+      }
+      return total;
+    }
+
+    rectangle_t getFrameRect() const noexcept override
+    {
+      if (count_ == 0) {
+        return { 0.0, 0.0, {0.0, 0.0} };
+      }
+
+      double minX = std::numeric_limits<double>::infinity();
+      double maxX = -std::numeric_limits<double>::infinity();
+      double minY = std::numeric_limits<double>::infinity();
+      double maxY = -std::numeric_limits<double>::infinity();
+
+      for (size_t i = 0; i < count_; ++i) {
+        rectangle_t frame = shapes_[i]->getFrameRect();
+        minX = std::min(minX, frame.pos.x - frame.width / 2.0);
+        maxX = std::max(maxX, frame.pos.x + frame.width / 2.0);
+        minY = std::min(minY, frame.pos.y - frame.height / 2.0);
+        maxY = std::max(maxY, frame.pos.y + frame.height / 2.0);
+      }
+
+      return { maxX - minX, maxY - minY, {(minX + maxX) / 2.0, (minY + maxY) / 2.0} };
+    }
+
+    void move(const point_t& pos) noexcept override
+    {
+      point_t center = getFrameRect().pos;
+      move(pos.x - center.x, pos.y - center.y);
+    }
+
+    void move(double dx, double dy) noexcept override
+    {
+      for (size_t i = 0; i < count_; ++i) {
+        shapes_[i]->move(dx, dy);
+      }
+    }
+
+    void scale(double k) override
+    {
+      Shape::scale(k);
+    }
+
+    Shape* clone() const override
+    {
+      return new CompositeShape(*this);
+    }
+
+    size_t getCount() const noexcept
+    {
+      return count_;
+    }
+
+  private:
+    size_t count_;
+    size_t capacity_;
+    Shape** shapes_;
+
+    void doScale(double k) noexcept override
+    {
+      point_t center = getFrameRect().pos;
+      for (size_t i = 0; i < count_; ++i) {
+        point_t shapePos = shapes_[i]->getFrameRect().pos;
+        double dx = (shapePos.x - center.x) * (k - 1.0);
+        double dy = (shapePos.y - center.y) * (k - 1.0);
+
+        shapes_[i]->move(dx, dy);
+        shapes_[i]->unsafeScale(k);
+      }
+    }
+
+    void swap(CompositeShape& other) noexcept
+    {
+      std::swap(count_, other.count_);
+      std::swap(capacity_, other.capacity_);
+      std::swap(shapes_, other.shapes_);
+    }
+  };
+
+  void printInfo(const Shape& shape, const std::string& name)
+  {
+    std::cout << "Info for " << name << ":\n";
+    std::cout << "  Area: " << shape.getArea() << "\n";
+    rectangle_t frame = shape.getFrameRect();
+    std::cout << "  Frame: pos(" << frame.pos.x << ", " << frame.pos.y
+      << "), w=" << frame.width << ", h=" << frame.height << "\n\n";
+  }
 }
