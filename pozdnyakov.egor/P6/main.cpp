@@ -191,7 +191,9 @@ namespace pozdnyakov
     }
 
   private:
-    point_t p1_, p2_, p3_;
+    point_t p1_;
+    point_t p2_;
+    point_t p3_;
 
     void doScale(double k) noexcept override
     {
@@ -234,6 +236,14 @@ namespace pozdnyakov
       other.shapes_ = nullptr;
     }
 
+    ~CompositeShape() override
+    {
+      for (size_t i = 0; i < count_; ++i) {
+        delete shapes_[i];
+      }
+      delete[] shapes_;
+    }
+
     CompositeShape &operator=(const CompositeShape &other)
     {
       if (this != &other) {
@@ -250,14 +260,6 @@ namespace pozdnyakov
         swap(temp);
       }
       return *this;
-    }
-
-    ~CompositeShape() override
-    {
-      for (size_t i = 0; i < count_; ++i) {
-        delete shapes_[i];
-      }
-      delete[] shapes_;
     }
 
     void addShape(Shape *shape)
@@ -305,7 +307,6 @@ namespace pozdnyakov
       if (count_ == 0) {
         return {0.0, 0.0, {0.0, 0.0}};
       }
-
       double minX = std::numeric_limits< double >::infinity();
       double maxX = -std::numeric_limits< double >::infinity();
       double minY = std::numeric_limits< double >::infinity();
@@ -318,7 +319,6 @@ namespace pozdnyakov
         minY = std::min(minY, frame.pos.y - frame.height / 2.0);
         maxY = std::max(maxY, frame.pos.y + frame.height / 2.0);
       }
-
       return {maxX - minX, maxY - minY, {(minX + maxX) / 2.0, (minY + maxY) / 2.0}};
     }
 
@@ -362,7 +362,6 @@ namespace pozdnyakov
         point_t shapePos = shapes_[i]->getFrameRect().pos;
         double dx = (shapePos.x - center.x) * (k - 1.0);
         double dy = (shapePos.y - center.y) * (k - 1.0);
-
         shapes_[i]->move(dx, dy);
         shapes_[i]->unsafeScale(k);
       }
@@ -378,7 +377,7 @@ namespace pozdnyakov
 
   void printInfo(const Shape &shape, const std::string &name)
   {
-    std::cout << "Info for " << name << ":\n";
+    std::cout << name << ":\n";
     std::cout << "  Area: " << shape.getArea() << "\n";
     rectangle_t frame = shape.getFrameRect();
     std::cout << "  Frame: pos(" << frame.pos.x << ", " << frame.pos.y << "), w=" << frame.width
@@ -392,39 +391,29 @@ int main()
 
   std::cout << std::fixed << std::setprecision(1);
 
-  std::cout << "Creating CompositeShape\n";
-  CompositeShape composite;
-
   try {
+    CompositeShape composite;
+
     composite.addShape(new Rectangle({5.0, 5.0}, 10.0, 5.0));
     composite.addShape(new Diamond({20.0, 5.0}, 10.0, 10.0));
     composite.addShape(new Triangle({0.0, 0.0}, {5.0, 10.0}, {10.0, 0.0}));
+
+    printInfo(composite, "Composite initial");
+
+    composite.scale(2.0);
+    printInfo(composite, "Composite scaled x2");
+
+    CompositeShape copy = composite;
+    copy.move(100.0, 100.0);
+
+    printInfo(composite, "Original");
+    printInfo(copy, "Copy");
+  } catch (const std::bad_alloc &e) {
+    std::cerr << "Memory allocation failed. " << e.what() << "\n";
+    return 2;
   } catch (const std::exception &e) {
-    std::cerr << "Error: " << e.what() << "\n";
+    std::cerr << "Error. " << e.what() << "\n";
     return 1;
-  }
-
-  printInfo(composite, "Composite");
-
-  std::cout << "Scaling CompositeShape\n";
-  composite.scale(2.0);
-  printInfo(composite, "Composite");
-
-  std::cout << "Testing Deep Copy\n";
-  CompositeShape copy = composite;
-
-  copy.move(100.0, 100.0);
-
-  printInfo(composite, "Original");
-  printInfo(copy, "Copy");
-
-  rectangle_t origFrame = composite.getFrameRect();
-  rectangle_t copyFrame = copy.getFrameRect();
-
-  if (std::abs(origFrame.pos.x - copyFrame.pos.x) > 1.0) {
-    std::cout << "Original and Copy are independent\n";
-  } else {
-    std::cout << "Original moved with Copy\n";
   }
 
   return 0;
