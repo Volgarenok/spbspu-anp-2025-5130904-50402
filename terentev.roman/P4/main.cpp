@@ -1,31 +1,23 @@
 #include <iostream>
 #include <cstddef>
 #include <cctype>
+#include <stdexcept>
 
 namespace terentev
 {
   char* readLine(std::istream& in, std::size_t& cap, std::size_t& size);
-  char* transformUppLow(const char* src, char* dst, int dst_sz);
-  char* transformRmvVow(const char* src, char* dst, int dst_sz);
+  char* transformUppLow(const char* src, char* dst);
+  char* transformRmvVow(const char* src, char* dst);
 }
+
 char* terentev::readLine(std::istream& in, std::size_t& cap, std::size_t& size)
 {
   size = 0;
   if (cap == 0)
   {
-    std::cerr << "Error: buffer capacity must be > 0\n";
-    return nullptr;
+    throw std::runtime_error("cap==0");
   }
-  char* buf = nullptr;
-  try
-  {
-    buf = new char[cap];
-  }
-  catch (const std::bad_alloc&)
-  {
-    std::cerr << "Error: cannot allocate memory for input buffer\n";
-    return nullptr;
-  }
+  char* buf = new char[cap];
   char ch;
   while (in.get(ch) && ch != '\n')
   {
@@ -36,17 +28,7 @@ char* terentev::readLine(std::istream& in, std::size_t& cap, std::size_t& size)
       {
         new_cap = size + 2;
       }
-      char* new_buf = 0;
-      try
-      {
-        new_buf = new char[new_cap];
-      }
-      catch (const std::bad_alloc&)
-      {
-        delete[] buf;
-        std::cerr << "Error: cannot allocate memory for input buffer\n";
-        return nullptr;
-      }
+      char* new_buf = new char[new_cap];
       for (std::size_t i = 0; i < size; ++i)
       {
         new_buf[i] = buf[i];
@@ -65,19 +47,20 @@ char* terentev::readLine(std::istream& in, std::size_t& cap, std::size_t& size)
   buf[size] = '\0';
   return buf;
 }
-char* terentev::transformUppLow(const char* src, char* dst, int dst_sz)
+
+char* terentev::transformUppLow(const char* src, char* dst)
 {
-  if (src == 0 || dst == 0 || dst_sz <= 0)
+  if (!src || !dst)
   {
-    return nullptr;
+    throw std::runtime_error("bad arguments");
   }
-  int i = 0;
+  std::size_t i = 0;
   while (src[i] != '\0')
   {
-    unsigned char c = static_cast <unsigned char> (src[i]);
+    unsigned char c = static_cast<unsigned char>(src[i]);
     if (std::isupper(c))
     {
-      dst[i] = static_cast <char> (std::tolower(c));
+      dst[i] = static_cast< char >(std::tolower(c));
     }
     else
     {
@@ -88,16 +71,19 @@ char* terentev::transformUppLow(const char* src, char* dst, int dst_sz)
   dst[i] = '\0';
   return dst;
 }
-char* terentev::transformRmvVow(const char* src, char* dst, int dst_sz)
+
+char* terentev::transformRmvVow(const char* src, char* dst)
 {
-  if (src == 0 || dst == 0 || dst_sz <= 0) {
-    return nullptr;
+  if (!src || !dst)
+  {
+    throw std::runtime_error("bad arguments");
   }
-  int i = 0;
-  int j = 0;
-  while (src[i] != '\0') {
-    unsigned char c = static_cast <unsigned char> (src[i]);
-    char lc = static_cast <char> (std::tolower(c));
+  std::size_t i = 0;
+  std::size_t j = 0;
+  while (src[i] != '\0')
+  {
+    unsigned char c = static_cast<unsigned char>(src[i]);
+    char lc = static_cast<char>(std::tolower(c));
     bool is_vowel = (lc == 'a') || (lc == 'e') || (lc == 'i') ||
       (lc == 'o') || (lc == 'u') || (lc == 'y');
     if (!is_vowel)
@@ -112,44 +98,45 @@ char* terentev::transformRmvVow(const char* src, char* dst, int dst_sz)
 
 int main()
 {
-  const std::size_t inite_cape = 128;
-  std::size_t cap = inite_cape;
-  std::size_t size = 0;
-  char* buf = terentev::readLine(std::cin, cap, size);
-  if (!buf)
-  {
-    std::cerr << "Error: no input\n";
-    return 1;
-  }
-  std::size_t res_cap = size + 1;
+  char* buf = nullptr;
   char* res = nullptr;
   try
   {
+    const std::size_t initial_cap = 128;
+    std::size_t cap = initial_cap;
+    std::size_t size = 0;
+    buf = terentev::readLine(std::cin, cap, size);
+    if (!buf)
+    {
+      std::cerr << "Error: no input\n";
+      return 1;
+    }
+    std::size_t res_cap = size + 1;
     res = new char[res_cap];
+
+    terentev::transformUppLow(buf, res);
+    std::cout << res << '\n';
+
+    terentev::transformRmvVow(buf, res);
+    std::cout << res << '\n';
+
+    delete[] res;
+    delete[] buf;
+    return 0;
   }
   catch (const std::bad_alloc&)
   {
-    delete[] buf;
-    std::cerr << "Error: cannot allocate memory for result buffer\n";
-    return 1;
+    std::cerr << "Error: cannot allocate memory\n";
   }
-  if (!terentev::transformUppLow(buf, res, static_cast<int>(res_cap)) && size != 0)
+  catch (const std::exception& e)
   {
-    delete[] res;
-    delete[] buf;
-    std::cerr << "Error: result buffer too small\n";
-    return 1;
+    std::cerr << "Error: " << e.what() << '\n';
   }
-  std::cout << res << '\n';
-  if (!terentev::transformRmvVow(buf, res, static_cast<int>(res_cap)) && size != 0)
+  catch (...)
   {
-    delete[] res;
-    delete[] buf;
-    std::cerr << "Error: result buffer too small\n";
-    return 1;
+    std::cerr << "Error: unknown error\n";
   }
-  std::cout << res << '\n';
   delete[] res;
   delete[] buf;
-  return 0;
+  return 1;
 }
