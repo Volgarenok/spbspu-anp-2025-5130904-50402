@@ -153,8 +153,8 @@ strelnikov::point_t strelnikov::getPolyC(const point_t *data, size_t k)
 
 strelnikov::Polygon::Polygon(point_t *data, size_t size):
   data_(new point_t[size]),
-  cen_(getPolyC(data_, size)),
-  size_(size)
+  size_(size),
+  cen_(getPolyC(data_, size))
 {
   if (size < 3) {
     delete[] data_;
@@ -422,7 +422,6 @@ int main()
   if (!std::cin) {
     return 3;
   }
-  strelnikov::point_t move{x, y};
 
   double k;
   std::cout << "Введите коэф. масштабирования:\n";
