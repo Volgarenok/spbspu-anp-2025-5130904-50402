@@ -42,18 +42,19 @@ namespace islamov
     resBuffer[resIndex] = '\0';
     return resBuffer;
   }
-  char* getline(std::istream& in)
+  char* getline(std::istream& in, size_t& length)
   {
     char* buffer = nullptr;
     size_t capacity = 0;
     size_t len = 0;
-    int ch = 0;
-    while ((ch = in.get()) != EOF && ch != '\n') {
+    char ch = '\0';
+    while (in.get(ch) && ch != '\n') {
       if (len + 1 >= capacity) {
         size_t new_capacity = capacity == 0 ? 32 : capacity * 2;
         char* new_buf = static_cast< char* >(std::malloc(new_capacity));
         if (!new_buf) {
           std::free(buffer);
+          length = 0;
           return nullptr;
         }
         if (buffer) {
@@ -63,24 +64,27 @@ namespace islamov
         buffer = new_buf;
         capacity = new_capacity;
       }
-      buffer[len++] = static_cast< char >(ch);
+      buffer[len++] = ch;
+    }
+    if (in.eof() && len == 0) {
+      length = 0;
+      return nullptr;
     }
     if (buffer) {
       buffer[len] = '\0';
-    } else if (ch == EOF && len == 0) {
-      return nullptr;
     }
+    length = len;
     return buffer;
   }
 }
 int main()
 {
-  char* inputLine = islamov::getline(std::cin);
+  size_t inputLen = 0;
+  char* inputLine = islamov::getline(std::cin, inputLen);
   if (inputLine == nullptr) {
     std::cerr << "Error reading input" << '\n';
     return 1;
   }
-  size_t inputLen = std::strlen(inputLine);
   char* resBuffer1 = static_cast< char* >(std::malloc(inputLen + 1));
   char* resBuffer2 = static_cast< char* >(std::malloc(inputLen + 1));
   if (resBuffer1 == nullptr || resBuffer2 == nullptr) {
