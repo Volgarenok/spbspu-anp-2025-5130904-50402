@@ -2,16 +2,20 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace strelnikov {
+namespace strelnikov
+{
   constexpr double PI = 3.14;
-  struct point_t {
+  struct point_t
+  {
     double x, y;
   };
-  struct rectangle_t {
+  struct rectangle_t
+  {
     double width, height;
     point_t c;
   };
-  class Shape {
+  class Shape
+  {
   public:
     virtual ~Shape() = default;
     virtual double getArea() const noexcept = 0;
@@ -20,7 +24,8 @@ namespace strelnikov {
     virtual void move(double, double) noexcept = 0;
     virtual void scale(double) noexcept = 0;
   };
-  class Rectangle final: public Shape {
+  class Rectangle final: public Shape
+  {
   public:
     Rectangle(double, double, point_t);
     double getArea() const noexcept override;
@@ -33,14 +38,15 @@ namespace strelnikov {
     rectangle_t rec_;
   };
 
-  class Polygon final: public Shape {
+  class Polygon final: public Shape
+  {
   public:
-    Polygon(point_t*, size_t);
-    Polygon(const Polygon&);
-    Polygon(Polygon&&) noexcept;
+    Polygon(point_t *, size_t);
+    Polygon(const Polygon &);
+    Polygon(Polygon &&) noexcept;
     ~Polygon() override;
-    Polygon& operator=(const Polygon&);
-    Polygon& operator=(Polygon&&) noexcept;
+    Polygon &operator=(const Polygon &);
+    Polygon &operator=(Polygon &&) noexcept;
     double getArea() const noexcept override;
     rectangle_t getFrameRect() const noexcept override;
     void move(point_t) noexcept override;
@@ -48,12 +54,13 @@ namespace strelnikov {
     void scale(double) noexcept override;
 
   private:
-    point_t* data_;
+    point_t *data_;
     size_t size_;
     point_t cen_;
   };
 
-  class Circle final: public Shape {
+  class Circle final: public Shape
+  {
   public:
     Circle(point_t, double);
     double getArea() const noexcept override;
@@ -69,12 +76,12 @@ namespace strelnikov {
 
   double getTrPolyS(point_t a, point_t b, point_t c);
   point_t getTrPolyC(point_t a, point_t b, point_t c);
-  point_t getPolyC(const point_t* data, size_t k);
-  void scaleAll(Shape* const* ishps, size_t size, point_t move, double k);
-  rectangle_t computeGlobalFrameRect(const Shape* const* ishps, size_t size);
-  double computeTotalArea(const Shape* const* ishps, size_t size);
+  point_t getPolyC(const point_t *data, size_t k);
+  void scaleAll(Shape *const *ishps, size_t size, point_t move, double k);
+  rectangle_t computeGlobalFrameRect(const Shape *const *ishps, size_t size);
+  double computeTotalArea(const Shape *const *ishps, size_t size);
   void printRectangle(const rectangle_t rect);
-  void printShapes(const Shape* const* ishps, size_t size);
+  void printShapes(const Shape *const *ishps, size_t size);
 };
 
 strelnikov::Rectangle::Rectangle(double wdth, double hght, point_t cntr):
@@ -126,7 +133,7 @@ strelnikov::point_t strelnikov::getTrPolyC(point_t a, point_t b, point_t c)
   return {x, y};
 }
 
-strelnikov::point_t strelnikov::getPolyC(const point_t* data, size_t k)
+strelnikov::point_t strelnikov::getPolyC(const point_t *data, size_t k)
 {
   double sum_s = 0;
   double sum_x = 0;
@@ -144,7 +151,7 @@ strelnikov::point_t strelnikov::getPolyC(const point_t* data, size_t k)
   return {(sum_x / sum_s), (sum_y / sum_s)};
 }
 
-strelnikov::Polygon::Polygon(point_t* data, size_t size):
+strelnikov::Polygon::Polygon(point_t *data, size_t size):
   data_(new point_t[size]),
   cen_(getPolyC(data_, size)),
   size_(size)
@@ -158,7 +165,7 @@ strelnikov::Polygon::Polygon(point_t* data, size_t size):
   }
 }
 
-strelnikov::Polygon::Polygon(const Polygon& p):
+strelnikov::Polygon::Polygon(const Polygon &p):
   data_(new point_t[p.size_]),
   size_(p.size_),
   cen_{p.cen_}
@@ -172,7 +179,7 @@ strelnikov::Polygon::Polygon(const Polygon& p):
   }
 }
 
-strelnikov::Polygon::Polygon(Polygon&& p) noexcept:
+strelnikov::Polygon::Polygon(Polygon &&p) noexcept:
   data_(p.data_),
   size_(p.size_),
   cen_(p.cen_)
@@ -187,12 +194,12 @@ strelnikov::Polygon::~Polygon()
   delete[] data_;
 }
 
-strelnikov::Polygon& strelnikov::Polygon::operator=(const Polygon& p)
+strelnikov::Polygon &strelnikov::Polygon::operator=(const Polygon &p)
 {
   if (this == &p) {
     return *this;
   }
-  point_t* tmp_data = nullptr;
+  point_t *tmp_data = nullptr;
   try {
     tmp_data = new point_t[p.size_];
   } catch (const std::bad_alloc &e) {
@@ -208,7 +215,7 @@ strelnikov::Polygon& strelnikov::Polygon::operator=(const Polygon& p)
   return *this;
 }
 
-strelnikov::Polygon& strelnikov::Polygon::operator=(Polygon&& p) noexcept
+strelnikov::Polygon &strelnikov::Polygon::operator=(Polygon &&p) noexcept
 {
   if (this == &p) {
     return *this;
@@ -308,7 +315,7 @@ void strelnikov::Circle::scale(double k) noexcept
   rad_ *= k;
 }
 
-void strelnikov::scaleAll(Shape* const* ishps, size_t size, point_t move, double k)
+void strelnikov::scaleAll(Shape *const *ishps, size_t size, point_t move, double k)
 {
   for (size_t i = 0; i < size; ++i) {
     ishps[i]->move(move);
@@ -316,8 +323,7 @@ void strelnikov::scaleAll(Shape* const* ishps, size_t size, point_t move, double
   }
 }
 
-strelnikov::rectangle_t strelnikov::computeGlobalFrameRect(const Shape* const* ishps,
-  const size_t size)
+strelnikov::rectangle_t strelnikov::computeGlobalFrameRect(const Shape *const *ishps, const size_t size)
 {
   rectangle_t first = ishps[0]->getFrameRect();
   double min_x = first.c.x - first.width / 2.0;
@@ -345,7 +351,7 @@ strelnikov::rectangle_t strelnikov::computeGlobalFrameRect(const Shape* const* i
   return {width, height, center};
 }
 
-double strelnikov::computeTotalArea(const Shape* const* ishps, size_t size)
+double strelnikov::computeTotalArea(const Shape *const *ishps, size_t size)
 {
   double res = 0.0;
   for (size_t i = 0; i < size; ++i) {
@@ -356,21 +362,20 @@ double strelnikov::computeTotalArea(const Shape* const* ishps, size_t size)
 
 void strelnikov::printRectangle(const rectangle_t rect)
 {
-  std::cout << "центр=(" << rect.c.x << ", " << rect.c.y
-    << ") ширина=" << rect.width << " высота=" << rect.height;
+  std::cout << "центр=(" << rect.c.x << ", " << rect.c.y << ") ширина=" << rect.width << " высота=" << rect.height;
 }
 
-void strelnikov::printShapes(const Shape* const* ishps, size_t size)
+void strelnikov::printShapes(const Shape *const *ishps, size_t size)
 {
   double area = computeTotalArea(ishps, size);
   rectangle_t total_frame = computeGlobalFrameRect(ishps, size);
-  
+
   for (size_t i = 0; i < size; ++i) {
     std::cout << ishps[i]->getArea() << '\t';
     printRectangle(ishps[i]->getFrameRect());
     std::cout << '\n';
   }
-  
+
   std::cout << "площадь всех фигур: " << area << '\n';
   std::cout << "Общая рамка: ";
   printRectangle(total_frame);
@@ -381,19 +386,13 @@ int main()
 {
   const int polyDataSize = 5;
   const int shapeSize = 3;
-  strelnikov::point_t data[polyDataSize] = {
-    {3.5, 2.0},
-    {4.76, 2.90},
-    {4.27, 4.44},
-    {2.73, 4.44},
-    {2.24, 2.90}
-  };
-  strelnikov::Shape** ishps = nullptr;
-  strelnikov::Circle* circle = nullptr;
-  strelnikov::Rectangle* rect = nullptr;
-  strelnikov::Polygon* poly = nullptr;
+  strelnikov::point_t data[polyDataSize] = {{3.5, 2.0}, {4.76, 2.90}, {4.27, 4.44}, {2.73, 4.44}, {2.24, 2.90}};
+  strelnikov::Shape **ishps = nullptr;
+  strelnikov::Circle *circle = nullptr;
+  strelnikov::Rectangle *rect = nullptr;
+  strelnikov::Polygon *poly = nullptr;
   try {
-    ishps = new strelnikov::Shape*[shapeSize];
+    ishps = new strelnikov::Shape *[shapeSize];
     circle = new strelnikov::Circle({3, 3}, 3);
     rect = new strelnikov::Rectangle(4, 4, {0, 0});
     poly = new strelnikov::Polygon(data, polyDataSize);
@@ -428,7 +427,7 @@ int main()
   double k;
   std::cout << "Введите коэф. масштабирования:\n";
   std::cin >> k;
-  if (!std::cin || k <= 0){
+  if (!std::cin || k <= 0) {
     for (size_t i = 0; i < shapeSize; ++i) {
       delete ishps[i];
     }
