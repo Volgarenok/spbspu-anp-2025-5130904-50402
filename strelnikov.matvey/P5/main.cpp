@@ -23,7 +23,6 @@ namespace strelnikov {
   class Rectangle final: public Shape {
   public:
     Rectangle(double, double, point_t);
-    ~Rectangle() override = default;
     double getArea() const noexcept override;
     rectangle_t getFrameRect() const noexcept override;
     void move(point_t) noexcept override;
@@ -57,7 +56,6 @@ namespace strelnikov {
   class Circle final: public Shape {
   public:
     Circle(point_t, double);
-    ~Circle() override = default;
     double getArea() const noexcept override;
     rectangle_t getFrameRect() const noexcept override;
     void move(point_t) noexcept override;
