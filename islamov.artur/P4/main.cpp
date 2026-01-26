@@ -27,17 +27,14 @@ namespace islamov
     resBuffer[resIndex] = '\0';
     return resBuffer;
   }
-  char* removeLL(const char* inputString, char* resBuffer, size_t bufferSize) noexcept
+  char* removeLL(const char* inputString, char* resBuffer) noexcept
   {
-    if (inputString == nullptr || resBuffer == nullptr || bufferSize == 0) {
+    if (inputString == nullptr || resBuffer == nullptr) {
       return nullptr;
     }
     size_t resIndex = 0;
     for (const char* src = inputString; *src != '\0'; ++src) {
-      if (!std::isalpha(static_cast<unsigned char>(*src))) {
-        if (resIndex >= bufferSize - 1) {
-          return nullptr;
-        }
+      if (!std::isalpha(static_cast< unsigned char >(*src))) {
         resBuffer[resIndex] = *src;
         ++resIndex;
       }
@@ -48,20 +45,25 @@ namespace islamov
   char* getline(std::istream& in)
   {
     char* buffer = nullptr;
-    size_t size = 0;
+    size_t capacity = 0;
     size_t len = 0;
-    int ch;
+    int ch = 0;
     while ((ch = in.get()) != EOF && ch != '\n') {
-      if (len + 1 >= size) {
-        size = size == 0 ? 32 : size * 2;
-        char* new_buf = static_cast<char*>(std::realloc(buffer, size));
+      if (len + 1 >= capacity) {
+        size_t new_capacity = capacity == 0 ? 32 : capacity * 2;
+        char* new_buf = static_cast< char* >(std::malloc(new_capacity));
         if (!new_buf) {
           std::free(buffer);
           return nullptr;
         }
+        if (buffer) {
+          std::memcpy(new_buf, buffer, len);
+          std::free(buffer);
+        }
         buffer = new_buf;
+        capacity = new_capacity;
       }
-      buffer[len++] = static_cast<char>(ch);
+      buffer[len++] = static_cast< char >(ch);
     }
     if (buffer) {
       buffer[len] = '\0';
@@ -79,8 +81,8 @@ int main()
     return 1;
   }
   size_t inputLen = std::strlen(inputLine);
-  char* resBuffer1 = static_cast<char*>(std::malloc(inputLen + 1));
-  char* resBuffer2 = static_cast<char*>(std::malloc(inputLen + 1));
+  char* resBuffer1 = static_cast< char* >(std::malloc(inputLen + 1));
+  char* resBuffer2 = static_cast< char* >(std::malloc(inputLen + 1));
   if (resBuffer1 == nullptr || resBuffer2 == nullptr) {
     std::cerr << "Memory allocation failed" << '\n';
     std::free(inputLine);
@@ -91,7 +93,7 @@ int main()
   resBuffer1[0] = '\0';
   resBuffer2[0] = '\0';
   char* result1 = islamov::excludeCFFS(inputLine, "abc", resBuffer1);
-  char* result2 = islamov::removeLL(inputLine, resBuffer2, inputLen + 1);
+  char* result2 = islamov::removeLL(inputLine, resBuffer2);
   if (result1 == nullptr || result2 == nullptr) {
     std::cerr << "Error in string processing" << '\n';
     std::free(inputLine);
