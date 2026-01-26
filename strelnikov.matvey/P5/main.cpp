@@ -420,6 +420,10 @@ int main()
   std::cout << "Введите точку от которой нужно масштабироваться:\n";
   std::cin >> x >> y;
   if (!std::cin) {
+    for (size_t i = 0; i < shapeSize; ++i) {
+      delete ishps[i];
+    }
+    delete[] ishps;
     return 3;
   }
 
@@ -431,6 +435,7 @@ int main()
       delete ishps[i];
     }
     delete[] ishps;
+    return 5;
   }
 
   try {
