@@ -405,6 +405,12 @@ int main()
     delete poly;
     delete[] ishps;
     return 1;
+  } catch (const std::logic_error &e) {
+    delete circle;
+    delete rect;
+    delete poly;
+    delete[] ishps;
+    return 2;
   }
   ishps[0] = circle;
   ishps[1] = rect;
@@ -417,9 +423,10 @@ int main()
   std::cout << "Введите точку от которой нужно масштабироваться:\n";
   std::cin >> x >> y;
   if (!std::cin) {
-    return 2;
+    return 3;
   }
   strelnikov::point_t move{x, y};
+
   double k;
   std::cout << "Введите коэф. масштабирования:\n";
   std::cin >> k;
@@ -437,7 +444,7 @@ int main()
       delete ishps[i];
     }
     delete[] ishps;
-    return 1;
+    return 4;
   }
   std::cout << "Фигуры после изменения: \n";
   strelnikov::printShapes(ishps, 3);
