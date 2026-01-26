@@ -75,7 +75,7 @@ namespace strelnikov {
   void scaleAll(Shape* const* ishps, size_t size, point_t move, double k);
   rectangle_t computeGlobalFrameRect(const Shape* const* ishps, size_t size);
   double computeTotalArea(const Shape* const* ishps, size_t size);
-  void printRectangle(const rectangle_t& rect);
+  void printRectangle(const rectangle_t rect);
   void printShapes(const Shape* const* ishps, size_t size);
 };
 
@@ -147,11 +147,11 @@ strelnikov::point_t strelnikov::getPolyC(const point_t* data, size_t k)
 }
 
 strelnikov::Polygon::Polygon(point_t* data, size_t size):
-  data_(new(std::nothrow) point_t[size]),
-  size_(size),
-  cen_(getPolyC(data_, size))
+  data_(new point_t[size]),
+  cen_(getPolyC(data_, size)),
+  size_(size)
 {
-  if (size < 3 || !data_) {
+  if (size < 3) {
     delete[] data_;
     throw std::logic_error("Bad poly");
   }
@@ -161,11 +161,11 @@ strelnikov::Polygon::Polygon(point_t* data, size_t size):
 }
 
 strelnikov::Polygon::Polygon(const Polygon& p):
-  data_(new(std::nothrow) point_t[p.size_]),
+  data_(new point_t[p.size_]),
   size_(p.size_),
   cen_{p.cen_}
 {
-  if(size_ < 3 || !data_) {
+  if (size_ < 3) {
     delete[] data_;
     throw std::logic_error("Bad poly while in copy constructor");
   }
@@ -197,7 +197,7 @@ strelnikov::Polygon& strelnikov::Polygon::operator=(const Polygon& p)
   point_t* tmp_data = nullptr;
   try {
     tmp_data = new point_t[p.size_];
-  } catch (std::bad_alloc) {
+  } catch (const std::bad_alloc &e) {
     return *this;
   }
   delete[] data_;
@@ -355,7 +355,9 @@ double strelnikov::computeTotalArea(const Shape* const* ishps, size_t size)
   }
   return res;
 }
-void strelnikov::printRectangle(const rectangle_t& rect) {
+
+void strelnikov::printRectangle(const rectangle_t rect)
+{
   std::cout << "центр=(" << rect.c.x << ", " << rect.c.y
     << ") ширина=" << rect.width << " высота=" << rect.height;
 }
@@ -421,7 +423,7 @@ int main()
   double k;
   std::cout << "Введите коэф. масштабирования:\n";
   std::cin >> k;
-  if(!std::cin || k <= 0){
+  if (!std::cin || k <= 0){
     for (size_t i = 0; i < shapeSize; ++i) {
       delete ishps[i];
     }
