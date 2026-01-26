@@ -5,7 +5,7 @@ namespace strelnikov {
 
   const int static_max = 10000;
 
-  bool prValidation(char* a)
+  bool prValidation(const char* a)
   {
     return (a && (a[0] == '1' || a[0] == '2') && a[1] == '\0');
   }
@@ -20,7 +20,7 @@ namespace strelnikov {
     return in;
   }
 
-  std::ostream& output(std::ostream& out, int* a, size_t r, size_t c)
+  std::ostream& output(std::ostream& out, const int* a, size_t r, size_t c)
   {
     out << r << ' ' << c;
     for (size_t i = 0; i < r * c; ++i) {
@@ -47,8 +47,8 @@ namespace strelnikov {
       --bot;
 
       if (left <= right) {
-        for (size_t i = bot+1; i >= top && i > 0; --i) {
-          mtx[(i-1) * c + right] += cnt++;
+        for (size_t i = bot + 1; i >= top && i > 0; --i) {
+          mtx[(i - 1) * c + right] += cnt++;
         }
         if (right == 0) {
           break;
@@ -56,8 +56,8 @@ namespace strelnikov {
         --right;
       }
       if (top <= bot && left <= right) {
-        for (size_t j = right+1; j >= left && j > 0; --j) {
-          mtx[top * c + j-1] += cnt++;
+        for (size_t j = right + 1; j >= left && j > 0; --j) {
+          mtx[top * c + j - 1] += cnt++;
         }
         ++top;
       }
@@ -95,7 +95,8 @@ namespace strelnikov {
     return cnt;
   }
 
-} // namespace strelnikov
+}
+
 int main(int argc, char* argv[])
 {
   if (argc > 4) {

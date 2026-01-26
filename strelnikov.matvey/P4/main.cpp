@@ -7,7 +7,7 @@ namespace strelnikov {
   char* addSymb(const char* str, size_t& s, char ch)
   {
     char* tmp = reinterpret_cast< char* >(malloc(s + 2));
-    if (tmp == nullptr) {
+    if (!tmp) {
       return nullptr;
     }
 
@@ -35,7 +35,7 @@ namespace strelnikov {
     while (in >> ch && ch != '\n') {
       char* tmp = addSymb(res, s, ch);
       free(res);
-      if (tmp == nullptr) {
+      if (!tmp) {
         if (isSkipWp) {
           in >> std::skipws;
         }
@@ -57,24 +57,6 @@ namespace strelnikov {
     return res;
   }
 
-  char* getStringForDgtSnd(const char* str, size_t& mod)
-  {
-    size_t size = 0;
-    char* res = nullptr;
-    for (size_t i = 0; str[i] != '\0'; ++i) {
-      if (std::isdigit(static_cast< unsigned char >(str[i]))) {
-        char* tmp = addSymb(res, size, str[i]);
-        free(res);
-        if (tmp == nullptr) {
-          return nullptr;
-        }
-        res = tmp;
-      }
-    }
-    mod = size;
-    return res;
-  }
-
   int doHasSam(char* str1, char* str2)
   {
     for (size_t i = 0; str1[i] != '\0'; ++i) {
@@ -87,42 +69,20 @@ namespace strelnikov {
     return 0;
   }
 
-  char* doDgtSnd(const char* str, const char* final)
+  void doDgtSnd(char* resultBuffer, const char* str1, const char* digits)
   {
     size_t i = 0;
-    char* res = nullptr;
-    for (; final[i] != '\0';) {
-      char* tmp = addSymb(res, i, final[i]);
-      free(res);
-      if (!tmp) {
-        return nullptr;
-      }
-      res = tmp;
+    while (str1[i] != '\0') {
+      resultBuffer[i] = str1[i];
+      ++i;
     }
-    size_t s = 0;
-
-    char* dig = getStringForDgtSnd(str, s);
-
-    if (!dig) {
-      if (!s) {
-        return res;
+    for (size_t k = 0; digits[k] != '\0'; ++k) {
+      if (std::isdigit(static_cast< unsigned char >(digits[k]))) {
+        resultBuffer[i] = digits[k];
+        ++i;
       }
-      free(res);
-      return nullptr;
     }
-
-    for (size_t j = 0; dig[j] != '\0'; ++j) {
-      char* tmp = addSymb(res, i, dig[j]);
-      free(res);
-      if (!tmp) {
-        free(dig);
-        return nullptr;
-      }
-      res = tmp;
-    }
-
-    free(dig);
-    return res;
+    resultBuffer[i] = '\0';
   }
 }
 
@@ -130,20 +90,24 @@ int main()
 {
   size_t s1 = 0;
   char* str1 = strelnikov::getString(std::cin, s1);
-  if (str1 == nullptr || s1 == 0) {
+  if (!str1 || s1 == 0) {
     return 1;
   }
   char strHas[] = "abc";
   int hasCommon = strelnikov::doHasSam(str1, strHas);
 
-  char strDgt[] = "g1h2k";
-  char* str2 = strelnikov::doDgtSnd(strDgt, str1);
-  if (!str2) {
-    free(str1);
+  const size_t dgt_size = 5;
+  char strDgt[dgt_size + 1] = "g1h2k";
+
+  char* resultBuffer = reinterpret_cast< char* >(std::malloc(s1 + dgt_size + 1));
+  if (!resultBuffer) {
+    std::free(str1);
     return 1;
   }
-  std::cout << hasCommon << '\n' << str2 << '\n';
+  resultBuffer[s1 + dgt_size] = '\0';
+  strelnikov::doDgtSnd(resultBuffer, str1, strDgt);
+  std::cout << hasCommon << '\n' << resultBuffer << '\n';
   std::free(str1);
-  std::free(str2);
+  std::free(resultBuffer);
   return 0;
 }
