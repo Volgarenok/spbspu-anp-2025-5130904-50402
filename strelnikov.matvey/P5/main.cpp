@@ -154,7 +154,7 @@ strelnikov::point_t strelnikov::getPolyC(const point_t *data, size_t k)
 strelnikov::Polygon::Polygon(point_t *data, size_t size):
   data_(new point_t[size]),
   size_(size),
-  cen_(getPolyC(data_, size))
+  cen_(getPolyC(data, size))
 {
   if (size < 3) {
     delete[] data_;
