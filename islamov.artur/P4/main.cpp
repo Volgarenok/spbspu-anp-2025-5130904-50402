@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cstring>
 #include <cstdlib>
 #include <cctype>
 
@@ -46,34 +45,36 @@ namespace islamov
   {
     char* buffer = nullptr;
     size_t capacity = 0;
-    size_t len = 0;
-    char ch = '\0';
-    while (in.get(ch) && ch != '\n') {
-      if (len + 1 >= capacity) {
-        size_t new_capacity = capacity == 0 ? 32 : capacity * 2;
-        char* new_buf = static_cast< char* >(std::malloc(new_capacity));
-        if (!new_buf) {
+    length = 0;
+    int ch = 0;
+    while ((ch = in.get()) != EOF && ch != '\n') {
+      if (length + 1 >= capacity) {
+        capacity = capacity == 0 ? 32 : capacity * 2;
+        void* temp = std::malloc(capacity);
+        if (!temp) {
           std::free(buffer);
           length = 0;
           return nullptr;
         }
+        char* new_buf = reinterpret_cast< char* >(temp);
         if (buffer) {
-          std::memcpy(new_buf, buffer, len);
-          std::free(buffer);
+          char* old_buf = buffer;
+          for (size_t i = 0; i < length; ++i) {
+            new_buf[i] = old_buf[i];
+          }
+          std::free(old_buf);
         }
         buffer = new_buf;
-        capacity = new_capacity;
       }
-      buffer[len++] = ch;
+      buffer[length++] = static_cast< char >(ch);
     }
-    if (in.eof() && len == 0) {
+    if (ch == EOF && length == 0) {
       length = 0;
       return nullptr;
     }
     if (buffer) {
-      buffer[len] = '\0';
+      buffer[length] = '\0';
     }
-    length = len;
     return buffer;
   }
 }
@@ -85,8 +86,10 @@ int main()
     std::cerr << "Error reading input" << '\n';
     return 1;
   }
-  char* resBuffer1 = static_cast< char* >(std::malloc(inputLen + 1));
-  char* resBuffer2 = static_cast< char* >(std::malloc(inputLen + 1));
+  void* temp1 = std::malloc(inputLen + 1);
+  void* temp2 = std::malloc(inputLen + 1);
+  char* resBuffer1 = reinterpret_cast< char* >(temp1);
+  char* resBuffer2 = reinterpret_cast< char* >(temp2);
   if (resBuffer1 == nullptr || resBuffer2 == nullptr) {
     std::cerr << "Memory allocation failed" << '\n';
     std::free(inputLine);
