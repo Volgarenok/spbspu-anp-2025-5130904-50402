@@ -67,6 +67,10 @@ char *alisov::getline(std::istream &in, size_t &size)
 
 char *alisov::rmvVow(const char *str, char *res)
 {
+  if (res == nullptr)
+  {
+    return nullptr;
+  }
   if (str == nullptr)
   {
     return res;
