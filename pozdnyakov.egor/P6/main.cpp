@@ -24,9 +24,9 @@ int main()
   try {
     CompositeShape composite;
 
-    composite.addShape(new Rectangle({5.0, 5.0}, 10.0, 5.0));
-    composite.addShape(new Diamond({20.0, 5.0}, 10.0, 10.0));
-    composite.addShape(new Triangle({0.0, 0.0}, {5.0, 10.0}, {10.0, 0.0}));
+    composite.append(new Rectangle({5.0, 5.0}, 10.0, 5.0));
+    composite.append(new Diamond({20.0, 5.0}, 10.0, 10.0));
+    composite.append(new Triangle({0.0, 0.0}, {5.0, 10.0}, {10.0, 0.0}));
 
     std::cout << "Composite created with " << composite.size() << " shapes.\n";
     printInfo(composite, "Composite initial");
@@ -39,6 +39,7 @@ int main()
       std::cerr << "Incorrect input\n";
       return 1;
     }
+    std::cout << "\n";
 
     if (k < 0.0) {
       std::cerr << "Invalid scale coefficient\n";
