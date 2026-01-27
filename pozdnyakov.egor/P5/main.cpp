@@ -11,8 +11,7 @@ int main()
   using namespace pozdnyakov;
 
   const size_t count = 3;
-  Shape **shapes = new Shape *[count] {
-  };
+  Shape **shapes = new Shape *[count] {};
 
   try {
     shapes[0] = new Rectangle({5.0, 5.0}, 10.0, 5.0);
@@ -28,6 +27,7 @@ int main()
   std::cout << "\n";
 
   point_t targetPoint;
+  std::cout << "\n";
   std::cout << "Enter scaling center (x y): ";
   if (!(std::cin >> targetPoint.x >> targetPoint.y)) {
     std::cerr << "Invalid coordinates input.\n";
@@ -35,7 +35,7 @@ int main()
     return 1;
   }
 
-  double k;
+  double k = 0.0;
   std::cout << "Enter scaling coefficient: ";
   if (!(std::cin >> k)) {
     std::cerr << "Invalid input for coefficient.\n";
@@ -53,6 +53,7 @@ int main()
 
   std::cout << "\n";
   printShapesInfo(shapes, count);
+  std::cout << "\n";
 
   clearShapes(shapes, count);
 

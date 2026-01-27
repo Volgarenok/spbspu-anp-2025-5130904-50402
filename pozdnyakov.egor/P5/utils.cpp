@@ -97,5 +97,4 @@ void pozdnyakov::printShapesInfo(const Shape *const *shapes, size_t count)
 
   std::cout << "Global FrameRect: ";
   printFrameRect(std::cout, globalFrame);
-  std::cout << "\n";
 }
