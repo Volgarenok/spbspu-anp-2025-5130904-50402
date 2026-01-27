@@ -9,6 +9,7 @@ namespace alisov
   char *rmvVow(const char *str, char *res);
   char *dgtSnd(const char *str1, const char *str2, char *res);
 }
+
 char *alisov::getline(std::istream &in, size_t &size)
 {
   bool is_skipws = in.flags() & std::ios_base::skipws;

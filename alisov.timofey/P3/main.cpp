@@ -37,12 +37,12 @@ namespace alisov
 
   int minSum(int *mtr, size_t m, size_t n)
   {
-    int sum = 0;
-    int min = std::numeric_limits< int >::max();
     if (m + n < 2)
     {
       return 0;
     }
+    int sum = 0;
+    int min = std::numeric_limits< int >::max();
     for (size_t k = 0; k <= m + n - 2; ++k)
     {
       sum = 0;
@@ -53,7 +53,7 @@ namespace alisov
           sum += mtr[i * n + (k - i)];
         }
       }
-      min = (sum < min) ? sum : min;
+      min = std::min(sum, min);
     }
     return min;
   }
@@ -63,48 +63,72 @@ namespace alisov
     int ans1 = 0;
     size_t total = m * n;
     int max_length = 0;
-
-    int mas[n][2];
-    for (size_t i = 0; i < n; ++i)
+    int **mas = nullptr;
+    try
     {
-      mas[i][0] = -1;
-      mas[i][1] = 0;
-    }
-
-    for (size_t i = 0; i < total; ++i)
-    {
-      size_t j = i % n;
-      if (mas[j][0] == -1)
+      mas = new int *[n];
+      for (size_t i = 0; i < n; ++i)
       {
-        mas[j][0] = j + 1;
-        mas[j][1] = 1;
+        mas[i] = nullptr;
       }
-      else
+      for (size_t i = 0; i < n; ++i)
       {
-        if (mtr[i] == mtr[i - n])
+        mas[i] = new int[2];
+        mas[i][0] = -1;
+        mas[i][1] = 0;
+      }
+
+      for (size_t i = 0; i < total; ++i)
+      {
+        size_t j = i % n;
+        if (mas[j][0] == -1)
         {
-          ++mas[j][1];
+          mas[j][0] = j + 1;
+          mas[j][1] = 1;
         }
         else
         {
-          if (mas[j][1] > max_length)
+          if (mtr[i] == mtr[i - n])
           {
-            max_length = mas[j][1];
+            ++mas[j][1];
           }
-          mas[j][1] = 1;
+          else
+          {
+            if (mas[j][1] > max_length)
+            {
+              max_length = mas[j][1];
+            }
+            mas[j][1] = 1;
+          }
+        }
+      }
+
+      for (size_t i = 0; i < n; ++i)
+      {
+        if (max_length < mas[i][1])
+        {
+          ans1 = mas[i][0];
+          max_length = mas[i][1];
         }
       }
     }
-
+    catch (const std::bad_alloc &)
+    {
+      if (mas)
+      {
+        for (size_t i = 0; i < n; ++i)
+        {
+          delete[] mas[i];
+        }
+        delete[] mas;
+      }
+      return 0;
+    }
     for (size_t i = 0; i < n; ++i)
     {
-      if (max_length < mas[i][1])
-      {
-        ans1 = mas[i][0];
-        max_length = mas[i][1];
-      }
+      delete[] mas[i];
     }
-
+    delete[] mas;
     return ans1;
   }
 }
