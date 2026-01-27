@@ -1,4 +1,4 @@
-#include "Shape.hpp"
+#include "shape.hpp"
 #include <stdexcept>
 
 void pozdnyakov::Shape::scale(double k)

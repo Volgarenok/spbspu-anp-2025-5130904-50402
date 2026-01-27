@@ -1,9 +1,9 @@
 #include <iostream>
 #include <iomanip>
 #include <new>
-#include "Rectangle.hpp"
-#include "Diamond.hpp"
-#include "Triangle.hpp"
+#include "rectangle.hpp"
+#include "diamond.hpp"
+#include "triangle.hpp"
 #include "compositeShape.hpp"
 
 void printInfo(const pozdnyakov::Shape &shape, const std::string &name)
@@ -28,6 +28,7 @@ int main()
     composite.addShape(new Diamond({20.0, 5.0}, 10.0, 10.0));
     composite.addShape(new Triangle({0.0, 0.0}, {5.0, 10.0}, {10.0, 0.0}));
 
+    std::cout << "Composite created with " << composite.size() << " shapes.\n";
     printInfo(composite, "Composite initial");
 
     double dx = 0.0;
@@ -55,10 +56,10 @@ int main()
     printInfo(composite, "Original");
     printInfo(copy, "Copy");
   } catch (const std::bad_alloc &e) {
-    std::cerr << "Memory allocation failed " << e.what() << "\n";
+    std::cerr << "Memory allocation failed: " << e.what() << "\n";
     return 2;
   } catch (const std::exception &e) {
-    std::cerr << "Error " << e.what() << "\n";
+    std::cerr << "Error: " << e.what() << "\n";
     return 1;
   }
 

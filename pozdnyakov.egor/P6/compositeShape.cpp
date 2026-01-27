@@ -2,8 +2,9 @@
 #include <algorithm>
 #include <stdexcept>
 #include <limits>
+#include <memory>
 
-pozdnyakov::CompositeShape::CompositeShape():
+pozdnyakov::CompositeShape::CompositeShape() noexcept:
   count_(0),
   capacity_(0),
   shapes_(nullptr)
@@ -14,8 +15,17 @@ pozdnyakov::CompositeShape::CompositeShape(const CompositeShape &other):
   capacity_(other.count_),
   shapes_(new Shape *[other.count_])
 {
-  for (size_t i = 0; i < count_; ++i) {
-    shapes_[i] = other.shapes_[i]->clone();
+  unsigned int i = 0;
+  try {
+    for (; i < count_; ++i) {
+      shapes_[i] = other.shapes_[i]->clone();
+    }
+  } catch (...) {
+    for (unsigned int k = 0; k < i; ++k) {
+      delete shapes_[k];
+    }
+    delete[] shapes_;
+    throw;
   }
 }
 
@@ -31,7 +41,7 @@ pozdnyakov::CompositeShape::CompositeShape(CompositeShape &&other) noexcept:
 
 pozdnyakov::CompositeShape &pozdnyakov::CompositeShape::operator=(const CompositeShape &other)
 {
-  if (this != &other) {
+  if (this != std::addressof(other)) {
     CompositeShape temp(other);
     swap(temp);
   }
@@ -40,7 +50,7 @@ pozdnyakov::CompositeShape &pozdnyakov::CompositeShape::operator=(const Composit
 
 pozdnyakov::CompositeShape &pozdnyakov::CompositeShape::operator=(CompositeShape &&other) noexcept
 {
-  if (this != &other) {
+  if (this != std::addressof(other)) {
     CompositeShape temp(std::move(other));
     swap(temp);
   }
@@ -49,10 +59,26 @@ pozdnyakov::CompositeShape &pozdnyakov::CompositeShape::operator=(CompositeShape
 
 pozdnyakov::CompositeShape::~CompositeShape()
 {
-  for (size_t i = 0; i < count_; ++i) {
+  for (unsigned int i = 0; i < count_; ++i) {
     delete shapes_[i];
   }
   delete[] shapes_;
+}
+
+pozdnyakov::Shape *pozdnyakov::CompositeShape::operator[](unsigned int index)
+{
+  if (index >= count_) {
+    throw std::out_of_range("Index out of range");
+  }
+  return shapes_[index];
+}
+
+const pozdnyakov::Shape *pozdnyakov::CompositeShape::operator[](unsigned int index) const
+{
+  if (index >= count_) {
+    throw std::out_of_range("Index out of range");
+  }
+  return shapes_[index];
 }
 
 void pozdnyakov::CompositeShape::addShape(Shape *shape)
@@ -61,9 +87,9 @@ void pozdnyakov::CompositeShape::addShape(Shape *shape)
     throw std::invalid_argument("Null shape");
   }
   if (count_ >= capacity_) {
-    size_t newCap = (capacity_ == 0) ? 1 : capacity_ * 2;
+    unsigned int newCap = (capacity_ == 0) ? 1 : capacity_ * 2;
     Shape **newShapes = new Shape *[newCap];
-    for (size_t i = 0; i < count_; ++i) {
+    for (unsigned int i = 0; i < count_; ++i) {
       newShapes[i] = shapes_[i];
     }
     delete[] shapes_;
@@ -73,20 +99,20 @@ void pozdnyakov::CompositeShape::addShape(Shape *shape)
   shapes_[count_++] = shape;
 }
 
-void pozdnyakov::CompositeShape::removeShape(size_t index)
+void pozdnyakov::CompositeShape::removeShape(unsigned int index)
 {
   if (index >= count_) {
     throw std::out_of_range("Index out of range");
   }
   delete shapes_[index];
-  for (size_t i = index; i < count_ - 1; ++i) {
+  for (unsigned int i = index; i < count_ - 1; ++i) {
     shapes_[i] = shapes_[i + 1];
   }
   shapes_[count_ - 1] = nullptr;
   count_--;
 }
 
-size_t pozdnyakov::CompositeShape::getCount() const noexcept
+unsigned int pozdnyakov::CompositeShape::size() const noexcept
 {
   return count_;
 }
@@ -94,30 +120,37 @@ size_t pozdnyakov::CompositeShape::getCount() const noexcept
 double pozdnyakov::CompositeShape::getArea() const noexcept
 {
   double total = 0.0;
-  for (size_t i = 0; i < count_; ++i) {
+  for (unsigned int i = 0; i < count_; ++i) {
     total += shapes_[i]->getArea();
   }
   return total;
 }
 
-// Исправлено: убрано ошибочное CompositeShape:: перед rectangle_t
 pozdnyakov::rectangle_t pozdnyakov::CompositeShape::getFrameRect() const noexcept
 {
   if (count_ == 0) {
     return {0.0, 0.0, {0.0, 0.0}};
   }
-  double minX = std::numeric_limits< double >::infinity();
-  double maxX = -std::numeric_limits< double >::infinity();
-  double minY = std::numeric_limits< double >::infinity();
-  double maxY = -std::numeric_limits< double >::infinity();
 
-  for (size_t i = 0; i < count_; ++i) {
-    rectangle_t frame = shapes_[i]->getFrameRect();
-    minX = std::min(minX, frame.pos.x - frame.width / 2.0);
-    maxX = std::max(maxX, frame.pos.x + frame.width / 2.0);
-    minY = std::min(minY, frame.pos.y - frame.height / 2.0);
-    maxY = std::max(maxY, frame.pos.y + frame.height / 2.0);
+  rectangle_t frame = shapes_[0]->getFrameRect();
+  double minX = frame.pos.x - frame.width / 2.0;
+  double maxX = frame.pos.x + frame.width / 2.0;
+  double minY = frame.pos.y - frame.height / 2.0;
+  double maxY = frame.pos.y + frame.height / 2.0;
+
+  for (unsigned int i = 1; i < count_; ++i) {
+    frame = shapes_[i]->getFrameRect();
+    double currentMinX = frame.pos.x - frame.width / 2.0;
+    double currentMaxX = frame.pos.x + frame.width / 2.0;
+    double currentMinY = frame.pos.y - frame.height / 2.0;
+    double currentMaxY = frame.pos.y + frame.height / 2.0;
+
+    minX = std::min(minX, currentMinX);
+    maxX = std::max(maxX, currentMaxX);
+    minY = std::min(minY, currentMinY);
+    maxY = std::max(maxY, currentMaxY);
   }
+
   return {maxX - minX, maxY - minY, {(minX + maxX) / 2.0, (minY + maxY) / 2.0}};
 }
 
@@ -129,7 +162,7 @@ void pozdnyakov::CompositeShape::move(const point_t &pos) noexcept
 
 void pozdnyakov::CompositeShape::move(double dx, double dy) noexcept
 {
-  for (size_t i = 0; i < count_; ++i) {
+  for (unsigned int i = 0; i < count_; ++i) {
     shapes_[i]->move(dx, dy);
   }
 }
@@ -147,7 +180,7 @@ pozdnyakov::Shape *pozdnyakov::CompositeShape::clone() const
 void pozdnyakov::CompositeShape::doScale(double k) noexcept
 {
   point_t center = getFrameRect().pos;
-  for (size_t i = 0; i < count_; ++i) {
+  for (unsigned int i = 0; i < count_; ++i) {
     point_t shapePos = shapes_[i]->getFrameRect().pos;
     double dx = (shapePos.x - center.x) * (k - 1.0);
     double dy = (shapePos.y - center.y) * (k - 1.0);

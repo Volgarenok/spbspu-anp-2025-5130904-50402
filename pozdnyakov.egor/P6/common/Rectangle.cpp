@@ -1,4 +1,4 @@
-#include "Rectangle.hpp"
+#include "rectangle.hpp"
 
 pozdnyakov::Rectangle::Rectangle(const point_t &center, double width, double height) noexcept:
   frame_{width, height, center}

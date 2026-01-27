@@ -1,7 +1,7 @@
 #ifndef TRIANGLE_HPP
 #define TRIANGLE_HPP
 
-#include "Shape.hpp"
+#include "shape.hpp"
 
 namespace pozdnyakov
 {

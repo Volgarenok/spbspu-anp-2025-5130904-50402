@@ -8,7 +8,6 @@ namespace pozdnyakov
   class Shape
   {
   public:
-    Shape() = default;
     virtual ~Shape() = default;
 
     virtual double getArea() const noexcept = 0;

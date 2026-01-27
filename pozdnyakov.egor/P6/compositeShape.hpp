@@ -1,24 +1,26 @@
 #ifndef COMPOSITE_SHAPE_HPP
 #define COMPOSITE_SHAPE_HPP
 
-#include "Shape.hpp"
-#include <cstddef>
+#include "shape.hpp"
 
 namespace pozdnyakov
 {
   class CompositeShape final: public Shape
   {
   public:
-    CompositeShape();
+    CompositeShape() noexcept;
     CompositeShape(const CompositeShape &other);
     CompositeShape(CompositeShape &&other) noexcept;
     CompositeShape &operator=(const CompositeShape &other);
     CompositeShape &operator=(CompositeShape &&other) noexcept;
     ~CompositeShape() override;
 
+    Shape *operator[](unsigned int index);
+    const Shape *operator[](unsigned int index) const;
+
     void addShape(Shape *shape);
-    void removeShape(size_t index);
-    size_t getCount() const noexcept;
+    void removeShape(unsigned int index);
+    unsigned int size() const noexcept;
 
     double getArea() const noexcept override;
     rectangle_t getFrameRect() const noexcept override;
@@ -28,8 +30,8 @@ namespace pozdnyakov
     Shape *clone() const override;
 
   private:
-    size_t count_;
-    size_t capacity_;
+    unsigned int count_;
+    unsigned int capacity_;
     Shape **shapes_;
 
     void doScale(double k) noexcept override;
