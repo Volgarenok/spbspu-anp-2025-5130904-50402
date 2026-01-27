@@ -18,7 +18,7 @@ char *alisov::getline(std::istream &in, size_t &size)
   }
   size_t cap = 1;
   size = 0;
-  char *str = static_cast< char * >(malloc(cap * sizeof(char)));
+  char *str = reinterpret_cast< char * >(malloc(cap));
   if (str == nullptr)
   {
     if (is_skipws)
@@ -57,7 +57,7 @@ char *alisov::getline(std::istream &in, size_t &size)
     }
     return nullptr;
   }
-  str[size] = '\0';
+  str[size] = '\n';
   if (is_skipws)
   {
     in >> std::skipws;
