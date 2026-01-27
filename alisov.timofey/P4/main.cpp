@@ -6,8 +6,8 @@ namespace alisov
 {
   void expand(char **str, size_t size, size_t &cap);
   char *getline(std::istream &in, size_t &k);
-  void rmvVow(const char *str, char *res);
-  void dgtSnd(const char *str1, size_t s1, const char *str2, size_t s2, char *res);
+  char *rmvVow(const char *str, char *res);
+  char *dgtSnd(const char *str1, size_t s1, const char *str2, size_t s2, char *res);
 }
 char *alisov::getline(std::istream &in, size_t &size)
 {
@@ -18,7 +18,7 @@ char *alisov::getline(std::istream &in, size_t &size)
   }
   size_t cap = 1;
   size = 0;
-  char *str = static_cast< char * >(malloc(cap * sizeof(char)));
+  char *str = reinterpret_cast< char * >(malloc(cap));
   if (str == nullptr)
   {
     if (is_skipws)
@@ -42,7 +42,7 @@ char *alisov::getline(std::istream &in, size_t &size)
       return nullptr;
     }
     in >> str[size];
-    if (!in || str[size] == '\0')
+    if (!in || str[size] == '\n')
     {
       break;
     }
@@ -65,17 +65,16 @@ char *alisov::getline(std::istream &in, size_t &size)
   return str;
 }
 
-void alisov::rmvVow(const char *str, char *res)
+char *alisov::rmvVow(const char *str, char *res)
 {
   if (str == nullptr)
   {
-    res = nullptr;
-    return;
+    return res;
   }
   const char *vows = "aeiouyAEIOUY";
   size_t i = 0;
   size_t r = 0;
-  while (str[i] != '\0')
+  while (str[i] != '\n')
   {
     if (!std::strchr(vows, str[i]))
     {
@@ -85,19 +84,20 @@ void alisov::rmvVow(const char *str, char *res)
     i++;
   }
   res[r] = '\0';
+  return res;
 }
 
-void alisov::dgtSnd(const char *str1, size_t s1, const char *str2, size_t s2, char *res)
+char *alisov::dgtSnd(const char *str1, size_t s1, const char *str2, size_t s2, char *res)
 {
   size_t i = 0;
 
-  while (i < s1 && str1[i] != '\0')
+  while (str1[i] != '\n')
   {
     res[i] = str1[i];
     ++i;
   }
 
-  for (size_t k = 0; k < s2 && str2[k] != '\0'; ++k)
+  for (size_t k = 0; str2[k] != '\0'; ++k)
   {
     if (std::isdigit(static_cast< unsigned char >(str2[k])))
     {
@@ -107,6 +107,7 @@ void alisov::dgtSnd(const char *str1, size_t s1, const char *str2, size_t s2, ch
   }
 
   res[i] = '\0';
+  return res;
 }
 
 void alisov::expand(char **str, size_t size, size_t &cap)
@@ -134,7 +135,6 @@ int main()
   char *str = alisov::getline(std::cin, size);
   if (str == nullptr)
   {
-    free(str);
     std::cerr << "Cant read line\n";
     return 1;
   }
