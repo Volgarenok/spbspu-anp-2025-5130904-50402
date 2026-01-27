@@ -15,11 +15,11 @@ char* terentev::readLine(std::istream& in, size_t& cap, size_t& size)
   size = 0;
   if (cap == 0)
   {
-    return nullptr;
+    throw std::runtime_error("cap==0");
   }
   char* buf = new char[cap];
   try {
-    char ch;
+    char ch = '\0';
     while (in.get(ch) && ch != '\n')
     {
       if (size + 1 >= cap)
@@ -48,7 +48,7 @@ char* terentev::readLine(std::istream& in, size_t& cap, size_t& size)
     buf[size] = '\0';
     return buf;
   }
-  catch (...)
+  catch (const std::bad_alloc&)
   {
     delete[] buf;
     throw;
@@ -113,15 +113,7 @@ int main()
     size_t cap = initial_cap;
     size_t size = 0;
     buf = terentev::readLine(std::cin, cap, size);
-
-    if (!buf)
-    {
-      std::cerr << "Error: no input\n";
-      return 1;
-    }
-
-    size_t res_cap = size + 1;
-    res = new char[res_cap];
+    res = new char[size + 1];
 
     if (!terentev::transformUppLow(buf, res))
     {
@@ -148,6 +140,10 @@ int main()
   catch (const std::bad_alloc&)
   {
     std::cerr << "Error: cannot allocate memory\n";
+  }
+  catch (const std::runtime_error& e)
+  {
+    std::cerr << "Error:runtime\n";
   }
   delete[] res;
   delete[] buf;
