@@ -6,14 +6,14 @@ namespace novikov
 {
   constexpr size_t MAX_STATIC_SIZE = 10000;
 
-  bool isNumber(const char *s)
+  bool isNumber(const char *s, long &value)
   {
     if (!s || *s == '\0') {
       return false;
     }
 
     char *endPtr = nullptr;
-    std::strtol(s, &endPtr, 10);
+    value = std::strtol(s, std::addressof(endPtr), 10);
     return *endPtr == '\0';
   }
 
@@ -105,14 +105,11 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  if (!novikov::isNumber(argv[1])) {
+  long mode = 0;
+  if (!novikov::isNumber(argv[1], mode)) {
     std::cerr << "First parameter is not a number\n";
     return 1;
   }
-
-  char *endPtr = nullptr;
-  long modeLong = std::strtol(argv[1], &endPtr, 10);
-  int mode = static_cast< int >(modeLong);
 
   if (mode != 1 && mode != 2) {
     std::cerr << "First parameter is out of range\n";
@@ -144,7 +141,7 @@ int main(int argc, char *argv[])
   if (mode == 1) {
     matrixData = fixedSizeMatrixData;
   } else {
-    matrixData = static_cast< int * >(std::malloc(totalElements * sizeof(int)));
+    matrixData = reinterpret_cast< int * >(std::malloc(totalElements * sizeof(int)));
     if (!matrixData) {
       std::cerr << "Memory allocation failed\n";
       return 2;
