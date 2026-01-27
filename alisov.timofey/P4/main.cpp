@@ -57,7 +57,7 @@ char *alisov::getline(std::istream &in, size_t &size)
     }
     return nullptr;
   }
-  str[size] = '\n';
+  str[size] = '\0';
   if (is_skipws)
   {
     in >> std::skipws;
@@ -101,7 +101,7 @@ char *alisov::dgtSnd(const char *str1, const char *str2, char *res)
     ++i;
   }
 
-  for (size_t k = 0; str2[k] != '\0'; ++k)
+  for (size_t k = 0; str2[k] != '\n'; ++k)
   {
     if (std::isdigit(static_cast< unsigned char >(str2[k])))
     {
