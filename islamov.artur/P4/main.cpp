@@ -46,8 +46,8 @@ namespace islamov
     char* buffer = nullptr;
     size_t capacity = 0;
     length = 0;
-    int ch = 0;
-    while ((ch = in.get()) != EOF && ch != '\n') {
+    char ch = '\0';
+    while (in.get(ch) && ch != '\n') {
       if (length + 1 >= capacity) {
         capacity = capacity == 0 ? 32 : capacity * 2;
         char* new_buf = reinterpret_cast< char* >(std::malloc(capacity));
@@ -64,9 +64,14 @@ namespace islamov
         }
         buffer = new_buf;
       }
-      buffer[length++] = static_cast< char >(ch);
+      buffer[length++] = ch;
     }
-    if (ch == EOF && length == 0) {
+    if (in.eof() && length == 0) {
+      length = 0;
+      return nullptr;
+    }
+    if (!in && !in.eof()) {
+      std::free(buffer);
       length = 0;
       return nullptr;
     }
