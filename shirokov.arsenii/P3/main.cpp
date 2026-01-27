@@ -1,18 +1,13 @@
 #include <fstream>
 #include <iostream>
-#include <memory>
 #include <stdexcept>
 #include <cstdlib>
+#include "variants.hpp"
+#include "massive.hpp"
 
 namespace shirokov
 {
   const size_t MATRIX_SIZE = 10000;
-  std::istream &input(std::istream &in, int *m, size_t lng);
-  std::ostream &outputMatrix(std::ostream &out, const int *matrix, size_t m, size_t n);
-  void spiral(int *matrix, size_t m, size_t n);
-  bool isTriangularMatrix(const int *matrix, size_t m, size_t n);
-  size_t transformIndexes(size_t i, size_t j, size_t n);
-  int stoi(const char *n);
 }
 
 int main(int argc, char **argv)
@@ -91,126 +86,4 @@ int main(int argc, char **argv)
   {
     delete[] matrix;
   }
-}
-
-int shirokov::stoi(const char *n)
-{
-  char *end = nullptr;
-  long val = std::strtol(n, std::addressof(end), 10);
-
-  if (*end != '\0')
-  {
-    throw std::logic_error("");
-  }
-
-  int out = static_cast< int >(val);
-  return out;
-}
-
-std::istream &shirokov::input(std::istream &in, int *m, size_t lng)
-{
-  for (size_t i = 0; i < lng; i++)
-  {
-    in >> m[i];
-    if (in.fail())
-    {
-      return in;
-    }
-  }
-  return in;
-}
-
-std::ostream &shirokov::outputMatrix(std::ostream &out, const int *matrix, size_t m, size_t n)
-{
-  out << m << ' ' << n;
-  for (size_t i = 0; i < m; i++)
-  {
-    for (size_t j = 0; j < n; j++)
-    {
-      out << ' ' << matrix[transformIndexes(i, j, n)];
-    }
-  }
-  return out;
-}
-
-size_t shirokov::transformIndexes(size_t i, size_t j, size_t n)
-{
-  return i * n + j;
-}
-
-void shirokov::spiral(int *matrix, size_t m, size_t n)
-{
-  if (m == 0 || n == 0)
-  {
-    return;
-  }
-  size_t ptr = matrix[transformIndexes(m - 1, 0, n)];
-  size_t leftBorder = 0;
-  size_t rightBorder = n - 1;
-  size_t upperBorder = 0;
-  size_t lowerBorder = m - 1;
-
-  size_t deductible = 1;
-  while (leftBorder < n || upperBorder < m || rightBorder > 0 || lowerBorder > 0)
-  {
-    for (size_t i = lowerBorder; i + 1 >= upperBorder + 1; i--)
-    {
-      ptr = transformIndexes(i, leftBorder, n);
-      matrix[ptr] -= deductible++;
-    }
-    if (leftBorder < n)
-    {
-      leftBorder++;
-    }
-
-    for (size_t j = leftBorder; j <= rightBorder; j++)
-    {
-      ptr = transformIndexes(upperBorder, j, n);
-      matrix[ptr] -= deductible++;
-    }
-    if (upperBorder < m)
-    {
-      upperBorder++;
-    }
-
-    for (size_t i = upperBorder; i <= lowerBorder; i++)
-    {
-      ptr = transformIndexes(i, rightBorder, n);
-      matrix[ptr] -= deductible++;
-    }
-    if (rightBorder > 0)
-    {
-      rightBorder--;
-    }
-
-    for (size_t j = rightBorder; j + 1 >= leftBorder + 1; j--)
-    {
-      ptr = transformIndexes(lowerBorder, j, n);
-      matrix[ptr] -= deductible++;
-    }
-    if (lowerBorder > 0)
-    {
-      lowerBorder--;
-    }
-  }
-}
-
-bool shirokov::isTriangularMatrix(const int *matrix, size_t m, size_t n)
-{
-  if (m == 0 || n == 0)
-  {
-    return false;
-  }
-  size_t minn = m < n ? m : n;
-  for (size_t i = 0; i < minn - 1; ++i)
-  {
-    for (size_t j = i + 1; j < minn; ++j)
-    {
-      if (matrix[transformIndexes(i, j, n)] != 0)
-      {
-        return false;
-      }
-    }
-  }
-  return true;
 }
