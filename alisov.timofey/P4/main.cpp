@@ -7,7 +7,7 @@ namespace alisov
   void expand(char **str, size_t size, size_t &cap);
   char *getline(std::istream &in, size_t &k);
   char *rmvVow(const char *str, char *res);
-  char *dgtSnd(const char *str1, size_t s1, const char *str2, size_t s2, char *res);
+  char *dgtSnd(const char *str1, const char *str2, char *res);
 }
 char *alisov::getline(std::istream &in, size_t &size)
 {
@@ -87,7 +87,7 @@ char *alisov::rmvVow(const char *str, char *res)
   return res;
 }
 
-char *alisov::dgtSnd(const char *str1, size_t s1, const char *str2, size_t s2, char *res)
+char *alisov::dgtSnd(const char *str1, const char *str2, char *res)
 {
   size_t i = 0;
 
@@ -151,7 +151,7 @@ int main()
     return 1;
   }
   alisov::rmvVow(str, res1);
-  alisov::dgtSnd(str, size, strDgt, dgt_size, res2);
+  alisov::dgtSnd(str, strDgt, res2);
   if (res1 == nullptr || res2 == nullptr)
   {
     free(str);
