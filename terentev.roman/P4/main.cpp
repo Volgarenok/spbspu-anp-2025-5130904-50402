@@ -43,7 +43,7 @@ char* terentev::readLine(std::istream& in, size_t& cap, size_t& size)
     if (size == 0 && !in)
     {
       delete[] buf;
-      return nullptr;
+      throw std::runtime_error("no input");
     }
     buf[size] = '\0';
     return buf;
