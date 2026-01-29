@@ -25,7 +25,7 @@ namespace petrov
     virtual rectangle_t getFrameRect() const noexcept = 0;
     virtual void move(const point_t& pos) noexcept = 0;
     virtual void move(double dx, double dy) noexcept = 0;
-    virtual void scale(double k);
+    void scale(double k);
     void untestedScale(double k) noexcept;
 
   private:
@@ -80,7 +80,7 @@ namespace petrov
 
     void doScale(double k) noexcept override;
     point_t getCenter() const noexcept;
-    static point_t computeCenter(const point_t (&points)[4]) noexcept;
+    point_t computeCenter(const point_t (&points)[4]) noexcept;
     double crossProduct(const point_t& o, const point_t& a, const point_t& b) const noexcept;
   };
 
@@ -101,12 +101,12 @@ int main()
     ComplexQuad quad({0.0, 0.0}, {4.0, 4.0}, {4.0, 0.0}, {0.0, 4.0});
 
     const size_t n = 3;
-    const Shape* shapes[n] = {std::addressof(rect), std::addressof(diamond), std::addressof(quad)};
+    Shape* shapes[n] = {std::addressof(rect), std::addressof(diamond), std::addressof(quad)};
 
     printInfo(shapes, n, "ДО МАСШТАБИРОВАНИЯ");
 
-    point_t scaleCenter;
-    double scaleCoeff;
+    point_t scaleCenter = {0.0, 0.0};
+    double scaleCoeff = 0.0;
 
     std::cout << "Введите центр масштабирования (x y): ";
     if (!(std::cin >> scaleCenter.x >> scaleCenter.y))
@@ -121,8 +121,7 @@ int main()
       std::cerr << "Неверный ввод коэффициента масштабирования\n";
       return 1;
     }
-    Shape* mutabShapes[n] = {&rect, &diamond, &quad};
-    scaleAll(mutabShapes, n, scaleCenter, scaleCoeff);
+    scaleAll(shapes, n, scaleCenter, scaleCoeff);
     printInfo(shapes, n, "ПОСЛЕ МАСШТАБИРОВАНИЯ");
   }
   catch (const std::exception& e)
