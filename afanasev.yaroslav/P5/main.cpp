@@ -1,5 +1,4 @@
 #include <iostream>
-#include <limits>
 
 namespace afanasev
 {
@@ -323,13 +322,15 @@ void afanasev::Rubber::scale(double k) noexcept
 afanasev::rectangle_t afanasev::calculateOverallFrameRect(const Shape * const * shapes,
   size_t cnt_shapes) noexcept
 {
-  double x_min = std::numeric_limits<double>::max();
-  double x_max = std::numeric_limits<double>::lowest();
-  double y_min = std::numeric_limits<double>::max();
-  double y_max = std::numeric_limits<double>::lowest();
+  rectangle_t frame = shapes[0]->getFrameRect();
 
-  for (size_t i = 0; i < cnt_shapes; i++) {
-    rectangle_t frame = shapes[i]->getFrameRect();
+  double x_min = frame.pos.x - frame.width / 2;
+  double x_max = frame.pos.x + frame.width / 2;
+  double y_min = frame.pos.y - frame.height / 2;
+  double y_max = frame.pos.y + frame.height / 2;
+
+  for (size_t i = 1; i < cnt_shapes; i++) {
+    frame = shapes[i]->getFrameRect();
 
     double left = frame.pos.x - frame.width / 2;
     double right = frame.pos.x + frame.width / 2;
@@ -382,7 +383,7 @@ void afanasev::printShapesInfo(const Shape * const * shapes, size_t cnt_shapes) 
   std::cout << '\n';
 }
 
-void afanasev::scaleAllShapes(afanasev::Shape ** shapes, size_t cnt_shapes,
+void afanasev::scaleAllShapes(Shape ** shapes, size_t cnt_shapes,
   double x, double y, double k) noexcept
 {
   shapes[0]->move({x, y});
