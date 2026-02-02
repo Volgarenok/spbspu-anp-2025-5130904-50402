@@ -5,73 +5,73 @@
 #include <stdexcept>
 
 namespace karpenkov {
-std::ifstream &readToArray(std::ifstream &input, int *array, size_t n, size_t m)
-  {
-  for (size_t i = 0; i < n * m; i++) {
-    if (!(input >> array[i])) {
-      break;
+  std::ifstream &readToArray(std::ifstream &input, int *array, size_t n, size_t m)
+    {
+    for (size_t i = 0; i < n * m; i++) {
+      if (!(input >> array[i])) {
+        break;
+      }
     }
+    return input;
   }
-  return input;
-}
 
-size_t CntColNsm(const int *array, size_t m, size_t n)
-  {
-  bool flag = false;
-  size_t num = 0, countColumn = n;
-  if (m * n == 0) {
+  size_t cntColNsm(const int *array, size_t m, size_t n)
+    {
+    bool flag = false;
+    size_t num = 0, countColumn = n;
+    if (m * n == 0) {
+      return num;
+    }
+    for (size_t i = 0; i + 3 < m * n ; ++i) {
+      if (num == n) {
+        flag = false;
+        num = 0;
+      }
+      if (array[i] == array[i + 3] && flag != true) {
+        --countColumn;
+        flag = true;
+      }
+      ++num;
+    }
     return num;
   }
-  for (size_t i = 0; i + 3 < m * n ; ++i) {
-    if (num == n) {
-      flag = false;
-      num = 0;
-    }
-    if (array[i] == array[i + 3] && flag != true) {
-      --countColumn;
-      flag = true;
-    }
-    ++num;
-  }
-  return num;
-}
 
-int MaxSumSdg(int *array, size_t m, size_t n)
-  {
-  int max_sum = std::numeric_limits< int >::min();
-  if (n * m == 0) {
-    return 0;
-  }
-  for (size_t diag = 1; diag < m; ++diag) {
-    int sum = 0;
-    size_t count = 0;
-    for (size_t i = 0; i < n; ++i) {
-      size_t j = i + diag;
-      if (j < m) {
-        sum += array[i * m + j];
-        ++count;
+  int maxSumSdg(const int *array, size_t m, size_t n)
+    {
+    int max_sum = std::numeric_limits< int >::min();
+    if (n * m == 0) {
+      return 0;
+    }
+    for (size_t diag = 1; diag < m; ++diag) {
+      int sum = 0;
+      size_t count = 0;
+      for (size_t i = 0; i < n; ++i) {
+        size_t j = i + diag;
+        if (j < m) {
+          sum += array[i * m + j];
+          ++count;
+        }
+      }
+      if (count > 0 && sum > max_sum) {
+        max_sum = sum;
       }
     }
-    if (count > 0 && sum > max_sum) {
-      max_sum = sum;
-    }
-  }
-  for (size_t diag = 1; diag < n; ++diag) {
-    int sum = 0;
-    size_t count = 0;
-    for (size_t i = 0; i < m; ++i) {
-      size_t j = i + diag;
-      if (j < n) {
-        sum += array[j * m + i];
-        ++count;
+    for (size_t diag = 1; diag < n; ++diag) {
+      int sum = 0;
+      size_t count = 0;
+      for (size_t i = 0; i < m; ++i) {
+        size_t j = i + diag;
+        if (j < n) {
+          sum += array[j * m + i];
+          ++count;
+        }
+      }
+      if (count > 0 && sum > max_sum) {
+        max_sum = sum;
       }
     }
-    if (count > 0 && sum > max_sum) {
-      max_sum = sum;
-    }
+    return max_sum;
   }
-  return max_sum;
-}
 }
 
 int main(int argc, char **argv)
@@ -104,7 +104,7 @@ int main(int argc, char **argv)
     return 2;
   }
 
-  size_t m, n;
+  size_t m = 0, n = 0;
   if (!(input >> m >> n)) {
     std::cerr << "Cannot read matrix dimension" << '\n';
     return 2;
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
     arrayPtr = stackArray;
   }
   if (num == 2) {
-    arrayPtr = reinterpret_cast<int *>(malloc(n * m * sizeof(int)));
+    arrayPtr = reinterpret_cast< int * >(malloc(n * m * sizeof(int)));
     if (arrayPtr == nullptr) {
       std::cerr << "Cannot allocate memory" << '\n';
       return 3;
@@ -145,8 +145,8 @@ int main(int argc, char **argv)
     std::cerr << "Cannot open output file" << '\n';
     return 2;
   }
-  output << karpenkov::CntColNsm(arrayPtr, m, n) << '\n';
-  output << karpenkov::MaxSumSdg(arrayPtr, m, n) << '\n';
+  output << karpenkov::cntColNsm(arrayPtr, m, n) << '\n';
+  output << karpenkov::maxSumSdg(arrayPtr, m, n) << '\n';
 
   if (num == 2) {
     free(arrayPtr);
