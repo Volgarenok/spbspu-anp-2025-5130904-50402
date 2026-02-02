@@ -79,7 +79,7 @@ char *alisov::rmvVow(const char *str, char *res)
   const char *vows = "aeiouyAEIOUY";
   size_t i = 0;
   size_t r = 0;
-  while (str[i] != '\n')
+  while (str[i] != '\0')
   {
     if (!std::strchr(vows, str[i]))
     {
@@ -96,13 +96,13 @@ char *alisov::dgtSnd(const char *str1, const char *str2, char *res)
 {
   size_t i = 0;
 
-  while (str1[i] != '\n')
+  while (str1[i] != '\0')
   {
     res[i] = str1[i];
     ++i;
   }
 
-  for (size_t k = 0; str2[k] != '\n'; ++k)
+  for (size_t k = 0; str2[k] != '\0'; ++k)
   {
     if (std::isdigit(static_cast< unsigned char >(str2[k])))
     {
