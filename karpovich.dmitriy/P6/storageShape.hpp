@@ -36,7 +36,7 @@ namespace karpovich
     size_t capacity() const noexcept;
     void shrink();
     void reserve(size_t k);
-    Shape* clone() const override;
+    StorageShape* clone() const override;
     void swap(StorageShape& other) noexcept;
 
     private:

@@ -52,7 +52,7 @@ karpovich::StorageShape& karpovich::StorageShape::operator=(StorageShape&& other
   }
   return *this;
 }
-karpovich::Shape* karpovich::StorageShape::clone() const
+karpovich::StorageShape* karpovich::StorageShape::clone() const
 {
   return new StorageShape(*this);
 }
