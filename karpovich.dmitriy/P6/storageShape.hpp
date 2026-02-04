@@ -10,7 +10,7 @@ namespace karpovich
     StorageShape(StorageShape&& other) noexcept;
     ~StorageShape();
     StorageShape& operator=(StorageShape&& other) noexcept;
-    StorageShape& operator=(const StorageShape& other) noexcept;
+    StorageShape& operator=(const StorageShape& other);
 
     double getArea() const noexcept override;
     rectangle_t getFrameRect() const noexcept override;

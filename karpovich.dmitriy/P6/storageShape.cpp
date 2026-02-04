@@ -5,7 +5,7 @@ karpovich::StorageShape::StorageShape() noexcept:
   size_(0),
   cap_(0)
 {}
-karpovich::StorageShape::StorageShape(const StorageShape& other) noexcept:
+karpovich::StorageShape::StorageShape(const StorageShape& other):
   shapes_(nullptr),
   size_(0),
   cap_(other.cap_)
