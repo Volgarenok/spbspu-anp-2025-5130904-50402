@@ -5,7 +5,7 @@ karpovich::StorageShape::StorageShape() noexcept:
   size_(0),
   cap_(0)
 {}
-karpovich::StorageShape::StorageShape(const StorageShape& other):
+karpovich::StorageShape::StorageShape(const StorageShape& other) noexcept:
   shapes_(nullptr),
   size_(0),
   cap_(other.cap_)
@@ -22,7 +22,7 @@ karpovich::StorageShape::StorageShape(const StorageShape& other):
     }
   }
 }
-karpovich::StorageShape& karpovich::StorageShape::operator=(const StorageShape& other)
+karpovich::StorageShape& karpovich::StorageShape::operator=(const StorageShape& other) noexcept
 {
   if (this != &other) {
     StorageShape temp(other);
@@ -52,7 +52,7 @@ karpovich::StorageShape& karpovich::StorageShape::operator=(StorageShape&& other
   }
   return *this;
 }
-karpovich::StorageShape* karpovich::StorageShape::clone() const
+karpovich::Shape* karpovich::StorageShape::clone() const
 {
   return new StorageShape(*this);
 }

@@ -2,14 +2,14 @@
 #include <iostream>
 #include <stdexcept>
 
-void karpovich::output(StorageShape& shapes, size_t size)
+void karpovich::output(const StorageShape& shapes, size_t size)
 {
   double total_area = 0.0;
   for (size_t i = 0; i < size; ++i) {
-    double area = shapes.get(i).getArea();
+    double area = shapes.getConst(i).getArea();
     total_area += area;
     std::cout << area << "\n";
-    outputRectangle(shapes.get(i).getFrameRect());
+    outputRectangle(shapes.getConst(i).getFrameRect());
   }
   std::cout << total_area << "\n";
   outputRectangle(shapes.getFrameRect());
