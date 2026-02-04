@@ -285,7 +285,7 @@ petrov::rectangle_t petrov::ComplexQuad::getFrameRect() const noexcept
   double min_y = points_[0].y;
   double max_y = points_[0].y;
 
-  for (int i = 1; i < 4; ++i)
+  for (size_t i = 1; i < 4; ++i)
   {
     min_x = std::min(min_x, points_[i].x);
     max_x = std::max(max_x, points_[i].x);
@@ -313,7 +313,7 @@ petrov::point_t petrov::ComplexQuad::getCenter() const noexcept
 
 void petrov::ComplexQuad::move(double dx, double dy) noexcept
 {
-  for (int i = 0; i < 4; ++i)
+  for (size_t i = 0; i < 4; ++i)
   {
     points_[i].x += dx;
     points_[i].y += dy;
@@ -324,7 +324,7 @@ void petrov::ComplexQuad::move(double dx, double dy) noexcept
 
 void petrov::ComplexQuad::doScale(double k) noexcept
 {
-  for (int i = 0; i < 4; ++i)
+  for (size_t i = 0; i < 4; ++i)
   {
     points_[i].x = center_.x + (points_[i].x - center_.x) * k;
     points_[i].y = center_.y + (points_[i].y - center_.y) * k;
