@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdexcept>
 
-void karpovich::output(StorageShape shapes, size_t size)
+void karpovich::output(StorageShape& shapes, size_t size)
 {
   double total_area = 0.0;
   for (size_t i = 0; i < size; ++i) {

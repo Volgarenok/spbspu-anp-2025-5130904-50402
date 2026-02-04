@@ -7,21 +7,17 @@ karpovich::StorageShape::StorageShape() noexcept:
 {}
 karpovich::StorageShape::StorageShape(const StorageShape& other):
   shapes_(nullptr),
-  size_(other.size_),
+  size_(0),
   cap_(other.cap_)
 {
   if (cap_ > 0) {
     shapes_ = new Shape*[cap_];
-    size_ = 0;
     try {
       for (; size_ < other.size_; ++size_) {
         shapes_[size_] = other.shapes_[size_]->clone();
       }
     } catch (const std::bad_alloc&) {
-      for (size_t i = 0; i < size_; ++i) {
-        delete shapes_[i];
-      }
-      delete[] shapes_;
+      clear();
       throw;
     }
   }
@@ -30,7 +26,7 @@ karpovich::StorageShape& karpovich::StorageShape::operator=(const StorageShape& 
 {
   if (this != &other) {
     StorageShape temp(other);
-    this->swap(temp);
+    swap(temp);
   }
   return *this;
 }
@@ -56,7 +52,7 @@ karpovich::StorageShape& karpovich::StorageShape::operator=(StorageShape&& other
   }
   return *this;
 }
-karpovich::Shape* karpovich::StorageShape::clone() const
+karpovich::StorageShape* karpovich::StorageShape::clone() const
 {
   return new StorageShape(*this);
 }

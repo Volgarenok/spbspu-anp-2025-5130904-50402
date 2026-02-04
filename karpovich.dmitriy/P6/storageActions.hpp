@@ -4,7 +4,7 @@
 
 namespace karpovich
 {
-  void output(StorageShape shapes, size_t size);
+  void output(StorageShape& shapes, size_t size);
   void scalefrompt(StorageShape& shapes, size_t size, double k, point_t pt);
 }
 #endif
