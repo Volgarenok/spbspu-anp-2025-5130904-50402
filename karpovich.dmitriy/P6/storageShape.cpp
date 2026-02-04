@@ -22,7 +22,7 @@ karpovich::StorageShape::StorageShape(const StorageShape& other):
     }
   }
 }
-karpovich::StorageShape& karpovich::StorageShape::operator=(const StorageShape& other) noexcept
+karpovich::StorageShape& karpovich::StorageShape::operator=(const StorageShape& other)
 {
   if (this != &other) {
     StorageShape temp(other);
@@ -180,7 +180,7 @@ bool karpovich::StorageShape::empty() noexcept
 {
   return !size_;
 }
-karpovich::StorageShape::~StorageShape()
+karpovich::StorageShape::~StorageShape() noexcept
 {
   clear();
 }

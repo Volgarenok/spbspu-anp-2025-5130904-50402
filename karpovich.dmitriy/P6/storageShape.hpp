@@ -6,9 +6,9 @@ namespace karpovich
   struct StorageShape final: Shape
   {
     StorageShape() noexcept;
-    StorageShape(const StorageShape& other) noexcept;
+    StorageShape(const StorageShape& other);
     StorageShape(StorageShape&& other) noexcept;
-    ~StorageShape();
+    ~StorageShape() noexcept override;
     StorageShape& operator=(StorageShape&& other) noexcept;
     StorageShape& operator=(const StorageShape& other);
 
