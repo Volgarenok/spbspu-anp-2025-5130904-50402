@@ -119,7 +119,7 @@ void alisov::expand(char **str, size_t size, size_t &cap)
 {
   char *tmp = nullptr;
   cap *= 2;
-  tmp = static_cast< char * >(malloc(cap));
+  tmp = reinterpret_cast< char * >(malloc(cap));
 
   if (tmp == nullptr)
   {
@@ -145,8 +145,8 @@ int main()
   }
   const size_t dgt_size = 5;
   char strDgt[dgt_size + 1] = "g1h2k";
-  char *res1 = static_cast< char * >(malloc(size + 1));
-  char *res2 = static_cast< char * >(malloc(size + dgt_size + 1));
+  char *res1 = reinterpret_cast< char * >(malloc(size + 1));
+  char *res2 = reinterpret_cast< char * >(malloc(size + dgt_size + 1));
   if (res1 == nullptr || res2 == nullptr)
   {
     free(str);
