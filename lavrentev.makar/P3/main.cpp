@@ -1,11 +1,10 @@
 #include <fstream>
 #include <iostream>
-#include <cstdlib>
 
 namespace lavrentev
 {
   size_t cntLocMin(const int* arr, size_t x, size_t y);
-  size_t numColLsr(const int* arr, size_t x, size_t y);
+  size_t numColLsr(const int* arr, size_t x, size_t y, int** mas);
   std::istream& inputFile(std::istream& in, int* m, size_t lng);
 }
 
@@ -82,14 +81,45 @@ int main(int argc, char** argv)
     return 2;
   }
 
+  int** mas = reinterpret_cast< int** >(malloc(y * sizeof(int*)));
+  if (mas == nullptr)
+  {
+    std::cerr << "Memory allocation fail for mas" << "\n";
+    free(arr);
+    return 3;
+  }
+
+  for (size_t i = 0; i < y; ++i)
+  {
+    mas[i] = reinterpret_cast< int* >(malloc(2 * sizeof(int)));
+    if (mas[i] == nullptr)
+    {
+      std::cerr << "Memory allocation fail for mas[" << i << "]" << "\n";
+      for (size_t j = 0; j < i; ++j)
+      {
+        free(mas[j]);
+      }
+      free(mas);
+      free(arr);
+      return 3;
+    }
+    mas[i][0] = -1;
+    mas[i][1] = 0;
+  }
+
   size_t ans2 = lavrentev::cntLocMin(matrix, x, y);
-  size_t ans11 = lavrentev::numColLsr(matrix, x, y);
+  size_t ans11 = lavrentev::numColLsr(matrix, x, y, mas);
 
   std::ofstream output(argv[3]);
 
   if (!output.is_open())
   {
     std::cerr << "Couldn't open output file" << '\n';
+    for (size_t i = 0; i < y; ++i)
+    {
+      free(mas[i]);
+    }
+    free(mas);
     free(arr);
     return 4;
   }
@@ -97,6 +127,11 @@ int main(int argc, char** argv)
   output << "Answer for var_2: " << ans2 << '\n';
   output << "Answer for var_11: " << ans11 << '\n';
 
+  for (size_t i = 0; i < y; ++i)
+  {
+    free(mas[i]);
+  }
+  free(mas);
   free(arr);
 }
 
@@ -123,12 +158,11 @@ size_t lavrentev::cntLocMin(const int* arr, size_t x, size_t y)
   return ans2;
 }
 
-size_t lavrentev::numColLsr(const int* arr, size_t x, size_t y)
+size_t lavrentev::numColLsr(const int* arr, size_t x, size_t y, int** mas)
 {
   int ans11 = 0;
   size_t total = x * y;
   int max_length = 0;
-  int mas[y][2];
 
   for (size_t i = 0; i < y; ++i)
   {
