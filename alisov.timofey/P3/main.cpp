@@ -203,8 +203,16 @@ int main(int argc, char **argv)
     }
     return 2;
   }
-
-  size_t res1 = alisov::ncl(matr, m, n);
+  size_t res1;
+  try
+  {
+    res1 = alisov::ncl(matr, m, n);
+  }
+  catch (const std::bad_alloc &)
+  {
+    delete[] matr;
+    return 0;
+  }
   int res2 = alisov::minSum(matr, m, n);
   out << "Answer for var-1: " << res1 << '\n';
   out << "Answer for var-2: " << res2 << '\n';
