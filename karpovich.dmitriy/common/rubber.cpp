@@ -40,3 +40,7 @@ void karpovich::Rubber::doScale(double k) noexcept
   radius1_ *= k;
   radius2_ *= k;
 }
+karpovich::Shape* karpovich::Rubber::clone() const
+{
+  return new Rubber(*this);
+}

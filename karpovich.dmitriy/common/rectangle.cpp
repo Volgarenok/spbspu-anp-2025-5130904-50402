@@ -27,3 +27,7 @@ void karpovich::Rectangle::doScale(double k) noexcept
   width_ *= k;
   height_ *= k;
 }
+karpovich::Shape* karpovich::Rectangle::clone() const
+{
+  return new Rectangle(*this);
+}

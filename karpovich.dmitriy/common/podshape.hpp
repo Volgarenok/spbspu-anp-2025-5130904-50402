@@ -19,6 +19,7 @@ namespace karpovich
     virtual rectangle_t getFrameRect() const noexcept = 0;
     virtual void move(point_t p) noexcept = 0;
     virtual void move(double dx, double dy) noexcept = 0;
+    virtual Shape* clone() const = 0;
     void scale(double k);
     void uncheckedScale(double k) noexcept;
     protected:

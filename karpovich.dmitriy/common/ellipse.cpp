@@ -27,3 +27,7 @@ void karpovich::Ellipse::doScale(double k) noexcept
   semiax1_ *= k;
   semiax2_ *= k;
 }
+karpovich::Shape* karpovich::Ellipse::clone() const
+{
+  return new Ellipse(*this);
+}
