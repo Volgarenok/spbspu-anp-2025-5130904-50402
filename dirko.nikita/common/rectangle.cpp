@@ -27,3 +27,8 @@ void dirko::Rectangle::scale_(double coef) noexcept
   w_ *= coef;
   h_ *= coef;
 }
+
+dirko::Shape *dirko::Rectangle::clone() const
+{
+  return new Rectangle(*this);
+}

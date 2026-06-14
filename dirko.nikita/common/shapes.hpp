@@ -12,6 +12,7 @@ namespace dirko
     rectangle_t getFrameRect() const noexcept override;
     void move(double dx, double dy) noexcept override;
     void move(point_t point) noexcept override;
+    Shape *clone() const override;
 
   private:
     double w_, h_;
@@ -30,6 +31,7 @@ namespace dirko
     rectangle_t getFrameRect() const noexcept override;
     void move(double dx, double dy) noexcept override;
     void move(point_t point) noexcept override;
+    Shape *clone() const override;
 
   private:
     point_t *pts_;
@@ -44,6 +46,7 @@ namespace dirko
     rectangle_t getFrameRect() const noexcept override;
     void move(double dx, double dy) noexcept override;
     void move(point_t point) noexcept override;
+    Shape *clone() const override;
 
   private:
     double r_;

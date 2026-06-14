@@ -26,3 +26,8 @@ void dirko::Bubble::scale_(double coef) noexcept
 {
   r_ *= coef;
 }
+
+dirko::Shape *dirko::Bubble::clone() const
+{
+  return new Bubble(*this);
+}

@@ -123,3 +123,8 @@ void dirko::Polygon::scale_(double coef) noexcept
     pts_[i].y += dy * (coef - 1);
   }
 }
+
+dirko::Shape *dirko::Polygon::clone() const
+{
+  return new Polygon(*this);
+}
