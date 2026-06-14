@@ -1,0 +1,173 @@
+#include <iostream>
+#include <iomanip>
+#include <cstring>
+
+namespace alisov
+{
+  void expand(char **str, size_t size, size_t &cap);
+  char *getline(std::istream &in, size_t &k);
+  char *rmvVow(const char *str, char *res);
+  char *dgtSnd(const char *str1, const char *str2, char *res);
+}
+
+char *alisov::getline(std::istream &in, size_t &size)
+{
+  bool is_skipws = in.flags() & std::ios_base::skipws;
+  if (is_skipws)
+  {
+    in >> std::noskipws;
+  }
+  size_t cap = 1;
+  size = 0;
+  char *str = reinterpret_cast< char * >(malloc(cap));
+  if (str == nullptr)
+  {
+    if (is_skipws)
+    {
+      in >> std::skipws;
+    }
+    return nullptr;
+  }
+  while (in)
+  {
+    if (size == cap)
+    {
+      alisov::expand(&str, size, cap);
+    }
+    if (str == nullptr)
+    {
+      if (is_skipws)
+      {
+        in >> std::skipws;
+      }
+      return nullptr;
+    }
+    in >> str[size];
+    if (!in || str[size] == '\n')
+    {
+      break;
+    }
+    size++;
+  }
+  if (size == 0 && !in)
+  {
+    free(str);
+    if (is_skipws)
+    {
+      in >> std::skipws;
+    }
+    return nullptr;
+  }
+  str[size] = '\0';
+  if (is_skipws)
+  {
+    in >> std::skipws;
+  }
+  return str;
+}
+
+char *alisov::rmvVow(const char *str, char *res)
+{
+  if (res == nullptr)
+  {
+    return nullptr;
+  }
+  if (str == nullptr)
+  {
+    return res;
+  }
+  const char *vows = "aeiouyAEIOUY";
+  size_t i = 0;
+  size_t r = 0;
+  while (str[i] != '\0')
+  {
+    if (!std::strchr(vows, str[i]))
+    {
+      res[r] = str[i];
+      r++;
+    }
+    i++;
+  }
+  res[r] = '\0';
+  return res;
+}
+
+char *alisov::dgtSnd(const char *str1, const char *str2, char *res)
+{
+  size_t i = 0;
+
+  while (str1[i] != '\0')
+  {
+    res[i] = str1[i];
+    ++i;
+  }
+
+  for (size_t k = 0; str2[k] != '\0'; ++k)
+  {
+    if (std::isdigit(static_cast< unsigned char >(str2[k])))
+    {
+      res[i] = str2[k];
+      ++i;
+    }
+  }
+
+  res[i] = '\0';
+  return res;
+}
+
+void alisov::expand(char **str, size_t size, size_t &cap)
+{
+  char *tmp = nullptr;
+  cap *= 2;
+  tmp = reinterpret_cast< char * >(malloc(cap));
+
+  if (tmp == nullptr)
+  {
+    free(*str);
+    *str = nullptr;
+    return;
+  }
+  for (size_t i = 0; i < size; ++i)
+  {
+    tmp[i] = (*str)[i];
+  }
+  free(*str);
+  *str = tmp;
+}
+int main()
+{
+  size_t size = 0;
+  char *str = alisov::getline(std::cin, size);
+  if (str == nullptr)
+  {
+    std::cerr << "Cant read line\n";
+    return 1;
+  }
+  const size_t dgt_size = 5;
+  char strDgt[dgt_size + 1] = "g1h2k";
+  char *res1 = reinterpret_cast< char * >(malloc(size + 1));
+  char *res2 = reinterpret_cast< char * >(malloc(size + dgt_size + 1));
+  if (res1 == nullptr || res2 == nullptr)
+  {
+    free(str);
+    free(res1);
+    free(res2);
+    std::cerr << "Memory error\n";
+    return 1;
+  }
+  alisov::rmvVow(str, res1);
+  alisov::dgtSnd(str, strDgt, res2);
+  if (res1 == nullptr || res2 == nullptr)
+  {
+    free(str);
+    free(res1);
+    free(res2);
+    std::cerr << "Error during conversion\n";
+    return 1;
+  }
+  std::cout << res1 << '\n';
+  std::cout << res2 << '\n';
+  free(str);
+  free(res1);
+  free(res2);
+}
